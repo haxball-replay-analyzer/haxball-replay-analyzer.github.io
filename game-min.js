@@ -4806,7 +4806,7 @@ b.ub = a.code.toLowerCase();
 return b
 };
 T.Fo = function () {
-return M.tk(/*n.Ee + 'api/geo'*/"pliki/geo.json").then(function (a) {
+return M.tk(/*n.Ee + 'api/geo'*/"https://haxball-replay-analyzer.github.io/pliki/geo.json").then(function (a) {
   return T.Rf(a)
 })
 //return false;
