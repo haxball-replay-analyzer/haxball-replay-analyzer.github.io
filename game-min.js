@@ -5390,7 +5390,7 @@ n.A.Me.Xa(a)
 return {
 }
 })  : b = Promise.resolve(null);
-return Promise.all([M.L('https://skokihaxball.000webhostapp.com/baza/res.dat', 'arraybuffer').then(function (a) {
+return Promise.all([M.L('pliki/res.dat', 'arraybuffer').then(function (a) {
 a = new JSZip(a);
 n.Na = new Ub(a);
 return Promise.all([n.Na.ro,
