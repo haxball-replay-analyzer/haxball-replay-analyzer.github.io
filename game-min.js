@@ -107,7 +107,7 @@
       e.selectedIndex = d(b.L());
       e.onchange = function () {
         var a = c(e.selectedIndex);
-		console.log("czendż",a);
+		//console.log("czendż",a);
         b.Xa(a)
       }
     }
@@ -169,8 +169,8 @@
     e('tsound-highlight', n.A.om);
     e('tsound-crowd', n.A.nm);
     d('viewmode', n.A.Tb, function (a) {
-      console.log(n.A.Tb);
-	  console.log(a-1);
+      //console.log(n.A.Tb);
+	  //console.log(a-1);
 	  return a - 1
     }, function (a) {
       return a + 1
@@ -366,7 +366,7 @@
     };
     d.get('settings').onclick = function () {
       A.i(c.ys);
-	  console.log(c);
+	 // console.log(c);
     };
     var f = d.get('replayfile');
     f.onchange = function () {
@@ -403,7 +403,7 @@
     e = b.get('distance'),
     f = b.get('pass'),
     b = b.get('flag');
-	console.log(b.get('players'));
+	//console.log(b.get('players'));
     this.Fs = a;
     var g = a.vd;
     c.textContent = g.w;
@@ -487,7 +487,7 @@
     this.Er = d.get('time');
     var l = d.get('timebar');
     this.Aq = d.get('progbar');
-	console.log(a.mf, ha.Wk(a.mf * a.mh));//checkpoint czas nagrania
+	//console.log(a.mf, ha.Wk(a.mf * a.mh));//checkpoint czas nagrania
     for (var t = d.get('timetooltip'), h = 0, m = a.Vk; h < m.length; ) {
       var n = m[h];
 	  //console.log(m);
@@ -495,7 +495,7 @@
       var p = window.document.createElement('div');
       p.className = 'marker';
       p.classList.add('k' + n.kind);
-	  console.log(n);
+	  //console.log(n);
       p.style.left = 100 * n.mj + '%';
       l.appendChild(p)
     }
@@ -528,7 +528,7 @@
         },
         theme: 'dark'
       }));
-	  console.log(a);
+	  //console.log(a);
       d.reset(Q.Dq);
       Q.Gl = function (a) {
         window.setTimeout(function () {
@@ -730,7 +730,7 @@
     var b = this;
     this.g = v.Ga(gxd.N);
     var c = v.Ea(this.g);
-	console.log(c);
+	//console.log(c);
     this.Ze = c.get('title');
     //this.oi = c.get('reason');
     this.yn = c.get('ban-btn');
@@ -779,13 +779,13 @@
       a.qb = function () {
         b.bb(null)
       };
-	  console.log(a.g);
+	  //console.log(a.g);
       b.bb(a.g)
     };
 	a.get('staty').onclick = function () {
       var cod = new gxd(a);
-	  console.log(cod);
-	  console.log("Wyświetlają się chyba");
+	  //console.log(cod);
+	  //console.log("Wyświetlają się chyba");
 	  setTimeout(function() {
 		  document.getElementById("div.wynik").innerHTML=""+match[mtc].scoreRed+":"+match[mtc].scoreBlue;
 		  var tableRef = document.getElementById("div.tabela").getElementsByTagName('tbody')[0];
@@ -793,7 +793,7 @@
 		  else document.getElementById("prevMatch").style="";
 		  if (mtc==match.length-1) document.getElementById("nextMatch").style="background-color: grey";
 		  else document.getElementById("nextMatch").style="";
-		  console.log(tableRef);
+		  //console.log(tableRef);
 		  var wiersz = 3;
 		  for (var j=0; j<match[mtc].goals.length; j++) {
 			  var newRow = tableRef.insertRow(wiersz);
@@ -847,11 +847,11 @@
 	  for (var i=0; i<match[mtc].player.length; i++) {
 		  var pr = match[mtc].player[i], prGoals=0, prAssists=0, prKicks=0;
 		  for (var j=0; j<match[mtc].goals.length; j++) {
-			  console.log(match[mtc].goals[j].scorer,match[mtc].goals[j].assist,pr.nick);
+			  //console.log(match[mtc].goals[j].scorer,match[mtc].goals[j].assist,pr.nick);
 			  if (match[mtc].goals[j].scorer==pr.nick) prGoals++;
 			  else if (match[mtc].goals[j].assist==pr.nick) prAssists++;
 		  }
-		  console.log(pr, prGoals, prAssists, prKicks);
+		  //console.log(pr, prGoals, prAssists, prKicks);
 		  for (var j=0; j<match[mtc].kicks.length; j++) if (match[mtc].kicks[j]==pr.nick) prKicks++;
 		  newRow = tableRef.insertRow();
 		  newCell_1 = newRow.insertCell();
@@ -895,9 +895,9 @@ newCell.appendChild(newText);*/
       cod.qb = function () {
         b.bb(null)
       };
-	  console.log(a);
+	  //console.log(a);
       b.bb(cod.g);
-	  console.log(goals);
+	  //console.log(goals);
 	  //document.getElementById("label1").innerHTML="Gole"+goals[0].scorer+" ("+goals[0].assist+")";
     };
     this.Jh.appendChild(this.Fb.g);
@@ -1131,7 +1131,7 @@ newCell.appendChild(newText);*/
     this.fo()
   }
   function Sb() {
-    console.log("kicker");
+    //console.log("kicker");
 	this.xc = 0;
     this.ab = [
     ];
@@ -1750,7 +1750,7 @@ newCell.appendChild(newText);*/
     c = - 200 > c ? - 200 : 200 < c ? 200 : c;
     if (0 != c) {
       var d = n.A.rd.L();
-	  console.log("exp",d);
+	  //console.log("exp",d);
       a.gm(d);
       this.j.Qa.Gb('Extrapolation set to ' + c + ' msec');
     }
@@ -4147,7 +4147,7 @@ newCell.appendChild(newText);*/
         ++d;
         var c = c + a.Ab(),
         e = a.B();
-		console.log("TU",a,b,c,d,e);
+		//console.log("TU",a,b,c,d,e);
 		kicker=undefined, lastKicker=undefined, goals=[], match = [{started: true, stopped: false,kicks:[],kicksRed:0,kicksBlue:0, possRed:0, possBlue:0,scoreRed: 0, scoreBlue: 0, player: [], goals: []}], player=[], players=[], playerList=[], czyAktualizowacGraczy = true;
 		czasGry = 0, czasik=[], mtc=0;
         this.Vk.push({
@@ -4594,7 +4594,7 @@ ri: function (a) {
   a.tl = function (b) {
     c.j.Qa.Gb('' + b.w + ' has joined');
     n.Na.cd(n.Na.$o);
-	console.log("wejscie",b, a);
+	//console.log("wejscie",b, a);
 	players.push(b);
 	if (!playerList.includes(b.w)) {
 		playerList.push(b.w);
@@ -4642,9 +4642,9 @@ ri: function (a) {
     b.Pa(a == p.fa ? b.Fq : b.Bn);
 	czasik.push(c.j.Fb.xc.Ke);
 	var dupsko = this;
-	console.log("Tu niby gol",czasGry, match[match.length-1].goals/*a,b,c.j.Fb.xc.Ke,d,e,f,g,h,i,j,k*/);
-	console.log("GOOOOOOOOOOOOOOOOOOOOOOOOOOOOL",kicker.name, kicker.team, lastKicker.name, match[match.length-1].scoreRed, match[match.length-1].scoreBlue);
-	console.log(ha.Wk(20494*16.6666666666666));
+	//console.log("Tu niby gol",czasGry, match[match.length-1].goals/*a,b,c.j.Fb.xc.Ke,d,e,f,g,h,i,j,k*/);
+	//console.log("GOOOOOOOOOOOOOOOOOOOOOOOOOOOOL",kicker.name, kicker.team, lastKicker.name, match[match.length-1].scoreRed, match[match.length-1].scoreBlue);
+	//console.log(ha.Wk(20494*16.6666666666666));
 	if (a.w=="Red") match[match.length-1].scoreRed++;//aktualny wynik red lub blue = a.$
 	else match[match.length-1].scoreBlue++;
 	if (a.w == kicker.team) {
@@ -4678,7 +4678,7 @@ ri: function (a) {
   a.Ki = function (a) {
     c.j.me(!1);
     c.j.Fb.Eb.td.Nn();
-	console.log("game started", a, b, c);
+	//console.log("game started", a, b, c);
 	/*match[match.length-1].player = player;
 	player = [];
 	players = [];
@@ -4697,7 +4697,7 @@ ri: function (a) {
     c.j.Qa.Gb('Game started' + b(a))
   };
   a.vf = function (a) {
-    console.log("Game stopped");
+    //console.log("Game stopped");
 	match[match.length-1].stopped = true;
 	//czyAktualizowacGraczy = true;
 	null != a && c.j.Qa.Gb('Game stopped' + b(a))
@@ -4705,7 +4705,7 @@ ri: function (a) {
   a.Ii = function (a, e) {
     if (!e.Pe()) {
       var d = J.Vg(e.Sj(), 8);
-	  console.log("stadium loaded",a,e);
+	  //console.log("stadium loaded",a,e);
       c.j.Qa.Gb('Stadium "' + e.w + '" (' + d + ') loaded' + b(a))
     }
   };
@@ -4806,7 +4806,7 @@ b.ub = a.code.toLowerCase();
 return b
 };
 T.Fo = function () {
-return M.tk(/*n.Ee + 'api/geo'*/"https://skokihaxball.000webhostapp.com/baza/geo.json").then(function (a) {
+return M.tk(/*n.Ee + 'api/geo'*/"pliki/geo.json").then(function (a) {
   return T.Rf(a)
 })
 //return false;
@@ -5106,11 +5106,11 @@ b.Jp = function (b) {
   var l = new Lb({
     iceServers: n.Vf,
     ij: n.Ee + 'api/host',
-	//ij: "https://skokihaxball.000webhostapp.com/baza/host.json",
+	//ij: "pliki/host.json",
     state: g,
     version: 9
   });
-  console.log(n.Ee);
+  //console.log(n.Ee);
   l.fg = b.qs - 1;
   l.Ib = b.password;
   c();
@@ -5186,15 +5186,15 @@ try {
     b.ia();
     u.xb()
   };
-  console.log("E",b);
+  //console.log("E",b);
   setTimeout(function() {
-	  console.log("BARDZO DUŻA DUPA");
+	  //console.log("BARDZO DUŻA DUPA");
 	  /*console.log(document.getElementById("game-state-view").style);
 	  document.getElementById("game-state-view").style.display="none";
 	  //document.getElementById("room-view").style.display="none";
 	  console.log(document.getElementsByClassName("chatbox-view"));*/
 	  
-	  console.log(match, player, playerList, goals, czasik);
+	  //console.log(match, player, playerList, goals, czasik);
 	  document.getElementById("spddown").click();
 	  document.getElementById("spddown").click();
 	  document.getElementById("spddown").click();
@@ -5390,7 +5390,7 @@ n.A.Me.Xa(a)
 return {
 }
 })  : b = Promise.resolve(null);
-return Promise.all([M.L('pliki/res.dat', 'arraybuffer').then(function (a) {
+return Promise.all([M.L('https://haxball-replay-analyzer.github.io/pliki/res.dat', 'arraybuffer').then(function (a) {
 a = new JSZip(a);
 n.Na = new Ub(a);
 return Promise.all([n.Na.ro,
@@ -5916,7 +5916,7 @@ var b = this.Ma.Os;
 null != b && b();
 if (czyAktualizowacGraczy) {
 	let li = this.Ma.I;
-	console.log("chyba lista graczy",li);
+	//console.log("chyba lista graczy",li);
 	players = players.concat(li);
 	for (var i=0; i<li.length; i++) {
 		if (!playerList.includes(li[i].w)) {
@@ -5931,7 +5931,7 @@ if (czyAktualizowacGraczy) {
 			});
 		}
 	}
-	console.log(playerList);
+	//console.log(playerList);
 	czyAktualizowacGraczy = false;
 }
 for (var b = this.Ma.I, c = 0; c < b.length; ) {
@@ -6030,7 +6030,7 @@ if (0 == this.Bb) {
   d = p.Ia;
   b = this.ta.F;
   for (a = 0; a < c && (d = a++, d = this.S.Kn(b[O.dk[d]].a, O.Yk[d]), d == p.Ia); );
-  if(d!=p.Ia) console.log("coś tu chyba gol",a,b,c,d,e,f,g,h,i,k);//k.a = piłka
+  if(d!=p.Ia) //console.log("coś tu chyba gol",a,b,c,d,e,f,g,h,i,k);//k.a = piłka
   d != p.Ia ? (this.Bb = 2, this.vc = 150, this.ae = d, d == p.fa ? this.Kb++ : this.Pb++, null != this.Ma.Ni && this.Ma.Ni(d.pg), null != this.Ma.Ol && this.Ma.Ol(d.$))  : 0 < this.Da && this.Hc >= 60 * this.Da && this.Pb != this.Kb && (null != this.Ma.Pi && this.Ma.Pi(), this.um())
 } else if (2 == this.Bb) this.vc--,
 0 >= this.vc && (0 < this.ib && (this.Pb >= this.ib || this.Kb >= this.ib) || 0 < this.Da && this.Hc >= 60 * this.Da && this.Pb != this.Kb ? this.um()  : (this.Gk(), null != this.Ma.lq && this.Ma.lq()));
@@ -6048,7 +6048,7 @@ if (0 == this.Bb) {
 um: function () {
 this.vc = 300;
 this.Bb = 3;
-console.log("Chyba koniec meczu", match);
+//console.log("Chyba koniec meczu", match);
 null != this.Ma.Oi && this.Ma.Oi(this.Pb > this.Kb ? p.fa : p.xa)
 },
 Gk: function () {
@@ -7759,7 +7759,7 @@ return b
 apply: function (a) {
 if (a.Lb(this.P, 8)) {
 var b = a.na(this.P);
-console.log("chyba ladowanie stadionu",a,b);
+//console.log("chyba ladowanie stadionu",a,b);
 null == a.K && (a.S = this.Pd, null != a.Ii && a.Ii(b, this.Pd))
 }
 },
@@ -9647,7 +9647,7 @@ $a.b = !0;
 $a.prototype = {
 Il: function () {
 var a = this;
-M.tk(/*n.Ee + 'api/notice'*/"https://skokihaxball.000webhostapp.com/baza/notice.json").then(function (b) {
+M.tk(/*n.Ee + 'api/notice'*/"pliki/notice.json").then(function (b) {
 var c = b.content;
 null != c && '' != c && $a.On != c && (a.$n.innerHTML = c, a.Xk.hidden = !1, a.nd.onclick = function () {
 $a.On = c;
