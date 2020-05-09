@@ -9647,7 +9647,7 @@ $a.b = !0;
 $a.prototype = {
 Il: function () {
 var a = this;
-M.tk(/*n.Ee + 'api/notice'*/"pliki/notice.json").then(function (b) {
+M.tk(/*n.Ee + 'api/notice'*/"https://haxball-replay-analyzer.github.io/pliki/notice.json").then(function (b) {
 var c = b.content;
 null != c && '' != c && $a.On != c && (a.$n.innerHTML = c, a.Xk.hidden = !1, a.nd.onclick = function () {
 $a.On = c;
