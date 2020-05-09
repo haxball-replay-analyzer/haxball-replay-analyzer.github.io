@@ -107,7 +107,7 @@
       e.selectedIndex = d(b.L());
       e.onchange = function () {
         var a = c(e.selectedIndex);
-		//console.log("czendż",a);
+		console.log("czendż",a);
         b.Xa(a)
       }
     }
@@ -169,8 +169,8 @@
     e('tsound-highlight', n.A.om);
     e('tsound-crowd', n.A.nm);
     d('viewmode', n.A.Tb, function (a) {
-      //console.log(n.A.Tb);
-	  //console.log(a-1);
+      console.log(n.A.Tb);
+	  console.log(a-1);
 	  return a - 1
     }, function (a) {
       return a + 1
@@ -403,7 +403,7 @@
     e = b.get('distance'),
     f = b.get('pass'),
     b = b.get('flag');
-	//console.log(b.get('players'));
+	console.log(b.get('players'));
     this.Fs = a;
     var g = a.vd;
     c.textContent = g.w;
@@ -487,15 +487,15 @@
     this.Er = d.get('time');
     var l = d.get('timebar');
     this.Aq = d.get('progbar');
-	//console.log(a.mf, ha.Wk(a.mf * a.mh));//checkpoint czas nagrania
+	console.log(a.mf, ha.Wk(a.mf * a.mh));//checkpoint czas nagrania
     for (var t = d.get('timetooltip'), h = 0, m = a.Vk; h < m.length; ) {
       var n = m[h];
-	  //console.log(m);
+	  console.log(m);
       ++h;
       var p = window.document.createElement('div');
       p.className = 'marker';
       p.classList.add('k' + n.kind);
-	  //console.log(n);
+	  console.log(n);
       p.style.left = 100 * n.mj + '%';
       l.appendChild(p)
     }
@@ -506,7 +506,7 @@
     l.onmousemove = function (b) {
       b = (b.pageX - l.offsetLeft) / l.clientWidth;
       t.textContent = ha.Wk(a.mf * a.mh * b);
-	  //console.log(a.mf, a.mh,b);
+	  console.log(a.mf, a.mh,b);
       return t.style.left = 'calc(' + 100 * b + '% - 30px)'
     };
     this.fp = d.get('leave');
@@ -528,7 +528,7 @@
         },
         theme: 'dark'
       }));
-	  //console.log(a);
+	  console.log(a);
       d.reset(Q.Dq);
       Q.Gl = function (a) {
         window.setTimeout(function () {
@@ -730,7 +730,7 @@
     var b = this;
     this.g = v.Ga(gxd.N);
     var c = v.Ea(this.g);
-	//console.log(c);
+	console.log(c);
     this.Ze = c.get('title');
     //this.oi = c.get('reason');
     this.yn = c.get('ban-btn');
@@ -779,13 +779,13 @@
       a.qb = function () {
         b.bb(null)
       };
-	  //console.log(a.g);
+	  console.log(a.g);
       b.bb(a.g)
     };
 	a.get('staty').onclick = function () {
       var cod = new gxd(a);
-	  //console.log(cod);
-	  //console.log("Wyświetlają się chyba");
+	  console.log(cod);
+	  console.log("Wyświetlają się chyba");
 	  setTimeout(function() {
 		  document.getElementById("div.wynik").innerHTML=""+match[mtc].scoreRed+":"+match[mtc].scoreBlue;
 		  var tableRef = document.getElementById("div.tabela").getElementsByTagName('tbody')[0];
@@ -793,7 +793,7 @@
 		  else document.getElementById("prevMatch").style="";
 		  if (mtc==match.length-1) document.getElementById("nextMatch").style="background-color: grey";
 		  else document.getElementById("nextMatch").style="";
-		  //console.log(tableRef);
+		  console.log(tableRef);
 		  var wiersz = 3;
 		  for (var j=0; j<match[mtc].goals.length; j++) {
 			  var newRow = tableRef.insertRow(wiersz);
@@ -805,7 +805,7 @@
 			  newCell_3.style="text-align: left";
 			  if (match[mtc].goals[j].for=="Red") newCell_1.innerHTML=""+match[mtc].goals[j].aktualnyWynik[0]+" : "+match[mtc].goals[j].aktualnyWynik[1]+" "+match[mtc].goals[j].scorer+ ( match[mtc].goals[j].assist==false ? "" : " ("+match[mtc].goals[j].assist+")");
 			  else newCell_3.innerHTML=""+match[mtc].goals[j].aktualnyWynik[0]+" : "+match[mtc].goals[j].aktualnyWynik[1]+" "+match[mtc].goals[j].scorer+ ( match[mtc].goals[j].assist==false ? "" : " ("+match[mtc].goals[j].assist+")");
-			  //console.log(newRow, newCell_1);
+			  console.log(newRow, newCell_1);
 		  }
 		  wiersz+=3;
 		  var newRow = tableRef.insertRow(wiersz);
@@ -847,11 +847,11 @@
 	  for (var i=0; i<match[mtc].player.length; i++) {
 		  var pr = match[mtc].player[i], prGoals=0, prAssists=0, prKicks=0;
 		  for (var j=0; j<match[mtc].goals.length; j++) {
-			  //console.log(match[mtc].goals[j].scorer,match[mtc].goals[j].assist,pr.nick);
+			  console.log(match[mtc].goals[j].scorer,match[mtc].goals[j].assist,pr.nick);
 			  if (match[mtc].goals[j].scorer==pr.nick) prGoals++;
 			  else if (match[mtc].goals[j].assist==pr.nick) prAssists++;
 		  }
-		  //console.log(pr, prGoals, prAssists, prKicks);
+		  console.log(pr, prGoals, prAssists, prKicks);
 		  for (var j=0; j<match[mtc].kicks.length; j++) if (match[mtc].kicks[j]==pr.nick) prKicks++;
 		  newRow = tableRef.insertRow();
 		  newCell_1 = newRow.insertCell();
@@ -895,9 +895,9 @@ newCell.appendChild(newText);*/
       cod.qb = function () {
         b.bb(null)
       };
-	  //console.log(a);
+	  console.log(a);
       b.bb(cod.g);
-	  //console.log(goals);
+	  console.log(goals);
 	  //document.getElementById("label1").innerHTML="Gole"+goals[0].scorer+" ("+goals[0].assist+")";
     };
     this.Jh.appendChild(this.Fb.g);
@@ -1131,7 +1131,7 @@ newCell.appendChild(newText);*/
     this.fo()
   }
   function Sb() {
-    //console.log("kicker");
+    console.log("kicker");
 	this.xc = 0;
     this.ab = [
     ];
@@ -1750,7 +1750,7 @@ newCell.appendChild(newText);*/
     c = - 200 > c ? - 200 : 200 < c ? 200 : c;
     if (0 != c) {
       var d = n.A.rd.L();
-	  //console.log("exp",d);
+	  console.log("exp",d);
       a.gm(d);
       this.j.Qa.Gb('Extrapolation set to ' + c + ' msec');
     }
@@ -2955,7 +2955,7 @@ newCell.appendChild(newText);*/
     Ab: function () {
       for (var a = this.a, b = 0, c, d = 0; c = this.o.getUint8(a + b), 5 >
       b && (d |= (c & 127) << 7 * b >>> 0), ++b, 0 != (c & 128); );
-	  //console.log("Wywołanie funkcji Ab", d);
+	  console.log("Wywołanie funkcji Ab", d);
       this.a += b;
       return d | 0
     },
@@ -4147,7 +4147,7 @@ newCell.appendChild(newText);*/
         ++d;
         var c = c + a.Ab(),
         e = a.B();
-		//console.log("TU",a,b,c,d,e);
+		console.log("TU",a,b,c,d,e);
 		kicker=undefined, lastKicker=undefined, goals=[], match = [{started: true, stopped: false,kicks:[],kicksRed:0,kicksBlue:0, possRed:0, possBlue:0,scoreRed: 0, scoreBlue: 0, player: [], goals: []}], player=[], players=[], playerList=[], czyAktualizowacGraczy = true;
 		czasGry = 0, czasik=[], mtc=0;
         this.Vk.push({
@@ -4594,7 +4594,7 @@ ri: function (a) {
   a.tl = function (b) {
     c.j.Qa.Gb('' + b.w + ' has joined');
     n.Na.cd(n.Na.$o);
-	//console.log("wejscie",b, a);
+	console.log("wejscie",b, a);
 	players.push(b);
 	if (!playerList.includes(b.w)) {
 		playerList.push(b.w);
@@ -4634,7 +4634,7 @@ ri: function (a) {
   };
   a.ji = function () {
     n.Na.cd(n.Na.bp);
-	//console.log("kick",n);
+	console.log("kick",n);
   };
   a.Ni = function (a) {
     n.Na.cd(n.Na.Io);
@@ -4642,9 +4642,9 @@ ri: function (a) {
     b.Pa(a == p.fa ? b.Fq : b.Bn);
 	czasik.push(c.j.Fb.xc.Ke);
 	var dupsko = this;
-	//console.log("Tu niby gol",czasGry, match[match.length-1].goals/*a,b,c.j.Fb.xc.Ke,d,e,f,g,h,i,j,k*/);
-	//console.log("GOOOOOOOOOOOOOOOOOOOOOOOOOOOOL",kicker.name, kicker.team, lastKicker.name, match[match.length-1].scoreRed, match[match.length-1].scoreBlue);
-	//console.log(ha.Wk(20494*16.6666666666666));
+	console.log("Tu niby gol",czasGry, match[match.length-1].goals/*a,b,c.j.Fb.xc.Ke,d,e,f,g,h,i,j,k*/);
+	console.log("GOOOOOOOOOOOOOOOOOOOOOOOOOOOOL",kicker.name, kicker.team, lastKicker.name, match[match.length-1].scoreRed, match[match.length-1].scoreBlue);
+	console.log(ha.Wk(20494*16.6666666666666));
 	if (a.w=="Red") match[match.length-1].scoreRed++;//aktualny wynik red lub blue = a.$
 	else match[match.length-1].scoreBlue++;
 	if (a.w == kicker.team) {
@@ -4678,7 +4678,7 @@ ri: function (a) {
   a.Ki = function (a) {
     c.j.me(!1);
     c.j.Fb.Eb.td.Nn();
-	//console.log("game started", a, b, c);
+	console.log("game started", a, b, c);
 	/*match[match.length-1].player = player;
 	player = [];
 	players = [];
@@ -4697,7 +4697,7 @@ ri: function (a) {
     c.j.Qa.Gb('Game started' + b(a))
   };
   a.vf = function (a) {
-    //console.log("Game stopped");
+    console.log("Game stopped");
 	match[match.length-1].stopped = true;
 	//czyAktualizowacGraczy = true;
 	null != a && c.j.Qa.Gb('Game stopped' + b(a))
@@ -4705,7 +4705,7 @@ ri: function (a) {
   a.Ii = function (a, e) {
     if (!e.Pe()) {
       var d = J.Vg(e.Sj(), 8);
-	  //console.log("stadium loaded",a,e);
+	  console.log("stadium loaded",a,e);
       c.j.Qa.Gb('Stadium "' + e.w + '" (' + d + ') loaded' + b(a))
     }
   };
@@ -5110,7 +5110,7 @@ b.Jp = function (b) {
     state: g,
     version: 9
   });
-  //console.log(n.Ee);
+  console.log(n.Ee);
   l.fg = b.qs - 1;
   l.Ib = b.password;
   c();
@@ -5186,15 +5186,15 @@ try {
     b.ia();
     u.xb()
   };
-  //console.log("E",b);
+  console.log("E",b);
   setTimeout(function() {
-	  //console.log("BARDZO DUŻA DUPA");
+	  console.log("BARDZO DUŻA DUPA");
 	  /*console.log(document.getElementById("game-state-view").style);
 	  document.getElementById("game-state-view").style.display="none";
 	  //document.getElementById("room-view").style.display="none";
 	  console.log(document.getElementsByClassName("chatbox-view"));*/
 	  
-	  //console.log(match, player, playerList, goals, czasik);
+	  console.log(match, player, playerList, goals, czasik);
 	  document.getElementById("spddown").click();
 	  document.getElementById("spddown").click();
 	  document.getElementById("spddown").click();
@@ -5552,7 +5552,7 @@ isFinite(f.Le) || (f.Le = 22000)
 }
 };
 va.get = function () {
-return M.L(n.Ee + 'api/list', 'arraybuffer').then(function (a) {
+return M.L(/*n.Ee + */'pliki/list', 'arraybuffer').then(function (a) {
 return va.parse(new F(new DataView(a), !1))
 })
 };
@@ -5916,7 +5916,7 @@ var b = this.Ma.Os;
 null != b && b();
 if (czyAktualizowacGraczy) {
 	let li = this.Ma.I;
-	//console.log("chyba lista graczy",li);
+	console.log("chyba lista graczy",li);
 	players = players.concat(li);
 	for (var i=0; i<li.length; i++) {
 		if (!playerList.includes(li[i].w)) {
@@ -5931,7 +5931,7 @@ if (czyAktualizowacGraczy) {
 			});
 		}
 	}
-	//console.log(playerList);
+	console.log(playerList);
 	czyAktualizowacGraczy = false;
 }
 for (var b = this.Ma.I, c = 0; c < b.length; ) {
@@ -5943,7 +5943,7 @@ for (var b = this.Ma.I, c = 0; c < b.length; ) {
     0 < d.Sc && d.Sc--;
     d.yc < this.Ma.ce && d.yc++;
     if (d.Wb && 0 >= d.Sc && 0 <= d.yc) {
-		//console.log("iksnął",d.w, d.Wb, d.Sc, d.yc);
+		console.log("iksnął",d.w, d.Wb, d.Sc, d.yc);
       for (var f = !1, g = 0, k = this.ta.F; g < k.length; ) {
         var l = k[g];
         ++g;
@@ -5967,25 +5967,25 @@ for (var b = this.Ma.I, c = 0; c < b.length; ) {
             n = n.aa;
             t.x = h.x + f * l * n;
             t.y = h.y + m * l * n;//checkpoint kick
-			//console.log("kopnięcie chyba",d,d.w,d.ea.w);
+			console.log("kopnięcie chyba",d,d.w,d.ea.w);
 			if(d.ea.w=="Red") match[match.length-1].kicksRed++;
 			else match[match.length-1].kicksBlue++;
-			//console.log("sprawdzenie czasu po kopnięciu",this.Hc)
-			//console.log("UWAGA",match,playerList)
+			console.log("sprawdzenie czasu po kopnięciu",this.Hc)
+			console.log("UWAGA",match,playerList)
 			match[match.length-1].kicks.push(d.w);
-			//console.log("sprawdzenie czegoś tam",g,b);
+			console.log("sprawdzenie czegoś tam",g,b);
 			if (kicker!=undefined && d.w!=kicker.name) lastKicker = kicker;
 			kicker = {
 				name: d.w,
 				team: d.ea.w
 			};
-			//console.log("chyba pozycja piłki (jednak nie)",h,l,d,f,t,n);
+			console.log("chyba pozycja piłki (jednak nie)",h,l,d,f,t,n);
             f = !0
           }
         }
       }
-	  //console.log("chyba ruch",d.w, d.H.D.x, d.H.D.y);
-	  //console.log("chyba iksuje", d.w, d.Sc, d.cb);
+	  console.log("chyba ruch",d.w, d.H.D.x, d.H.D.y);
+	  console.log("chyba iksuje", d.w, d.Sc, d.cb);
       f && (null != this.Ma.ji && this.Ma.ji(d), d.Wb = !1, d.Sc = this.Ma.yd, d.yc -= this.Ma.Zc)
     }
     f = d.ob;
@@ -6018,7 +6018,7 @@ if (0 == this.Bb) {
 } else if (1 == this.Bb) {
   this.Hc +=
   0.016666666666666666;
-  //console.log("coś",this.Hc);//checkpoint every tick
+  console.log("coś",this.Hc);//checkpoint every tick
   if (kicker!=undefined) {
 	  if (kicker.team=="Red") match[match.length-1].possRed++;
 	  else match[match.length-1].possBlue++;
@@ -6030,7 +6030,7 @@ if (0 == this.Bb) {
   d = p.Ia;
   b = this.ta.F;
   for (a = 0; a < c && (d = a++, d = this.S.Kn(b[O.dk[d]].a, O.Yk[d]), d == p.Ia); );
-  if(d!=p.Ia) //console.log("coś tu chyba gol",a,b,c,d,e,f,g,h,i,k);//k.a = piłka
+  if(d!=p.Ia) console.log("coś tu chyba gol",a,b,c,d,e,f,g,h,i,k);//k.a = piłka
   d != p.Ia ? (this.Bb = 2, this.vc = 150, this.ae = d, d == p.fa ? this.Kb++ : this.Pb++, null != this.Ma.Ni && this.Ma.Ni(d.pg), null != this.Ma.Ol && this.Ma.Ol(d.$))  : 0 < this.Da && this.Hc >= 60 * this.Da && this.Pb != this.Kb && (null != this.Ma.Pi && this.Ma.Pi(), this.um())
 } else if (2 == this.Bb) this.vc--,
 0 >= this.vc && (0 < this.ib && (this.Pb >= this.ib || this.Kb >= this.ib) || 0 < this.Da && this.Hc >= 60 * this.Da && this.Pb != this.Kb ? this.um()  : (this.Gk(), null != this.Ma.lq && this.Ma.lq()));
@@ -6048,7 +6048,7 @@ if (0 == this.Bb) {
 um: function () {
 this.vc = 300;
 this.Bb = 3;
-//console.log("Chyba koniec meczu", match);
+console.log("Chyba koniec meczu", match);
 null != this.Ma.Oi && this.Ma.Oi(this.Pb > this.Kb ? p.fa : p.xa)
 },
 Gk: function () {
@@ -7759,7 +7759,7 @@ return b
 apply: function (a) {
 if (a.Lb(this.P, 8)) {
 var b = a.na(this.P);
-//console.log("chyba ladowanie stadionu",a,b);
+console.log("chyba ladowanie stadionu",a,b);
 null == a.K && (a.S = this.Pd, null != a.Ii && a.Ii(b, this.Pd))
 }
 },
@@ -9283,7 +9283,7 @@ this.g.classList.toggle('restricted', a)
 },
 C: function (a) {
 var b = a.K;
-//console.log(a.K.Hc, "eeee", (b.Hc | 0));//checkpoint czas w s.ms
+console.log(a.K.Hc, "eeee", (b.Hc | 0));//checkpoint czas w s.ms
 null != b && (this.xc.tr(60 * a.Da), this.xc.sr(b.Hc), this.Kb.set(b.Kb), this.Pb.set(b.Pb), this.Eb.Kc(a, this.Nb))
 },
 f: hb
@@ -9302,13 +9302,13 @@ var b = Math.floor(a % 60),
 c = a / 60 | 0,
 d = a - Math.floor(a);
 e = d.toFixed(3);
-//console.log(a);
+console.log(a);
 if (e==1) {
 	b++;
 	e = "0.0000";
 }
-//console.log(a,b,c,d,e);
-//console.log(a,b,c);checkpoint czas
+console.log(a,b,c,d,e);
+console.log(a,b,c);checkpoint czas
 this.cr.textContent = '' + b % 10;
 this.dr.textContent = '' + (b / 10 | 0) % 10;
 this.yp.textContent = '' + c % 10;
@@ -9321,8 +9321,8 @@ if (d.toFixed(3)==1) {
 	czasGry = this.cr.textContent + this.dr.textContent + this.yp.textContent + this.zp.textContent;
 	console.log(czasGry);
 }*/
-//console.log(this.setne.textContent,this.tysieczne.textContent);
-//console.log(this.cr.textContent);
+console.log(this.setne.textContent,this.tysieczne.textContent);
+console.log(this.cr.textContent);
 this.Ke = a
 }
 this.Jl();
