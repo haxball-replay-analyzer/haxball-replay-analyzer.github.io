@@ -1,6 +1,9 @@
 (function (qc) {
   var kicker, lastKicker, goals=[], match = [{started: true, stopped: false,kicks:[],kicksRed:0,kicksBlue:0, possRed:0, possBlue:0,scoreRed: 0, scoreBlue: 0, player: [], goals: []}], player=[], players=[], playerList=[], czyAktualizowacGraczy = true;
   var czasGry = 0, czasik=[], mtc=0, playSounds = false;
+  document.onload = function() {
+	  console.log("załadowano");
+  };
   function hc() {
   }
   function r() {
