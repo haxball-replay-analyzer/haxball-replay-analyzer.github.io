@@ -9308,7 +9308,7 @@ if (e==1) {
 	e = "0.0000";
 }
 console.log(a,b,c,d,e);
-console.log(a,b,c);checkpoint czas
+console.log(a,b,c);//checkpoint czas
 this.cr.textContent = '' + b % 10;
 this.dr.textContent = '' + (b / 10 | 0) % 10;
 this.yp.textContent = '' + c % 10;
