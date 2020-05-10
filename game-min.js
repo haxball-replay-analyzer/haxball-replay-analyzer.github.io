@@ -5,9 +5,10 @@
 	  console.log("łado");
   }
   setTimeout(function() {
-	  console.log("eeeee");
+	  console.log("ffff");
 	  document.getElementById("button_ok").disabled = false;
 	  console.log(document.getElementById("button_ok"));
+	  document.getElementById("button_ok").click();
   }, 5000);
   function hc() {
   }
