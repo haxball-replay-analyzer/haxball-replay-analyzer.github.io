@@ -5,7 +5,7 @@
 	  console.log("łado");
   }
   setTimeout(function() {
-	  console.log("ffff");
+	  console.log("aaa");
 	  document.getElementById("button_ok").disabled = false;
 	  console.log(document.getElementById("button_ok"));
 	  document.getElementById("button_ok").click();
