@@ -317,6 +317,7 @@
     var b = v.Ea(this.g);
     this.Cb = b.get('input');
     this.af = b.get('ok');
+	console.log(this.af);
     b.get('cancel').onclick = function () {
       null != a.Va && a.Va(null)
     };
@@ -328,7 +329,8 @@
       13 == b.keyCode && a.Dc() && null != a.Va && a.Va(a.Cb.value)
     };
     this.af.onclick = function () {
-      a.Dc() && null != a.Va && a.Va(a.Cb.value)
+      console.log("się klika");
+	  a.Dc() && null != a.Va && a.Va(a.Cb.value)
     };
     this.C()
   }
