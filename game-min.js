@@ -1,9 +1,14 @@
 (function (qc) {
   var kicker, lastKicker, goals=[], match = [{started: true, stopped: false,kicks:[],kicksRed:0,kicksBlue:0, possRed:0, possBlue:0,scoreRed: 0, scoreBlue: 0, player: [], goals: []}], player=[], players=[], playerList=[], czyAktualizowacGraczy = true;
   var czasGry = 0, czasik=[], mtc=0, playSounds = false;
-  document.onload = function() {
-	  console.log("załadowano");
-  };
+  function dupa() {
+	  console.log("łado");
+  }
+  setTimeout(function() {
+	  console.log("eeeee");
+	  document.getElementById("button_ok").disabled = false;
+	  console.log(document.getElementById("button_ok"));
+  }, 5000);
   function hc() {
   }
   function r() {
