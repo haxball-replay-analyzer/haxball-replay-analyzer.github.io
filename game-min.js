@@ -4,12 +4,12 @@
   function dupa() {
 	  console.log("łado");
   }
-  setTimeout(function() {
+  /*setTimeout(function() {
 	  console.log("aaa");
 	  document.getElementById("button_ok").disabled = false;
 	  console.log(document.getElementById("button_ok"));
 	  //document.getElementById("button_ok").click();
-  }, 5000);
+  }, 5000);*/
   function hc() {
   }
   function r() {
@@ -4326,7 +4326,7 @@ newCell.appendChild(newText);*/
     }
     return d
   }; Hb.L = function () {
-    console.log(window.top.location);
+    //console.log(window.top.location);
 	return Hb.gf("")
   }; ub.b = !0; ub.cq = function (a) {
     if (3 > a.length) throw new q('Not enough arguments');
@@ -4676,7 +4676,7 @@ ri: function (a) {
 	if (a.w == kicker.team) {
 		match[match.length-1].goals.push({scorer: kicker.name, aktualnyWynik: [match[match.length-1].scoreRed,match[match.length-1].scoreBlue]});
 		match[match.length-1].player[playerList.indexOf(kicker.name)].goals++;
-		if (a.w == lastKicker.team) {
+		if (lastKicker!= undefined && a.w == lastKicker.team) {
 			match[match.length-1].goals[match[match.length-1].goals.length-1].assist = lastKicker.name;
 			match[match.length-1].player[playerList.indexOf(lastKicker.name)].assists++;
 		} else {
@@ -9658,7 +9658,7 @@ c += l.I;
 }
 }
 //document.getElementById("div_list").style.display="none";
-this.cs.textContent = '' + c + ' players in ' + d + ' rooms';
+//this.cs.textContent = '' + c + ' players in ' + d + ' rooms';
 this.Bs.update()
 },
 en: function (a) {
