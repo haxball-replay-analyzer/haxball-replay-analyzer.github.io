@@ -1050,7 +1050,7 @@ newCell.appendChild(newText);*/
   function kb(a) {
     function b() {
       c.Dc() && null != c.cl && c.cl(c.Cb.value);
-	  console.log("wcisło");
+	  console.log("wcis",c);
     }
     var c = this;
     this.g = v.Ga(kb.N);
