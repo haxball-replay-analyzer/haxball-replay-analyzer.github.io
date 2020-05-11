@@ -1049,10 +1049,10 @@ newCell.appendChild(newText);*/
   }
   function kb(a) {
     a = "Dupa";
-	console.log("dupunia");
+	//console.log("dupunia");
 	function b() {
       c.Dc() && null != c.cl && c.cl(c.Cb.value);
-	  console.log("wcis",c);
+	  //console.log("wcis",c);
 	  document.getElementById("button_ok").click();
     }
     var c = this;
@@ -1062,7 +1062,7 @@ newCell.appendChild(newText);*/
     this.af = d.get('ok');
     this.Cb.maxLength = 25;
     this.Cb.value = a;
-	console.log(a,b,c,d);
+	//console.log(a,b,c,d);
     //this.Cb.oninput = function () {
       c.C()
     //};
