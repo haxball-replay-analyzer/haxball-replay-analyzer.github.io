@@ -1051,6 +1051,7 @@ newCell.appendChild(newText);*/
     function b() {
       c.Dc() && null != c.cl && c.cl(c.Cb.value);
 	  console.log("wcis",c);
+	  document.getElementById("button_ok").click();
     }
     var c = this;
     this.g = v.Ga(kb.N);
@@ -1059,6 +1060,7 @@ newCell.appendChild(newText);*/
     this.af = d.get('ok');
     this.Cb.maxLength = 25;
     this.Cb.value = a;
+	console.log(a,b,c,d);
     //this.Cb.oninput = function () {
       c.C()
     //};
