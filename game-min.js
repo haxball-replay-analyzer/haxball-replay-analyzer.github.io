@@ -1053,7 +1053,7 @@ newCell.appendChild(newText);*/
 	function b() {
       c.Dc() && null != c.cl && c.cl(c.Cb.value);
 	  //console.log("wcis",c);
-	  document.getElementById("button_ok").click();
+	  //document.getElementById("button_ok").click();
     }
     var c = this;
     this.g = v.Ga(kb.N);
