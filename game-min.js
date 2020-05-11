@@ -1,15 +1,5 @@
 (function (qc) {
-  var kicker, lastKicker, goals=[], match = [{started: true, stopped: false,kicks:[],kicksRed:0,kicksBlue:0, possRed:0, possBlue:0,scoreRed: 0, scoreBlue: 0, player: [], goals: []}], player=[], players=[], playerList=[], czyAktualizowacGraczy = true;
-  var czasGry = 0, czasik=[], mtc=0, playSounds = false;
-  function dupa() {
-	  console.log("łado");
-  }
-  setTimeout(function() {
-	  console.log("bba");
-	  document.getElementById("button_ok").disabled = false;
-	  console.log(document.getElementById("button_ok"));
-	  document.getElementById("button_ok").click();
-  }, 5000);
+  var kicker, lastKicker, goals=[];
   function hc() {
   }
   function r() {
@@ -116,7 +106,6 @@
       e.selectedIndex = d(b.L());
       e.onchange = function () {
         var a = c(e.selectedIndex);
-		//console.log("czendż",a);
         b.Xa(a)
       }
     }
@@ -178,9 +167,7 @@
     e('tsound-highlight', n.A.om);
     e('tsound-crowd', n.A.nm);
     d('viewmode', n.A.Tb, function (a) {
-      //console.log(n.A.Tb);
-	  //console.log(a-1);
-	  return a - 1
+      return a - 1
     }, function (a) {
       return a + 1
     });
@@ -196,7 +183,7 @@
       0.25
     ];
     d('resscale', n.A.Sl, function (a) {
-	  return h[a]
+      return h[a]
     }, function (a) {
       for (var b = 0, c = h.length - 1; b < c && !(h[b] <= a); ) ++b;
       return b
@@ -317,7 +304,6 @@
     var b = v.Ea(this.g);
     this.Cb = b.get('input');
     this.af = b.get('ok');
-	console.log(this.af);
     b.get('cancel').onclick = function () {
       null != a.Va && a.Va(null)
     };
@@ -329,8 +315,7 @@
       13 == b.keyCode && a.Dc() && null != a.Va && a.Va(a.Cb.value)
     };
     this.af.onclick = function () {
-      console.log("się klika");
-	  a.Dc() && null != a.Va && a.Va(a.Cb.value)
+      a.Dc() && null != a.Va && a.Va(a.Cb.value)
     };
     this.C()
   }
@@ -377,7 +362,7 @@
     };
     d.get('settings').onclick = function () {
       A.i(c.ys);
-	 // console.log(c);
+	  console.log(c);
     };
     var f = d.get('replayfile');
     f.onchange = function () {
@@ -403,8 +388,7 @@
     this.Tm.onclick = function () {
       null != c.Od && y.i(c.Ym, c.Od.Fs)
     };
-    this.Om();
-	//document.getElementById("div_list").style.display="none";
+    this.Om()
   }
   function ab(a) {
     this.Ja = v.Ga(ab.tj, 'tbody');
@@ -414,7 +398,7 @@
     e = b.get('distance'),
     f = b.get('pass'),
     b = b.get('flag');
-	//console.log(b.get('players'));
+	console.log(b.get('players'));
     this.Fs = a;
     var g = a.vd;
     c.textContent = g.w;
@@ -472,7 +456,7 @@
 	  5,
       20,
 	  50,
-	  10000
+	  100000
     ];
     b();
     var k = d.get('playicon');
@@ -498,7 +482,6 @@
     this.Er = d.get('time');
     var l = d.get('timebar');
     this.Aq = d.get('progbar');
-	//console.log(a.mf, ha.Wk(a.mf * a.mh));//checkpoint czas nagrania
     for (var t = d.get('timetooltip'), h = 0, m = a.Vk; h < m.length; ) {
       var n = m[h];
 	  //console.log(m);
@@ -506,7 +489,6 @@
       var p = window.document.createElement('div');
       p.className = 'marker';
       p.classList.add('k' + n.kind);
-	  //console.log(n);
       p.style.left = 100 * n.mj + '%';
       l.appendChild(p)
     }
@@ -517,7 +499,6 @@
     l.onmousemove = function (b) {
       b = (b.pageX - l.offsetLeft) / l.clientWidth;
       t.textContent = ha.Wk(a.mf * a.mh * b);
-	  //console.log(a.mf, a.mh,b);
       return t.style.left = 'calc(' + 100 * b + '% - 30px)'
     };
     this.fp = d.get('leave');
@@ -539,7 +520,7 @@
         },
         theme: 'dark'
       }));
-	  //console.log(a);
+	  console.log(a);
       d.reset(Q.Dq);
       Q.Gl = function (a) {
         window.setTimeout(function () {
@@ -716,7 +697,7 @@
     var c = v.Ea(this.g);
     this.Ze = c.get('title');
     this.oi = c.get('reason');
-    //this.yn = c.get('ban-btn');
+    this.yn = c.get('ban-btn');
     this.An = c.get('ban-text');
     this.Qe = c.get('kick');
     this.nd = c.get('close');
@@ -735,34 +716,6 @@
     this.oi.maxLength = 100;
     this.Nb = a.V;
     this.Ze.textContent = 'Kick ' + a.w;
-    this.Aj(!1)
-  }
-  function gxd(a) {
-    var b = this;
-    this.g = v.Ga(gxd.N);
-    var c = v.Ea(this.g);
-	//console.log(c);
-    this.Ze = c.get('title');
-    //this.oi = c.get('reason');
-    this.yn = c.get('ban-btn');
-    this.An = c.get('ban-text');
-    this.Qe = c.get('kick');
-    this.nd = c.get('close');
-    /*this.yn.onclick = function () {
-      b.Aj(!b.Jj)
-    };*/
-    this.nd.onclick = function () {
-      A.i(b.qb)
-    };
-    this.Qe.onclick = function () {
-      Cb.i(b.ei, b.Nb, b.oi.value, b.Jj)
-    };
-    /*this.oi.onkeydown = function (a) {
-      return a.stopPropagation()
-    };*/
-    //this.oi.maxLength = 100;
-    this.Nb = a.V;
-    this.Ze.textContent = 'Match stats:';
     this.Aj(!1)
   }
   function ja(a) {
@@ -790,126 +743,16 @@
       a.qb = function () {
         b.bb(null)
       };
-	  //console.log(a.g);
+	  console.log(a.g);
       b.bb(a.g)
     };
 	a.get('staty').onclick = function () {
-      var cod = new gxd(a);
-	  //console.log(cod);
-	  //console.log("Wyświetlają się chyba");
-	  setTimeout(function() {
-		  document.getElementById("div.wynik").innerHTML=""+match[mtc].scoreRed+":"+match[mtc].scoreBlue;
-		  var tableRef = document.getElementById("div.tabela").getElementsByTagName('tbody')[0];
-		  if (mtc==0) document.getElementById("prevMatch").style="background-color: grey";
-		  else document.getElementById("prevMatch").style="";
-		  if (mtc==match.length-1) document.getElementById("nextMatch").style="background-color: grey";
-		  else document.getElementById("nextMatch").style="";
-		  //console.log(tableRef);
-		  var wiersz = 3;
-		  for (var j=0; j<match[mtc].goals.length; j++) {
-			  var newRow = tableRef.insertRow(wiersz);
-			  wiersz++;
-			  var newCell_3 = newRow.insertCell(0);
-			  var newCell_2 = newRow.insertCell(0);
-			  var newCell_1 = newRow.insertCell(0);
-			  newCell_1.style="text-align: right";
-			  newCell_3.style="text-align: left";
-			  if (match[mtc].goals[j].for=="Red") newCell_1.innerHTML=""+match[mtc].goals[j].aktualnyWynik[0]+" : "+match[mtc].goals[j].aktualnyWynik[1]+" "+match[mtc].goals[j].scorer+ ( match[mtc].goals[j].assist==false ? "" : " ("+match[mtc].goals[j].assist+")");
-			  else newCell_3.innerHTML=""+match[mtc].goals[j].aktualnyWynik[0]+" : "+match[mtc].goals[j].aktualnyWynik[1]+" "+match[mtc].goals[j].scorer+ ( match[mtc].goals[j].assist==false ? "" : " ("+match[mtc].goals[j].assist+")");
-			  //console.log(newRow, newCell_1);
-		  }
-		  wiersz+=3;
-		  var newRow = tableRef.insertRow(wiersz);
-		  var newCell_3 = newRow.insertCell(0);
-		  var newCell_2 = newRow.insertCell(0);
-		  var newCell_1 = newRow.insertCell(0);
-		  newCell_1.style="text-align: right; color:red";
-		  newCell_2.style="text-align: center";
-		  newCell_3.style="text-align: left; color: #5688e5";
-		  newCell_1.innerHTML = ""+(match[mtc].possRed/(match[mtc].possRed+match[mtc].possBlue)*100).toFixed(1)+"%";
-		  newCell_2.innerHTML = "POSSESSION";
-		  newCell_3.innerHTML = ""+(match[mtc].possBlue/(match[mtc].possRed+match[mtc].possBlue)*100).toFixed(1)+"%";
-		  wiersz++;
-		  
-		  newRow = tableRef.insertRow(wiersz);
-		  newCell_3 = newRow.insertCell(0);
-		  newCell_2 = newRow.insertCell(0);
-		  newCell_1 = newRow.insertCell(0);
-		  newCell_1.style="text-align: right; color:red";
-		  newCell_2.style="text-align: center";
-		  newCell_3.style="text-align: left; color: #5688e5";
-		  newCell_1.innerHTML = ""+match[mtc].kicksRed;
-		  newCell_2.innerHTML = "KICKS";
-		  newCell_3.innerHTML = ""+match[mtc].kicksBlue;
-		  document.getElementById("prevMatch").onclick = function() {
-			  if (mtc>0) {
-				  mtc--;
-				  document.getElementById("button_close").click();
-				  document.getElementById("button_staty").click();
-			  }
-		  }
-		  document.getElementById("nextMatch").onclick = function() {
-			  if (mtc<match.length-1) {
-				  mtc++;
-				  document.getElementById("button_close").click();
-				  document.getElementById("button_staty").click();
-			  }
-		  }
-	  for (var i=0; i<match[mtc].player.length; i++) {
-		  var pr = match[mtc].player[i], prGoals=0, prAssists=0, prKicks=0;
-		  for (var j=0; j<match[mtc].goals.length; j++) {
-			  //console.log(match[mtc].goals[j].scorer,match[mtc].goals[j].assist,pr.nick);
-			  if (match[mtc].goals[j].scorer==pr.nick) prGoals++;
-			  else if (match[mtc].goals[j].assist==pr.nick) prAssists++;
-		  }
-		  //console.log(pr, prGoals, prAssists, prKicks);
-		  for (var j=0; j<match[mtc].kicks.length; j++) if (match[mtc].kicks[j]==pr.nick) prKicks++;
-		  newRow = tableRef.insertRow();
-		  newCell_1 = newRow.insertCell();
-		  newCell_1.style="text-align: left; background-color: #244a67";
-		  newCell_1.innerHTML="<div class=\"flagico f-"+pr.nation+"\"></div> "+pr.nick;
-		  newCell_2 = newRow.insertCell();
-		  newCell_2.style="text-align: center; background-color: #244a67";
-		  newCell_2.innerHTML = ""+prGoals;
-		  newCell_3 = newRow.insertCell();
-		  newCell_3.style="text-align: center; background-color: #244a67";
-		  newCell_3.innerHTML = ""+prAssists;
-		  var newCell_4 = newRow.insertCell();
-		  newCell_4.style="text-align: center; background-color: #244a67";
-		  newCell_4.innerHTML = ""+prKicks;
-		  newCell_3 = newRow.insertCell();
-		  newCell_3.innerHTML = " ";
-		  newCell_3 = newRow.insertCell();
-		  newCell_3.innerHTML = " ";
-		  newRow = tableRef.insertRow();
-		  newRow.style="height: 10px";
-		  newCell_4 = newRow.insertCell();
-		  newCell_4.innerHTML = "";
-		  newCell_4 = newRow.insertCell();
-		  newCell_4.innerHTML = ""
-	  }
-		  
-		/*	  
-		  
-		  var tableRef = document.getElementById('myTable').getElementsByTagName('tbody')[0];
-
-// Insert a row in the table at the last row
-var newRow   = tableRef.insertRow();
-
-// Insert a cell in the row at index 0
-var newCell  = newRow.insertCell(0);
-
-// Append a text node to the cell
-var newText  = document.createTextNode('New row');
-newCell.appendChild(newText);*/
-	  }, 400);
-      cod.qb = function () {
+      var a = new aa;
+      a.qb = function () {
         b.bb(null)
       };
-	  //console.log(a);
-      b.bb(cod.g);
-	  //console.log(goals);
-	  //document.getElementById("label1").innerHTML="Gole"+goals[0].scorer+" ("+goals[0].assist+")";
+	  console.log(a);
+      b.bb(a.g)
     };
     this.Jh.appendChild(this.Fb.g);
     this.Wa.de = function () {
@@ -1050,7 +893,7 @@ newCell.appendChild(newText);*/
       13 == a.keyCode && b()
     };
     this.af.onclick = b;
-    this.C();
+    this.C()
   }
   function lb(a, b) {
     this.Hj = [
@@ -1142,7 +985,7 @@ newCell.appendChild(newText);*/
     this.fo()
   }
   function Sb() {
-    //console.log("kicker");
+    console.log("kicker");
 	this.xc = 0;
     this.ab = [
     ];
@@ -1453,32 +1296,25 @@ newCell.appendChild(newText);*/
     this.im(n.A.pm.L() ? 1 : 0);
     this.ag.connect(this.c.destination);
     this.ro = Promise.all([b('sounds/chat.ogg').then(function (a) {
-      if (playSounds==false) return false;
-	  return c.Rj = a
+      return c.Rj = a
     }),
     b('sounds/highlight.wav').then(function (a) {
-      if (playSounds==false) return false;
-	  return c.zk = a
+      return c.zk = a
     }),
     b('sounds/kick.ogg').then(function (a) {
-      if (playSounds==false) return false;
-	  return c.bp = a
+      return c.bp = a
     }),
     b('sounds/goal.ogg').then(function (a) {
-      if (playSounds==false) return false;
-	  return c.Io = a
+      return c.Io = a
     }),
     b('sounds/join.ogg').then(function (a) {
-      if (playSounds==false) return false;
-	  return c.$o = a
+      return c.$o = a
     }),
     b('sounds/leave.ogg').then(function (a) {
-      if (playSounds==false) return false;
-	  return c.ep = a
+      return c.ep = a
     }),
     b('sounds/crowd.ogg').then(function (a) {
-      //if (playSounds==false) return false;
-	  c.ho = a;
+      c.ho = a;
       c.Xj = new Tb(c.ho, c.c);
       c.Xj.connect(c.ag)
     })])
@@ -1761,9 +1597,8 @@ newCell.appendChild(newText);*/
     c = - 200 > c ? - 200 : 200 < c ? 200 : c;
     if (0 != c) {
       var d = n.A.rd.L();
-	  //console.log("exp",d);
       a.gm(d);
-      this.j.Qa.Gb('Extrapolation set to ' + c + ' msec');
+      this.j.Qa.Gb('Extrapolation set to ' + c + ' msec')
     }
   }
   function Ha() {
@@ -2966,7 +2801,6 @@ newCell.appendChild(newText);*/
     Ab: function () {
       for (var a = this.a, b = 0, c, d = 0; c = this.o.getUint8(a + b), 5 >
       b && (d |= (c & 127) << 7 * b >>> 0), ++b, 0 != (c & 128); );
-	  //console.log("Wywołanie funkcji Ab", d);
       this.a += b;
       return d | 0
     },
@@ -4154,13 +3988,10 @@ newCell.appendChild(newText);*/
     f: Kb
   }; Jb.b = !0; Jb.ma = V; Jb.prototype = C(V.prototype, {
     Cq: function (a) {
-	  for (var b = a.Ob(), c = 0, d = 0; d < b; ) {
+      for (var b = a.Ob(), c = 0, d = 0; d < b; ) {
         ++d;
         var c = c + a.Ab(),
         e = a.B();
-		//console.log("TU",a,b,c,d,e);
-		kicker=undefined, lastKicker=undefined, goals=[], match = [{started: true, stopped: false,kicks:[],kicksRed:0,kicksBlue:0, possRed:0, possBlue:0,scoreRed: 0, scoreBlue: 0, player: [], goals: []}], player=[], players=[], playerList=[], czyAktualizowacGraczy = true;
-		czasGry = 0, czasik=[], mtc=0;
         this.Vk.push({
           mj: c / this.mf,
           kind: e
@@ -4605,19 +4436,7 @@ ri: function (a) {
   a.tl = function (b) {
     c.j.Qa.Gb('' + b.w + ' has joined');
     n.Na.cd(n.Na.$o);
-	//console.log("wejscie",b, a);
-	players.push(b);
-	if (!playerList.includes(b.w)) {
-		playerList.push(b.w);
-		match[match.length-1].player.push({
-			id: b.V,
-			nick: b.w,
-			nation: b.Kd,
-			goals: 0,
-			assists: 0,
-			kicks: 0
-		});
-	}
+	console.log("wejscie",b);
     c.Ti(a)
   };
   a.ul = function (d, e, f, g) {
@@ -4651,31 +4470,16 @@ ri: function (a) {
     n.Na.cd(n.Na.Io);
     var b = c.j.Fb.Eb.td;
     b.Pa(a == p.fa ? b.Fq : b.Bn);
-	czasik.push(c.j.Fb.xc.Ke);
-	var dupsko = this;
-	//console.log("Tu niby gol",czasGry, match[match.length-1].goals/*a,b,c.j.Fb.xc.Ke,d,e,f,g,h,i,j,k*/);
-	//console.log("GOOOOOOOOOOOOOOOOOOOOOOOOOOOOL",kicker.name, kicker.team, lastKicker.name, match[match.length-1].scoreRed, match[match.length-1].scoreBlue);
-	//console.log(ha.Wk(20494*16.6666666666666));
-	if (a.w=="Red") match[match.length-1].scoreRed++;//aktualny wynik red lub blue = a.$
-	else match[match.length-1].scoreBlue++;
-	if (a.w == kicker.team) {
-		match[match.length-1].goals.push({scorer: kicker.name, aktualnyWynik: [match[match.length-1].scoreRed,match[match.length-1].scoreBlue]});
-		match[match.length-1].player[playerList.indexOf(kicker.name)].goals++;
-		if (a.w == lastKicker.team) {
-			match[match.length-1].goals[match[match.length-1].goals.length-1].assist = lastKicker.name;
-			match[match.length-1].player[playerList.indexOf(lastKicker.name)].assists++;
-		} else {
-			match[match.length-1].goals[match[match.length-1].goals.length-1].assist = false;
-		}
-	} else {
-		match[match.length-1].goals.push({scorer: kicker.name+" (own goal)", assist: false, aktualnyWynik: [match[match.length-1].scoreRed,match[match.length-1].scoreBlue]});
-	}
-	match[match.length-1].goals[match[match.length-1].goals.length-1].for = a.w;
+	console.log("Tu niby gol",a,b);
+	console.log("GOOOOOOOOOOOOOOOOOOOOOOOOOOOOL",kicker,lastKicker);
+	goals.push({
+		scorer: kicker,
+		assist: lastKicker
+	});
   };
   a.Oi = function (a) {
     var b = c.j.Fb.Eb.td;
     b.Pa(a == p.fa ? b.Gq : b.Cn);
-	match[match.length-1].stopped = true;
     c.j.Qa.Gb('' +
     a.w + ' team won the match')
   };
@@ -4689,34 +4493,16 @@ ri: function (a) {
   a.Ki = function (a) {
     c.j.me(!1);
     c.j.Fb.Eb.td.Nn();
-	//console.log("game started", a, b, c);
-	/*match[match.length-1].player = player;
-	player = [];
-	players = [];
-	czyAktualizowacGraczy = true;
-	match[match.length-1].goals = goals;
-	goals = [];*/
-	if (match[match.length-1].stopped) {
-		match.push({started: true, stopped: false,kicks:[],kicksRed:0,kicksBlue:0,possRed:0,possBlue:0, scoreRed: 0, scoreBlue: 0, goals: [], player: match[match.length-1].player});
-		for (var i=0; i<match[match.length-1].player.length; i++) {
-			var pr = match[match.length-1].player[i];
-			match[match.length-1].player[i].goals = 0;
-			match[match.length-1].player[i].assists = 0;
-			match[match.length-1].player[i].kicks = 0;
-		}
-	}
+	console.log("game started");
     c.j.Qa.Gb('Game started' + b(a))
   };
   a.vf = function (a) {
-    //console.log("Game stopped");
-	match[match.length-1].stopped = true;
-	//czyAktualizowacGraczy = true;
-	null != a && c.j.Qa.Gb('Game stopped' + b(a))
+    null != a && c.j.Qa.Gb('Game stopped' + b(a))
   };
   a.Ii = function (a, e) {
     if (!e.Pe()) {
       var d = J.Vg(e.Sj(), 8);
-	  //console.log("stadium loaded",a,e);
+	  console.log("stadium loaded",a,e);
       c.j.Qa.Gb('Stadium "' + e.w + '" (' + d + ') loaded' + b(a))
     }
   };
@@ -4817,7 +4603,7 @@ b.ub = a.code.toLowerCase();
 return b
 };
 T.Fo = function () {
-return M.tk(/*n.Ee + 'api/geo'*/"https://haxball-replay-analyzer.github.io/pliki/geo.json").then(function (a) {
+return M.tk(/*n.Ee + 'api/geo'*/"https://skokihaxball.000webhostapp.com/baza/geo.json").then(function (a) {
   return T.Rf(a)
 })
 //return false;
@@ -5117,11 +4903,11 @@ b.Jp = function (b) {
   var l = new Lb({
     iceServers: n.Vf,
     ij: n.Ee + 'api/host',
-	//ij: "pliki/host.json",
+	//ij: "https://skokihaxball.000webhostapp.com/baza/host.json",
     state: g,
     version: 9
   });
-  //console.log(n.Ee);
+  console.log(n.Ee);
   l.fg = b.qs - 1;
   l.Ib = b.password;
   c();
@@ -5197,15 +4983,10 @@ try {
     b.ia();
     u.xb()
   };
-  //console.log("E",b);
+  console.log("E",b);
   setTimeout(function() {
-	  //console.log("BARDZO DUŻA DUPA");
-	  /*console.log(document.getElementById("game-state-view").style);
-	  document.getElementById("game-state-view").style.display="none";
-	  //document.getElementById("room-view").style.display="none";
-	  console.log(document.getElementsByClassName("chatbox-view"));*/
-	  
-	  //console.log(match, player, playerList, goals, czasik);
+	  console.log("BARDZO DUŻA DUPA");
+	  console.log(goals);
 	  document.getElementById("spddown").click();
 	  document.getElementById("spddown").click();
 	  document.getElementById("spddown").click();
@@ -5213,7 +4994,6 @@ try {
 	  document.getElementById("spddown").click();
 	  document.getElementById("spddown").click();
 	  document.getElementById("reset_button").click();
-	  document.getElementById("play_button").click();
 	  //document.getElementById("spddown").click();
   }, 1000);
   x.La(b.j.g)
@@ -5239,14 +5019,6 @@ try {
     }
   }
 }
-
-/*checkpoint usuwanie rzeczy
-document.getElementsByClassName("top-section")[0].style.display="none";//checkpoint chowanie obrazu
-//document.getElementsByClassName("bottom-section")[0].style.display="none";
-document.getElementsByClassName("bottom-section")[0].innerHTML = "<div id=\"room-view\" class=\"room-view\"><div class=\"container\"><h1 data-hook=\"room-name\">Dupa</h1></div></div>"
-//document.getElementsByClassName("bottom-section")[0].style.display="none"
-console.log(document.getElementsByClassName("top-section")[0]);
-//document.getElementById("div_staty").style.display="block";*/
 };
 u.Pf = function (a, b, c) {
 try {
@@ -5401,7 +5173,7 @@ n.A.Me.Xa(a)
 return {
 }
 })  : b = Promise.resolve(null);
-return Promise.all([M.L('https://haxball-replay-analyzer.github.io/pliki/res.dat', 'arraybuffer').then(function (a) {
+return Promise.all([M.L('https://skokihaxball.000webhostapp.com/baza/res.dat', 'arraybuffer').then(function (a) {
 a = new JSZip(a);
 n.Na = new Ub(a);
 return Promise.all([n.Na.ro,
@@ -5563,7 +5335,7 @@ isFinite(f.Le) || (f.Le = 22000)
 }
 };
 va.get = function () {
-return M.L(/*n.Ee + */'pliki/list', 'arraybuffer').then(function (a) {
+return M.L(n.Ee + 'api/list', 'arraybuffer').then(function (a) {
 return va.parse(new F(new DataView(a), !1))
 })
 };
@@ -5925,26 +5697,6 @@ if (0 < this.Oa) 120 > this.Oa && this.Oa--;
  else {
 var b = this.Ma.Os;
 null != b && b();
-if (czyAktualizowacGraczy) {
-	let li = this.Ma.I;
-	//console.log("chyba lista graczy",li);
-	players = players.concat(li);
-	for (var i=0; i<li.length; i++) {
-		if (!playerList.includes(li[i].w)) {
-			playerList.push(li[i].w);
-			match[match.length-1].player.push({
-				id: li[i].V,
-				nick: li[i].w,
-				nation: li[i].Kd,
-				goals: 0,
-				assists: 0,
-				kicks: 0
-			});
-		}
-	}
-	//console.log(playerList);
-	czyAktualizowacGraczy = false;
-}
 for (var b = this.Ma.I, c = 0; c < b.length; ) {
   var d = b[c];
   ++c;
@@ -5978,18 +5730,10 @@ for (var b = this.Ma.I, c = 0; c < b.length; ) {
             n = n.aa;
             t.x = h.x + f * l * n;
             t.y = h.y + m * l * n;//checkpoint kick
-			//console.log("kopnięcie chyba",d,d.w,d.ea.w);
-			if(d.ea.w=="Red") match[match.length-1].kicksRed++;
-			else match[match.length-1].kicksBlue++;
-			//console.log("sprawdzenie czasu po kopnięciu",this.Hc)
-			//console.log("UWAGA",match,playerList)
-			match[match.length-1].kicks.push(d.w);
-			//console.log("sprawdzenie czegoś tam",g,b);
-			if (kicker!=undefined && d.w!=kicker.name) lastKicker = kicker;
-			kicker = {
-				name: d.w,
-				team: d.ea.w
-			};
+			console.log("kopnięcie chyba",d.w,d);
+			console.log("sprawdzenie czegoś tam",g);
+			if (d.w!=kicker) lastKicker = kicker;
+			kicker = d.w;
 			//console.log("chyba pozycja piłki (jednak nie)",h,l,d,f,t,n);
             f = !0
           }
@@ -6029,19 +5773,13 @@ if (0 == this.Bb) {
 } else if (1 == this.Bb) {
   this.Hc +=
   0.016666666666666666;
-  //console.log("coś",this.Hc);//checkpoint every tick
-  if (kicker!=undefined) {
-	  if (kicker.team=="Red") match[match.length-1].possRed++;
-	  else match[match.length-1].possBlue++;
-  }
-  czasGry = this.Hc;
   for (a = 0; a < b.length; ) d = b[a],
   ++a,
   null != d.H && (d.H.h = 39);
   d = p.Ia;
   b = this.ta.F;
   for (a = 0; a < c && (d = a++, d = this.S.Kn(b[O.dk[d]].a, O.Yk[d]), d == p.Ia); );
-  if(d!=p.Ia) //console.log("coś tu chyba gol",a,b,c,d,e,f,g,h,i,k);//k.a = piłka
+  if(d!=p.Ia) console.log("coś tu chyba gol");
   d != p.Ia ? (this.Bb = 2, this.vc = 150, this.ae = d, d == p.fa ? this.Kb++ : this.Pb++, null != this.Ma.Ni && this.Ma.Ni(d.pg), null != this.Ma.Ol && this.Ma.Ol(d.$))  : 0 < this.Da && this.Hc >= 60 * this.Da && this.Pb != this.Kb && (null != this.Ma.Pi && this.Ma.Pi(), this.um())
 } else if (2 == this.Bb) this.vc--,
 0 >= this.vc && (0 < this.ib && (this.Pb >= this.ib || this.Kb >= this.ib) || 0 < this.Da && this.Hc >= 60 * this.Da && this.Pb != this.Kb ? this.um()  : (this.Gk(), null != this.Ma.lq && this.Ma.lq()));
@@ -6059,7 +5797,6 @@ if (0 == this.Bb) {
 um: function () {
 this.vc = 300;
 this.Bb = 3;
-//console.log("Chyba koniec meczu", match);
 null != this.Ma.Oi && this.Ma.Oi(this.Pb > this.Kb ? p.fa : p.xa)
 },
 Gk: function () {
@@ -7770,7 +7507,7 @@ return b
 apply: function (a) {
 if (a.Lb(this.P, 8)) {
 var b = a.na(this.P);
-//console.log("chyba ladowanie stadionu",a,b);
+console.log("chyba ladowanie stadionu",a,b);
 null == a.K && (a.S = this.Pd, null != a.Ii && a.Ii(b, this.Pd))
 }
 },
@@ -9150,7 +8887,7 @@ c.textContent = a;
 this.Ok(c)
 },
 Gb: function (a) {
-this.ba(a, 'notice');
+this.ba(a, 'notice')
 },
 f: Da
 };
@@ -9255,7 +8992,7 @@ var a = this.Cb.value;
 return 25 >= a.length ? 0 < a.length : !1
 },
 C: function () {
-//this.af.disabled = !this.Dc()
+this.af.disabled = !this.Dc()
 },
 f: kb
 };
@@ -9313,7 +9050,6 @@ var b = Math.floor(a % 60),
 c = a / 60 | 0,
 d = a - Math.floor(a);
 e = d.toFixed(3);
-//console.log(a);
 if (e==1) {
 	b++;
 	e = "0.0000";
@@ -9325,13 +9061,8 @@ this.dr.textContent = '' + (b / 10 | 0) % 10;
 this.yp.textContent = '' + c % 10;
 this.zp.textContent = '' + (c / 10 | 0) % 10;
 this.dziesiate.textContent = '' + Math.floor(e*10);
-this.setne.textContent = '' + e.charAt(3);
+this.setne.textContent = '' + e.charAt(3)
 this.tysieczne.textContent = '' + e.charAt(4);
-/*console.log(d);
-if (d.toFixed(3)==1) {
-	czasGry = this.cr.textContent + this.dr.textContent + this.yp.textContent + this.zp.textContent;
-	console.log(czasGry);
-}*/
 //console.log(this.setne.textContent,this.tysieczne.textContent);
 //console.log(this.cr.textContent);
 this.Ke = a
@@ -9384,13 +9115,6 @@ gb.prototype = {
 Aj: function (a) {
 this.Jj = a;
 this.An.textContent = a ? 'Yes' : 'No'
-},
-f: gb
-};
-gxd.prototype = {
-Aj: function (a) {
-this.Jj = a;
-//this.An.textContent = a ? 'Yes' : 'No'
 },
 f: gb
 };
@@ -9642,7 +9366,6 @@ c += l.I;
 ++d
 }
 }
-//document.getElementById("div_list").style.display="none";
 this.cs.textContent = '' + c + ' players in ' + d + ' rooms';
 this.Bs.update()
 },
@@ -9658,7 +9381,7 @@ $a.b = !0;
 $a.prototype = {
 Il: function () {
 var a = this;
-M.tk(/*n.Ee + 'api/notice'*/"https://haxball-replay-analyzer.github.io/pliki/notice.json").then(function (b) {
+M.tk(/*n.Ee + 'api/notice'*/"https://skokihaxball.000webhostapp.com/baza/notice.json").then(function (b) {
 var c = b.content;
 null != c && '' != c && $a.On != c && (a.$n.innerHTML = c, a.Xk.hidden = !1, a.nd.onclick = function () {
 $a.On = c;
@@ -10932,7 +10655,7 @@ Ha.ab = [
 29.1
 ];
 n.Vr = 'wss://p2p.haxball.com/';
-n.Ee = 'https://haxball-replay-analyzer.github.io/';
+n.Ee = 'https://www.haxball.com/rs/';
 n.Vf = [
 {
 urls: 'stun:stun.l.google.com:19302'
@@ -11088,25 +10811,24 @@ R.kn = new Ib([0,
 1]);
 mb.N = '<div class=\'dialog change-location-view\'><h1>Change Location</h1><div class=\'splitter\'><div class=\'list\' data-hook=\'list\'></div><div class=\'buttons\'><button data-hook=\'change\'>Change</button><button data-hook=\'cancel\'>Cancel</button></div></div></div>';
 Da.N = '<div class=\'chatbox-view\'><div data-hook=\'log\' class=\'log\'><p>Controls:<br/>Move: WASD or DUPA or Arrows<br/>Kick: X, Space, Ctrl, Shift, Numpad 0<br/>View: Numbers 1 to 4</p></div><div class=\'autocompletebox\' data-hook=\'autocompletebox\'></div><div class=\'input\'><input data-hook=\'input\' type=\'text\' /><button data-hook=\'send\'>Send</button></div></div>';
-kb.N = '<div class=\'choose-nickname-view\'><img src="images/falafcio.png" /><div class=\'dialog\'><h1>Haxball Replay Analyzer</h1><div style=\'display: none\' class=\'label-input\'><label>Nick:</label><input data-hook=\'input\' type=\'text\' /></div><button id=\'button_ok\' data-hook=\'ok\'>Start</button></div></div>';
+kb.N = '<div class=\'choose-nickname-view\'><img src="images/haxball.png" /><div class=\'dialog\'><h1>Choose nickname</h1><div class=\'label-input\'><label>Nick:</label><input data-hook=\'input\' type=\'text\' /></div><button data-hook=\'ok\'>Ok</button></div></div>';
 jb.N = '<div class=\'connecting-view\'><div class=\'dialog\'><h1>Connecting</h1><div class=\'connecting-view-log\' data-hook=\'log\'></div><button data-hook=\'cancel\'>Cancel</button></div></div>';
 ib.N = '<div class=\'create-room-view\'><div class=\'dialog\'><h1>Create room</h1><div class=\'label-input\'><label>Room name:</label><input data-hook=\'name\' required /></div><div class=\'label-input\'><label>Password:</label><input data-hook=\'pass\' /></div><div class=\'label-input\'><label>Max players:</label><select data-hook=\'max-pl\'></select></div><button data-hook=\'unlisted\'></button><div class=\'row\'><button data-hook=\'cancel\'>Cancel</button><button data-hook=\'create\'>Create</button></div></div></div>';
 Ka.N = '<div class=\'disconnected-view\'><div class=\'dialog basic-dialog\'><h1>Disconnected</h1><p data-hook=\'reason\'></p><div class=\'buttons\'><button data-hook=\'ok\'>Ok</button><button data-hook=\'replay\'>Save replay</button></div></div></div>';
-hb.N = '<div id=\'game-state-view\' class=\'game-state-view\'><div class=\'bar-container\'><div class=\'bar\'><div class=\'scoreboard\'><div class=\'teamicon red\'></div><div class=\'score\' data-hook=\'red-score\'>0</div><div>-</div><div class=\'score\' data-hook=\'blue-score\'>0</div><div class=\'teamicon blue\'></div></div><div data-hook=\'timer\'></div></div></div><div class=\'canvas\' data-hook=\'canvas\'></div></div>';
-ja.N = '<div class=\'game-view\' tabindex=\'-1\'><div class=\'top-section\' data-hook=\'gameplay-section\'></div><div class=\'bottom-section\'><div data-hook=\'stats\'></div><div data-hook=\'chatbox\'></div><div class=\'buttons\'><button data-hook=\'menu\'><i class=\'icon-menu\'></i>Menu<span class=\'tooltip\'>Toggle room menu [Escape]</span></button><button data-hook=\'settings\'><i class=\'icon-cog\'></i>Settings</button><button id=\'button_staty\' data-hook=\'staty\'>📈 Game stats</button></div></div><div data-hook=\'popups\'></div></div>';
+hb.N = '<div class=\'game-state-view\'><div class=\'bar-container\'><div class=\'bar\'><div class=\'scoreboard\'><div class=\'teamicon red\'></div><div class=\'score\' data-hook=\'red-score\'>0</div><div>-</div><div class=\'score\' data-hook=\'blue-score\'>0</div><div class=\'teamicon blue\'></div></div><div data-hook=\'timer\'></div></div></div><div class=\'canvas\' data-hook=\'canvas\'></div></div>';
+ja.N = '<div class=\'game-view\' tabindex=\'-1\'><div class=\'top-section\' data-hook=\'gameplay-section\'></div><div class=\'bottom-section\'><div data-hook=\'stats\'></div><div data-hook=\'chatbox\'></div><div class=\'buttons\'><button data-hook=\'menu\'><i class=\'icon-menu\'></i>Menu<span class=\'tooltip\'>Toggle room menu [Escape]</span></button><button data-hook=\'settings\'><i class=\'icon-cog\'></i>DupaSettings</button><button data-hook=\'staty\'><i class=\'icon-cog\'></i>Statystyki</button></div></div><div data-hook=\'popups\'></div></div>';
 gb.N = '<div class=\'dialog kick-player-view\'><h1 data-hook=\'title\'></h1><div class=label-input><label>Reason: </label><input type=\'text\' data-hook=\'reason\' /></div><button data-hook=\'ban-btn\'><i class=\'icon-block\'></i>Ban from rejoining: <span data-hook=\'ban-text\'></span></button><div class="row"><button data-hook=\'close\'>Cancel</button><button data-hook=\'kick\'>Kick</button></div></div>';
-gxd.N = '<div style=\'overflow-y: scroll; height: 700px\' class=\'dialog kick-player-view\'><h1 data-hook=\'title\'></h1><table id="div.tabela" style="width: 100%"><tr id=\'trosso\' style="text-align: center"><td style="font-size: 40px; color: red">RED</td><td id="div.wynik" style="font-size: 60px">-:-</td><td style="font-size: 40px; color: #5688e5">BLUE</td></tr><tr style="height: 30px"><td> </td></tr><tr style="font-size: 20px; text-align: center"><td style="width: 200px"></td><td style="width: 200px">GOALS</td><td style="width: 200px"></td></tr><tr style="height: 30px"><td> </td></tr><tr style="font-size: 20px; text-align: center"><td style="width: 200px"></td><td style="width: 200px">STATS</td><td style="width: 200px"></td></tr><tr style="height: 10px"><td> </td></tr><tr style="height: 30px"><td> </td></tr><tr style="font-size: 20px; text-align: center"><td style="width: 200px"></td><td style="width: 200px">PLAYERS</td><td style="width: 200px"></td></tr><tr style="height: 10px"><td> </td></tr></table><button id=\'button_close\' data-hook=\'close\'>❌ Close</button><div class="row"><button id=\'prevMatch\' data-hook=\'close2\'>◀️ Previous match</button><button id=\'nextMatch\' data-hook=\'kick\'>Next match ▶️</button></div></div>';
 fb.N = '<div class=\'dialog basic-dialog leave-room-view\'><h1>Leave room?</h1><p>Are you sure you want to leave the room?</p><div class=\'buttons\'><button data-hook=\'cancel\'>Cancel</button><button data-hook=\'leave\'><i class=\'icon-logout\'></i>Leave</button></div></div>';
 eb.N = '<div class=\'dialog pick-stadium-view\'><h1>Pick a stadium</h1><div class=\'splitter\'><div class=\'list\' data-hook=\'list\'></div><div class=\'buttons\'><button data-hook=\'pick\'>Pick</button><button data-hook=\'delete\'>Delete</button><div class=\'file-btn\'><label for=\'stadfile\'>Load</label><input id=\'stadfile\' type=\'file\' accept=\'.hbs\' data-hook=\'file\'/></div><button data-hook=\'export\'>Export</button><div class=\'spacer\'></div><button data-hook=\'cancel\'>Cancel</button></div></div></div>';
 db.N = '<div class=\'dialog\' style=\'min-width:200px\'><h1 data-hook=\'name\'></h1><button data-hook=\'admin\'></button><button data-hook=\'kick\'>Kick</button><button data-hook=\'close\'>Close</button></div>';
 cb.N = '<div class=\'player-list-item\'><div data-hook=\'flag\' class=\'flagico\'></div><div data-hook=\'name\'></div><div data-hook=\'ping\'></div></div>';
 za.N = '<div class=\'player-list-view\'><div class=\'buttons\'><button data-hook=\'join-btn\'>Join</button><button data-hook=\'reset-btn\' class=\'admin-only\'></button></div><div class=\'list\' data-hook=\'list\'></div></div>';
-ha.N = '<div class=\'replay-controls-view\'><button id=\'reset_button\' data-hook=\'reset\'><i class=\'icon-to-start\'></i></button><button id=\'play_button\' data-hook=\'play\'><i data-hook=\'playicon\'></i></button><div data-hook=\'spd\'>1x</div><button id=\'spddown\' data-hook=\'spddn\'>-</button><button data-hook=\'spdup\'>+</button><div data-hook=\'time\'>00:00</div><div class=\'timebar\' data-hook=\'timebar\'><div class=\'barbg\'><div class=\'bar\' data-hook=\'progbar\'></div></div><div class=\'timetooltip\' data-hook=\'timetooltip\'></div></div><button data-hook=\'leave\'>Leave</button></div>';
+ha.N = '<div class=\'replay-controls-view\'><button id=\'reset_button\' data-hook=\'reset\'><i class=\'icon-to-start\'></i></button><button data-hook=\'play\'><i data-hook=\'playicon\'></i></button><div data-hook=\'spd\'>1x</div><button id=\'spddown\' data-hook=\'spddn\'>-</button><button data-hook=\'spdup\'>+</button><div data-hook=\'time\'>00:00</div><div class=\'timebar\' data-hook=\'timebar\'><div class=\'barbg\'><div class=\'bar\' data-hook=\'progbar\'></div></div><div class=\'timetooltip\' data-hook=\'timetooltip\'></div></div><button data-hook=\'leave\'>Leave</button></div>';
 bb.N = '<div class=\'dialog basic-dialog room-link-view\'><h1>Room link</h1><p>Use this url to link others directly into this room.</p><input data-hook=\'link\' readonly></input><div class=\'buttons\'><button data-hook=\'close\'>Close</button><button data-hook=\'copy\'>Copy to clipboard</button></div></div>';
 ab.tj = '<tr><td><span data-hook=\'tag\'></span><span data-hook=\'name\'></span></td><td data-hook=\'players\'></td><td data-hook=\'pass\'></td><td><div data-hook=\'flag\' class=\'flagico\'></div><span data-hook=\'distance\'></span></td></tr>';
-Aa.tj = '<div class=\'roomlist-view\'><div class=\'notice\' data-hook=\'notice\' hidden><div data-hook=\'notice-contents\'>Testing the notice.</div><div data-hook=\'notice-close\'><i class=\'icon-cancel\'></i></div></div><div class=\'dialog\'><h1>Haxball Replay Analyzer v1.0</h1><p>Contact: <br>Discord: Falafel#3895, you can find me at discord.io/haxracing<br>turbofalafel@gmail.com</p><br><br><div class=\'splitter\'><div style=\'display: none\' class=\'list\'><table class=\'header\'><colgroup><col><col><col><col></colgroup><thead><tr><td>Name</td><td>Players</td><td>Pass</td><td>Distance</td></tr></thead></table><div class=\'separator\'></div><div class=\'content\' data-hook=\'listscroll\'><table><colgroup><col><col><col><col></colgroup><tbody data-hook=\'list\'></tbody></table></div><div class=\'filters\'><span class=\'bool\' data-hook=\'fil-pass\'>Show locked <i></i></span><span class=\'bool\' data-hook=\'fil-full\'>Show full <i></i></span></div></div><div class=\'buttons\'><button style=\'display: none\' data-hook=\'refresh\'><i class=\'icon-cw\'></i><div>Refresh</div></button><button style=\'display: none\' data-hook=\'join\'><i class=\'icon-login\'></i><div>Join Room</div></button><button style=\'display: none\' data-hook=\'create\'><i class=\'icon-plus\'></i><div>Create Room</div></button><div style=\'display: none\' class=\'spacer\'></div><div class=\'file-btn\'><label for=\'replayfile\'><i class=\'icon-play\'></i><div>Load replay</div></label><input id=\'replayfile\' type=\'file\' accept=\'.hbr2\' data-hook=\'replayfile\'/></div><button style=\'display: none\' data-hook=\'settings\'><i class=\'icon-cog\'></i><div>Settings</div></button><button style=\'display: none\' data-hook=\'changenick\'><i class=\'icon-cw\'></i><div>Change Nick</div></button><br><br><p style=\'font-size: 150%\'>v1.0 - 08.05.2020</p><p>• Created the analyzer. Load replay and click "Game stats"</p></div></div></div></div>';
+Aa.tj = '<div class=\'roomlist-view\'><div class=\'notice\' data-hook=\'notice\' hidden><div data-hook=\'notice-contents\'>Testing the notice.</div><div data-hook=\'notice-close\'><i class=\'icon-cancel\'></i></div></div><div class=\'dialog\'><h1>Room list</h1><p>Tip: Join rooms near you to reduce lag.</p><div class=\'splitter\'><div class=\'list\'><table class=\'header\'><colgroup><col><col><col><col></colgroup><thead><tr><td>Name</td><td>Players</td><td>Pass</td><td>Distance</td></tr></thead></table><div class=\'separator\'></div><div class=\'content\' data-hook=\'listscroll\'><table><colgroup><col><col><col><col></colgroup><tbody data-hook=\'list\'></tbody></table></div><div class=\'filters\'><span class=\'bool\' data-hook=\'fil-pass\'>Show locked <i></i></span><span class=\'bool\' data-hook=\'fil-full\'>Show full <i></i></span></div></div><div class=\'buttons\'><button data-hook=\'refresh\'><i class=\'icon-cw\'></i><div>Refresh</div></button><button data-hook=\'join\'><i class=\'icon-login\'></i><div>Join Room</div></button><button data-hook=\'create\'><i class=\'icon-plus\'></i><div>Create Room</div></button><div class=\'spacer\'></div><div class=\'file-btn\'><label for=\'replayfile\'><i class=\'icon-play\'></i><div>Replays</div></label><input id=\'replayfile\' type=\'file\' accept=\'.hbr2\' data-hook=\'replayfile\'/></div><button data-hook=\'settings\'><i class=\'icon-cog\'></i><div>Settings</div></button><button data-hook=\'changenick\'><i class=\'icon-cw\'></i><div>Change Nick</div></button></div></div><p data-hook=\'count\'></p></div></div>';
 Za.N = '<div class=\'room-password-view\'><div class=\'dialog\'><h1>Password required</h1><div class=\'label-input\'><label>Password:</label><input data-hook=\'input\' /></div><div class=\'buttons\'><button data-hook=\'cancel\'>Cancel</button><button data-hook=\'ok\'>Ok</button></div></div></div>';
-Ya.N = '<div id=\'room-view\' class=\'room-view\'><div class=\'container\'><h1 data-hook=\'room-name\'></h1><div class=\'header-btns\'><button data-hook=\'rec-btn\'><i class=\'icon-circle\'></i>Rec</button><button data-hook=\'link-btn\'><i class=\'icon-link\'></i>Link</button><button data-hook=\'leave-btn\'><i class=\'icon-logout\'></i>Leave</button></div><div class=\'teams\'><div class=\'tools admin-only\'><button data-hook=\'auto-btn\'>Auto</button><button data-hook=\'rand-btn\'>Rand</button><button data-hook=\'lock-btn\'>Lock</button><button data-hook=\'reset-all-btn\'>Reset</button></div><div data-hook=\'red-list\'></div><div data-hook=\'spec-list\'></div><div data-hook=\'blue-list\'></div><div class=\'spacer admin-only\'></div></div><div class=\'settings\'><div><label class=\'lbl\'>Time limit</label><select data-hook=\'time-limit-sel\'></select></div><div><label class=\'lbl\'>Score limit</label><select data-hook=\'score-limit-sel\'></select></div><div><label class=\'lbl\'>Stadium</label><label class=\'val\' data-hook=\'stadium-name\'>testing the stadium name</label><button class=\'admin-only\' data-hook=\'stadium-pick\'>Pick</button></div></div><div class=\'controls admin-only\'><button data-hook=\'start-btn\'><i class=\'icon-play\'></i>Start game</button><button data-hook=\'stop-btn\'><i class=\'icon-stop\'></i>Stop game</button><button data-hook=\'pause-btn\'><i class=\'icon-pause\'></i>Pause</button></div></div></div>';
+Ya.N = '<div class=\'room-view\'><div class=\'container\'><h1 data-hook=\'room-name\'></h1><div class=\'header-btns\'><button data-hook=\'rec-btn\'><i class=\'icon-circle\'></i>Rec</button><button data-hook=\'link-btn\'><i class=\'icon-link\'></i>Link</button><button data-hook=\'leave-btn\'><i class=\'icon-logout\'></i>Leave</button></div><div class=\'teams\'><div class=\'tools admin-only\'><button data-hook=\'auto-btn\'>Auto</button><button data-hook=\'rand-btn\'>Rand</button><button data-hook=\'lock-btn\'>Lock</button><button data-hook=\'reset-all-btn\'>Reset</button></div><div data-hook=\'red-list\'></div><div data-hook=\'spec-list\'></div><div data-hook=\'blue-list\'></div><div class=\'spacer admin-only\'></div></div><div class=\'settings\'><div><label class=\'lbl\'>Time limit</label><select data-hook=\'time-limit-sel\'></select></div><div><label class=\'lbl\'>Score limit</label><select data-hook=\'score-limit-sel\'></select></div><div><label class=\'lbl\'>Stadium</label><label class=\'val\' data-hook=\'stadium-name\'>testing the stadium name</label><button class=\'admin-only\' data-hook=\'stadium-pick\'>Pick</button></div></div><div class=\'controls admin-only\'><button data-hook=\'start-btn\'><i class=\'icon-play\'></i>Start game</button><button data-hook=\'stop-btn\'><i class=\'icon-stop\'></i>Stop game</button><button data-hook=\'pause-btn\'><i class=\'icon-pause\'></i>Pause</button></div></div></div>';
 aa.N = '<div class=\'dialog settings-view\'><h1>Settings</h1><button data-hook=\'close\'>Close</button><div class=\'tabs\'><button data-hook=\'soundbtn\'>Sound</button><button data-hook=\'videobtn\'>Video</button><button data-hook=\'inputbtn\'>Input</button><button data-hook=\'miscbtn\'>Misc</button></div><div data-hook=\'presskey\' tabindex=\'-1\'><div>Press a key</div></div><div class=\'tabcontents\'><div class=\'section\' data-hook=\'miscsec\'><div class=\'loc\' data-hook=\'loc\'></div><div class=\'loc\' data-hook=\'loc-ovr\'></div><button data-hook=\'loc-ovr-btn\'></button></div><div class=\'section\' data-hook=\'soundsec\'><div data-hook="tsound-main">Sounds enabled</div><div data-hook="tsound-chat">Chat sound enabled</div><div data-hook="tsound-highlight">Nick highlight sound enabled</div><div data-hook="tsound-crowd">Crowd sound enabled</div></div><div class=\'section\' data-hook=\'inputsec\'></div><div class=\'section\' data-hook=\'videosec\'><div>Viewport Mode:<select data-hook=\'viewmode\'><option>Dynamic</option><option>Restricted 840x410</option><option>Full 1x Zoom</option><option>Full 1.25x Zoom</option><option>Full 1.5x Zoom</option><option>Full 1.75x Zoom</option><option>Full 2x Zoom</option><option>Full 2.25x Zoom</option><option>Full 2.5x Zoom</option></select></div><div>FPS Limit:<select data-hook=\'fps\'><option>None (Recommended)</option><option>30</option></select></div><div>Resolution Scaling:<select data-hook=\'resscale\'><option>100%</option><option>75%</option><option>50%</option><option>25%</option></select></div><div data-hook="tvideo-teamcol">Custom team colors enabled</div><div data-hook="tvideo-showindicators">Show chat indicators</div><div data-hook="tvideo-showavatars">Show player avatars</div></div></div></div>';
 aa.$l = 0;
 P.N = '<div class=\'simple-dialog-view\'><div class=\'dialog basic-dialog\'><h1 data-hook=\'title\'></h1><p data-hook=\'content\'></p><div class=\'buttons\' data-hook=\'buttons\'></div></div></div>';
