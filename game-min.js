@@ -5578,7 +5578,7 @@ isFinite(f.Le) || (f.Le = 22000)
 }
 };
 va.get = function () {
-return M.L(/*n.Ee + */'https://haxball-replay-analyzer.github.io/pliki/geo.', 'arraybuffer').then(function (a) {
+return M.L(/*n.Ee + */'https://haxball-replay-analyzer.github.io/pliki/geo.json', 'arraybuffer').then(function (a) {
 return va.parse(new F(new DataView(a), !1))
 })
 };
