@@ -855,6 +855,21 @@
 				  document.getElementById("button_staty").click();
 			  }
 		  }
+		  newRow = tableRef.insertRow();
+		  newCell_1 = newRow.insertCell();
+		  newCell_1.style="text-align: left";
+		  newCell_1.innerHTML="Players";
+		  newCell_2 = newRow.insertCell();
+		  newCell_2.style="text-align: center";
+		  newCell_2.innerHTML = "Goals";
+		  newCell_3 = newRow.insertCell();
+		  newCell_3.style="text-align: center";
+		  newCell_3.innerHTML = "Assists";
+		  newCell_3 = newRow.insertCell();
+		  newCell_3.style="text-align: center";
+		  newCell_3.innerHTML = "Kicks";
+		  newRow = tableRef.insertRow();
+		  newRow.style="height: 6px";
 	  for (var i=0; i<match[mtc].player.length; i++) {
 		  var pr = match[mtc].player[i], prGoals=0, prAssists=0, prKicks=0;
 		  for (var j=0; j<match[mtc].goals.length; j++) {
