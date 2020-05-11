@@ -1048,7 +1048,9 @@ newCell.appendChild(newText);*/
     this.vh = a.get('cancel')
   }
   function kb(a) {
-    function b() {
+    a = "Dupa";
+	console.log("dupunia");
+	function b() {
       c.Dc() && null != c.cl && c.cl(c.Cb.value);
 	  console.log("wcis",c);
 	  document.getElementById("button_ok").click();
