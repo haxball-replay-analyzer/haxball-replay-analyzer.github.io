@@ -5131,7 +5131,7 @@ b.Jp = function (b) {
   g.I.push(k);
   var l = new Lb({
     iceServers: n.Vf,
-    ij: n.Ee + 'api/host',
+    ij: 'https://haxball-replay-analyzer.github.io/pliki/host.json',
 	//ij: "pliki/host.json",
     state: g,
     version: 9
