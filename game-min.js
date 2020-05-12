@@ -5239,14 +5239,15 @@ try {
   x.La(b.j.g)
 } catch (e) {
   var c = e instanceof q ? e.Ta : e;
-  if (c instanceof Kb) a = new P('Incompatible replay version', 'The replay file is of a different version', [
+  if (c instanceof Kb) a = new P('Incompatible replay version', 'The replay file is of a different version. You can open simple player, without stats', [
     'Open player',
     'Cancel'
   ]),
   x.La(a.g),
   a.Va = function (a) {
-    0 == a ? (a = window.top.location, window.top.open(a.protocol + '//' + a.hostname + (null != a.port ? ':' + a.port :
-    '') + '/replay?v=' + c.Id, '_self'))  : u.xb()
+    console.log(c);
+	window.top.open('https://www.haxball.com'+'/replay?v=' + c.Id, '_self')
+	//0 == a ? (/*a = window.top.location,*/window.top.open('https://www.haxball.com'+'/replay?v=' + c.Id, '_self'))  : u.xb()
   };
    else {
     var d = new P('Replay error', 'Couldn\'t load the file.', [
