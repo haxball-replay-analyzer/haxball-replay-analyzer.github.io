@@ -4693,11 +4693,11 @@ ri: function (a) {
 	match[match.length-1].goals[match[match.length-1].goals.length-1].for = a.w;
   };
   a.Oi = function (a) {
-    var b = c.j.Fb.Eb.td;
+    //console.log("Ktoś wygrał");
+	var b = c.j.Fb.Eb.td;
     b.Pa(a == p.fa ? b.Gq : b.Cn);
 	match[match.length-1].stopped = true;
-    c.j.Qa.Gb('' +
-    a.w + ' team won the match')
+    c.j.Qa.Gb('' +a.w + ' team won the match')
   };
   a.ml = function (a, e, f) {
     e && !f && c.j.Qa.Gb('Game paused' + b(a))
@@ -6061,7 +6061,7 @@ if (0 == this.Bb) {
   d = p.Ia;
   b = this.ta.F;
   for (a = 0; a < c && (d = a++, d = this.S.Kn(b[O.dk[d]].a, O.Yk[d]), d == p.Ia); );
-  if(d!=p.Ia) //console.log("coś tu chyba gol",a,b,c,d,e,f,g,h,i,k);//k.a = piłka
+  if(d!=p.Ia) console.log(this.Ma.Pi);//console.log("coś tu chyba gol",a,b,c,d,e,f,g,h,i,k);//k.a = piłka
   d != p.Ia ? (this.Bb = 2, this.vc = 150, this.ae = d, d == p.fa ? this.Kb++ : this.Pb++, null != this.Ma.Ni && this.Ma.Ni(d.pg), null != this.Ma.Ol && this.Ma.Ol(d.$))  : 0 < this.Da && this.Hc >= 60 * this.Da && this.Pb != this.Kb && (null != this.Ma.Pi && this.Ma.Pi(), this.um())
 } else if (2 == this.Bb) this.vc--,
 0 >= this.vc && (0 < this.ib && (this.Pb >= this.ib || this.Kb >= this.ib) || 0 < this.Da && this.Hc >= 60 * this.Da && this.Pb != this.Kb ? this.um()  : (this.Gk(), null != this.Ma.lq && this.Ma.lq()));
