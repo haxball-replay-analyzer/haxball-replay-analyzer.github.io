@@ -1,6 +1,11 @@
 (function (qc) {
-  var kicker, lastKicker, goals=[], match = [{started: true, stopped: false,kicks:[],kicksRed:0,kicksBlue:0, possRed:0, possBlue:0,scoreRed: 0, scoreBlue: 0, player: [], goals: []}], player=[], players=[], playerList=[], czyAktualizowacGraczy = true;
-  var czasGry = 0, czasik=[], mtc=0, playSounds = false;
+  var kicker, lastKicker, goals=[], match = [{started: true, stopped: false,kicks:[],shots:[],shotsRed:0,shotsBlue:0,passes:[],passesRed:0,passesBlue:0,kicksRed:0,kicksBlue:0, possRed:0, possBlue:0,scoreRed: 0, scoreBlue: 0, player: [], goals: []}], player=[], players=[], playerList=[], czyAktualizowacGraczy = true;
+  var czasGry = 0, czasik=[], mtc=0, playSounds = false, pileczka=[], aktualizuj = true, aktualizujStadion = true;
+  var redGoalCord=[],blueGoalCord=[];
+  
+  
+  // ZWRÓCIĆ UWAGĘ NA ZMIENNĄ 'AKTUALIZUJ' PRZY WSZELKICH STATACH
+  
   function dupa() {
 	  console.log("łado");
   }
@@ -522,7 +527,11 @@
     };
     this.fp = d.get('leave');
     this.fp.onclick = function () {
-      A.i(c.de)
+      A.i(c.de);
+	  aktualizuj = true;
+	  kicker, lastKicker, goals=[], match = [{started: true, stopped: false,kicks:[],shots:[],shotsRed:0,shotsBlue:0,passes:[],passesRed:0,passesBlue:0,kicksRed:0,kicksBlue:0, possRed:0, possBlue:0,scoreRed: 0, scoreBlue: 0, player: [], goals: []}], player=[], players=[], playerList=[], czyAktualizowacGraczy = true;
+      czasGry = 0, czasik=[], mtc=0, playSounds = false, pileczka=[], aktualizuj = true, aktualizujStadion = true;
+	  redGoalCord=[],blueGoalCord=[];
     }
   }
   function Q(a) {
@@ -841,6 +850,29 @@
 		  newCell_1.innerHTML = ""+match[mtc].kicksRed;
 		  newCell_2.innerHTML = "KICKS";
 		  newCell_3.innerHTML = ""+match[mtc].kicksBlue;
+		  
+		  newRow = tableRef.insertRow(wiersz);
+		  newCell_1 = newRow.insertCell();
+		  newCell_1.innerHTML = ""+match[mtc].passesRed;
+		  newCell_1.style="text-align: right; color:red";
+		  newCell_1 = newRow.insertCell();
+		  newCell_1.innerHTML = "PASSES";
+		  newCell_1.style="text-align: center";
+		  newCell_1 = newRow.insertCell();
+		  newCell_1.innerHTML = ""+match[mtc].passesBlue;
+		  newCell_1.style="text-align: left; color: #5688e5";
+		  
+		  newRow = tableRef.insertRow(wiersz);
+		  newCell_1 = newRow.insertCell();
+		  newCell_1.innerHTML = ""+match[mtc].shotsRed;
+		  newCell_1.style="text-align: right; color:red";
+		  newCell_1 = newRow.insertCell();
+		  newCell_1.innerHTML = "SHOTS ON GOAL";
+		  newCell_1.style="text-align: center";
+		  newCell_1 = newRow.insertCell();
+		  newCell_1.innerHTML = ""+match[mtc].shotsBlue;
+		  newCell_1.style="text-align: left; color: #5688e5";
+		  
 		  document.getElementById("prevMatch").onclick = function() {
 			  if (mtc>0) {
 				  mtc--;
@@ -855,23 +887,30 @@
 				  document.getElementById("button_staty").click();
 			  }
 		  }
+		  tableRef = document.getElementById("div.tabela2").getElementsByTagName('tbody')[0];
 		  newRow = tableRef.insertRow();
 		  newCell_1 = newRow.insertCell();
-		  newCell_1.style="text-align: left";
+		  newCell_1.style="text-align: left; width: 100px";
 		  newCell_1.innerHTML="Players";
 		  newCell_2 = newRow.insertCell();
-		  newCell_2.style="text-align: center";
+		  newCell_2.style="text-align: center; width: 100px";
 		  newCell_2.innerHTML = "Goals";
 		  newCell_3 = newRow.insertCell();
-		  newCell_3.style="text-align: center";
+		  newCell_3.style="text-align: center; width: 100px";
 		  newCell_3.innerHTML = "Assists";
 		  newCell_3 = newRow.insertCell();
-		  newCell_3.style="text-align: center";
+		  newCell_3.style="text-align: center; width: 100px";
 		  newCell_3.innerHTML = "Kicks";
+		  newCell_3 = newRow.insertCell();
+		  newCell_3.style="text-align: center; width: 100px";
+		  newCell_3.innerHTML = "Passes";
+		  newCell_3 = newRow.insertCell();
+		  newCell_3.style="text-align: center; width: 100px";
+		  newCell_3.innerHTML = "Shots on Goal";
 		  newRow = tableRef.insertRow();
 		  newRow.style="height: 6px";
 	  for (var i=0; i<match[mtc].player.length; i++) {
-		  var pr = match[mtc].player[i], prGoals=0, prAssists=0, prKicks=0;
+		  var pr = match[mtc].player[i], prGoals=0, prAssists=0, prKicks=0, prPasses=0,prShots=0;
 		  for (var j=0; j<match[mtc].goals.length; j++) {
 			  //console.log(match[mtc].goals[j].scorer,match[mtc].goals[j].assist,pr.nick);
 			  if (match[mtc].goals[j].scorer==pr.nick) prGoals++;
@@ -879,30 +918,53 @@
 		  }
 		  //console.log(pr, prGoals, prAssists, prKicks);
 		  for (var j=0; j<match[mtc].kicks.length; j++) if (match[mtc].kicks[j]==pr.nick) prKicks++;
+		  for (var j=0; j<match[mtc].passes.length; j++) if (match[mtc].passes[j]==pr.nick) prPasses++;
+		  for (var j=0; j<match[mtc].shots.length; j++) if (match[mtc].shots[j]==pr.nick) prShots++;
 		  newRow = tableRef.insertRow();
 		  newCell_1 = newRow.insertCell();
-		  newCell_1.style="text-align: left; background-color: #244a67";
+		  newCell_1.style="text-align: left; background-color: #244a67; width: 100px";
 		  newCell_1.innerHTML="<div class=\"flagico f-"+pr.nation+"\"></div> "+pr.nick;
 		  newCell_2 = newRow.insertCell();
-		  newCell_2.style="text-align: center; background-color: #244a67";
+		  newCell_2.style="text-align: center; background-color: #244a67; width: 100px";
 		  newCell_2.innerHTML = ""+prGoals;
 		  newCell_3 = newRow.insertCell();
-		  newCell_3.style="text-align: center; background-color: #244a67";
+		  newCell_3.style="text-align: center; background-color: #244a67; width: 100px";
 		  newCell_3.innerHTML = ""+prAssists;
 		  var newCell_4 = newRow.insertCell();
-		  newCell_4.style="text-align: center; background-color: #244a67";
+		  newCell_4.style="text-align: center; background-color: #244a67; width: 100px";
 		  newCell_4.innerHTML = ""+prKicks;
+		  
+		  newCell_4 = newRow.insertCell();
+		  newCell_4.style="text-align: center; background-color: #244a67; width: 100px";
+		  newCell_4.innerHTML = ""+prPasses;
+		  
+		  newCell_2 = newRow.insertCell();
+		  newCell_2.style="text-align: center; background-color: #244a67; width: 100px";
+		  newCell_2.innerHTML = ""+prShots;
+		  
 		  newCell_3 = newRow.insertCell();
 		  newCell_3.innerHTML = " ";
 		  newCell_3 = newRow.insertCell();
 		  newCell_3.innerHTML = " ";
+		  
 		  newRow = tableRef.insertRow();
 		  newRow.style="height: 10px";
 		  newCell_4 = newRow.insertCell();
 		  newCell_4.innerHTML = "";
 		  newCell_4 = newRow.insertCell();
-		  newCell_4.innerHTML = ""
-	  }
+		  newCell_4.innerHTML = "";
+		  
+	  };
+	var im = document.getElementsByClassName("dialog kick-player-view")[0];
+	//console.log(im);
+	var imx = (im.clientWidth/2)+im.offsetWidth-120;
+	var imxx = "position:absolute;top:15px;left:"+imx+"px";
+	document.getElementById("button_close").style=imxx;
+	aktualizuj = false;
+	/*document.getElementById("button_leave").onclick = function() {
+		aktualizuj = true;
+		A.i(c.de);
+	};*/
 		  
 		/*	  
 		  
@@ -4179,7 +4241,7 @@ newCell.appendChild(newText);*/
         var c = c + a.Ab(),
         e = a.B();
 		//console.log("TU",a,b,c,d,e);
-		kicker=undefined, lastKicker=undefined, goals=[], match = [{started: true, stopped: false,kicks:[],kicksRed:0,kicksBlue:0, possRed:0, possBlue:0,scoreRed: 0, scoreBlue: 0, player: [], goals: []}], player=[], players=[], playerList=[], czyAktualizowacGraczy = true;
+		if (aktualizuj) kicker=undefined, lastKicker=undefined, goals=[], match = [{started: true, stopped: false,kicks:[],shots:[],shotsRed:0,shotsBlue:0,passes:[],passesRed:0,passesBlue:0,kicksRed:0,kicksBlue:0, possRed:0, possBlue:0,scoreRed: 0, scoreBlue: 0, player: [], goals: []}], player=[], players=[], playerList=[], czyAktualizowacGraczy = true;
 		czasGry = 0, czasik=[], mtc=0;
         this.Vk.push({
           mj: c / this.mf,
@@ -4626,19 +4688,21 @@ ri: function (a) {
     c.j.Qa.Gb('' + b.w + ' has joined');
     n.Na.cd(n.Na.$o);
 	//console.log("wejscie",b, a);
-	players.push(b);
-	if (!playerList.includes(b.w)) {
-		playerList.push(b.w);
-		match[match.length-1].player.push({
-			id: b.V,
-			nick: b.w,
-			nation: b.Kd,
-			goals: 0,
-			assists: 0,
-			kicks: 0
-		});
+	if (aktualizuj) {
+		players.push(b);
+		if (!playerList.includes(b.w)) {
+			playerList.push(b.w);
+			match[match.length-1].player.push({
+				id: b.V,
+				nick: b.w,
+				nation: b.Kd,
+				goals: 0,
+				assists: 0,
+				kicks: 0
+			});
+		}
+		c.Ti(a)
 	}
-    c.Ti(a)
   };
   a.ul = function (d, e, f, g) {
     y.i(c.Op, d.V);
@@ -4676,27 +4740,29 @@ ri: function (a) {
 	//console.log("Tu niby gol",czasGry, match[match.length-1].goals/*a,b,c.j.Fb.xc.Ke,d,e,f,g,h,i,j,k*/);
 	//console.log("GOOOOOOOOOOOOOOOOOOOOOOOOOOOOL",kicker.name, kicker.team, lastKicker.name, match[match.length-1].scoreRed, match[match.length-1].scoreBlue);
 	//console.log(ha.Wk(20494*16.6666666666666));
-	if (a.w=="Red") match[match.length-1].scoreRed++;//aktualny wynik red lub blue = a.$
-	else match[match.length-1].scoreBlue++;
-	if (a.w == kicker.team) {
-		match[match.length-1].goals.push({scorer: kicker.name, aktualnyWynik: [match[match.length-1].scoreRed,match[match.length-1].scoreBlue]});
-		match[match.length-1].player[playerList.indexOf(kicker.name)].goals++;
-		if (lastKicker!= undefined && a.w == lastKicker.team) {
-			match[match.length-1].goals[match[match.length-1].goals.length-1].assist = lastKicker.name;
-			match[match.length-1].player[playerList.indexOf(lastKicker.name)].assists++;
+	if (aktualizuj) {
+		if (a.w=="Red") match[match.length-1].scoreRed++;//aktualny wynik red lub blue = a.$
+		else match[match.length-1].scoreBlue++;
+		if (a.w == kicker.team) {
+			match[match.length-1].goals.push({scorer: kicker.name, aktualnyWynik: [match[match.length-1].scoreRed,match[match.length-1].scoreBlue]});
+			match[match.length-1].player[playerList.indexOf(kicker.name)].goals++;
+			if (lastKicker!= undefined && a.w == lastKicker.team) {
+				match[match.length-1].goals[match[match.length-1].goals.length-1].assist = lastKicker.name;
+				match[match.length-1].player[playerList.indexOf(lastKicker.name)].assists++;
+			} else {
+				match[match.length-1].goals[match[match.length-1].goals.length-1].assist = false;
+			}
 		} else {
-			match[match.length-1].goals[match[match.length-1].goals.length-1].assist = false;
+			match[match.length-1].goals.push({scorer: kicker.name+" (own goal)", assist: false, aktualnyWynik: [match[match.length-1].scoreRed,match[match.length-1].scoreBlue]});
 		}
-	} else {
-		match[match.length-1].goals.push({scorer: kicker.name+" (own goal)", assist: false, aktualnyWynik: [match[match.length-1].scoreRed,match[match.length-1].scoreBlue]});
+		match[match.length-1].goals[match[match.length-1].goals.length-1].for = a.w;
 	}
-	match[match.length-1].goals[match[match.length-1].goals.length-1].for = a.w;
   };
   a.Oi = function (a) {
     //console.log("Ktoś wygrał");
 	var b = c.j.Fb.Eb.td;
     b.Pa(a == p.fa ? b.Gq : b.Cn);
-	match[match.length-1].stopped = true;
+	if (aktualizuj) match[match.length-1].stopped = true;
     c.j.Qa.Gb('' +a.w + ' team won the match')
   };
   a.ml = function (a, e, f) {
@@ -4716,8 +4782,8 @@ ri: function (a) {
 	czyAktualizowacGraczy = true;
 	match[match.length-1].goals = goals;
 	goals = [];*/
-	if (match[match.length-1].stopped) {
-		match.push({started: true, stopped: false,kicks:[],kicksRed:0,kicksBlue:0,possRed:0,possBlue:0, scoreRed: 0, scoreBlue: 0, goals: [], player: match[match.length-1].player});
+	if (match[match.length-1].stopped && aktualizuj) {
+		match.push({started: true, stopped: false,kicks:[],shots:[],shotsRed:0,shotsBlue:0,passes:[],passesRed:0,passesBlue:0,kicksRed:0,kicksBlue:0,possRed:0,possBlue:0, scoreRed: 0, scoreBlue: 0, goals: [], player: match[match.length-1].player});
 		for (var i=0; i<match[match.length-1].player.length; i++) {
 			var pr = match[match.length-1].player[i];
 			match[match.length-1].player[i].goals = 0;
@@ -4729,14 +4795,16 @@ ri: function (a) {
   };
   a.vf = function (a) {
     //console.log("Game stopped");
-	match[match.length-1].stopped = true;
+	if (aktualizuj) match[match.length-1].stopped = true;
 	//czyAktualizowacGraczy = true;
 	null != a && c.j.Qa.Gb('Game stopped' + b(a))
   };
   a.Ii = function (a, e) {
     if (!e.Pe()) {
       var d = J.Vg(e.Sj(), 8);
+	  console.log(e);
 	  //console.log("stadium loaded",a,e);
+	  aktualizujStadion = true;
       c.j.Qa.Gb('Stadium "' + e.w + '" (' + d + ') loaded' + b(a))
     }
   };
@@ -5946,7 +6014,7 @@ if (0 < this.Oa) 120 > this.Oa && this.Oa--;
  else {
 var b = this.Ma.Os;
 null != b && b();
-if (czyAktualizowacGraczy) {
+if (czyAktualizowacGraczy && aktualizuj) {
 	let li = this.Ma.I;
 	//console.log("chyba lista graczy",li);
 	players = players.concat(li);
@@ -5980,37 +6048,73 @@ for (var b = this.Ma.I, c = 0; c < b.length; ) {
         var l = k[g];
         ++g;
         if (0 != (l.v & 64) && l != d.H) {
-          var t = l.a,
+		  var t = l.a,
           h = d.H.a,
           m = t.x - h.x,
           t = t.y - h.y,
           h = Math.sqrt(m * m + t * t);
           if (4 > h - l.Z - d.H.Z) {
-            var f = m / h,
+            //console.log("pileczka",l.a.x,l.a.y); TU KORDY PILKI
+			let ball = {x:l.a.x, y:l.a.y};
+			var f = m / h,
             m = t / h,
             t = e.Re,
             n = h = l.D,
             l = l.aa;
             h.x = n.x + f * t * l;
             h.y = n.y + m * t * l;
+			//console.log("wektor piłki",h.x,h.y,e); TU WEKTOR PO STRZALE
+			ball.vx = h.x;
+			ball.vy = h.y;
             n = d.H;
             l = - e.Se;
             h = t = n.D;
             n = n.aa;
             t.x = h.x + f * l * n;
             t.y = h.y + m * l * n;//checkpoint kick
+			//console.log(t.x,t.y);
 			//console.log("kopnięcie chyba",d,d.w,d.ea.w);
-			if(d.ea.w=="Red") match[match.length-1].kicksRed++;
-			else match[match.length-1].kicksBlue++;
-			//console.log("sprawdzenie czasu po kopnięciu",this.Hc)
-			//console.log("UWAGA",match,playerList)
-			match[match.length-1].kicks.push(d.w);
-			//console.log("sprawdzenie czegoś tam",g,b);
-			if (kicker!=undefined && d.w!=kicker.name) lastKicker = kicker;
-			kicker = {
-				name: d.w,
-				team: d.ea.w
-			};
+			//console.log(ball);
+			let rA = ball.vy/ball.vx;
+			let rB = 1;
+			let rC = ball.y - (ball.vy/ball.vx)*ball.x;
+			if (d.ea.w == "Red" && ball.vx>0 && 99.762*ball.vx+ball.x > blueGoalCord[0] && ball.x<blueGoalCord[0]) {
+				let poz = rA*blueGoalCord[0] + rC;
+				if (poz > blueGoalCord[1] && poz < blueGoalCord[2]) {
+					console.log("Celny strzał "+d.w);
+					match[match.length-1].shots.push(d.w);
+					match[match.length-1].shotsRed++;
+				}
+			} else if (d.ea.w == "Blue" && ball.vx<0 && 99.762*ball.vx+ball.x < redGoalCord[0] && ball.x>redGoalCord[0]) {
+				let poz = rA*redGoalCord[0] + rC;
+				if (poz > redGoalCord[1] && poz < redGoalCord[2]) {
+					console.log("Celny strzał"+d.w);
+					match[match.length-1].shots.push(d.w);
+					match[match.length-1].shotsBlue++;
+				}
+			}
+			if (aktualizuj) {
+				if(d.ea.w=="Red") match[match.length-1].kicksRed++;
+				else match[match.length-1].kicksBlue++;
+				//console.log("sprawdzenie czasu po kopnięciu",this.Hc)
+				//console.log("UWAGA",match,playerList)
+				match[match.length-1].kicks.push(d.w);
+				pileczka.push(/*[k[0].D,k[0].a]*/[t,l]);
+				//console.log("sprawdzenie czegoś tam",k[0].D,k[0].a);
+				if (kicker!=undefined && d.w!=kicker.name) {
+					lastKicker = kicker;
+					if (lastKicker.team==d.ea.w) {
+						//console.log("Podanie ",lastKicker.name+" do "+d.w);
+						match[match.length-1].passes.push(lastKicker.name);
+						if (lastKicker.team=="Red") match[match.length-1].passesRed++;
+						else match[match.length-1].passesBlue++;
+					}
+				}
+				kicker = {
+					name: d.w,
+					team: d.ea.w
+				};
+			}
 			//console.log("chyba pozycja piłki (jednak nie)",h,l,d,f,t,n);
             f = !0
           }
@@ -6050,8 +6154,28 @@ if (0 == this.Bb) {
 } else if (1 == this.Bb) {
   this.Hc +=
   0.016666666666666666;
+  //console.log(this);
+  if (aktualizujStadion) {
+	//console.log(a.S);//cały czas wyyświetlany stadion checkpoint
+	var std = this.S.tc[0];
+	if (std.qe.w=="Red") redGoalCord=[std.W.x, std.W.y, std.ca.y];
+	else blueGoalCord=[std.W.x, std.W.y, std.ca.y];
+	
+	std = this.S.tc[1];
+	if (std.qe.w=="Red") redGoalCord=[std.W.x, std.ca.y, std.W.y];
+	else blueGoalCord=[std.W.x, std.W.y, std.ca.y];
+	if (redGoalCord[2]<redGoalCord[1]) {
+		redGoalCord.push(redGoalCord[1]);
+		redGoalCord.splice(1,1);
+	}
+	if (blueGoalCord[2]<blueGoalCord[1]) {
+		blueGoalCord.push(blueGoalCord[2]);
+		blueGoalCord.splice(1,1);
+	}
+	aktualizujStadion = false;
+}
   //console.log("coś",this.Hc);//checkpoint every tick
-  if (kicker!=undefined) {
+  if (kicker!=undefined && aktualizuj) {
 	  if (kicker.team=="Red") match[match.length-1].possRed++;
 	  else match[match.length-1].possBlue++;
   }
@@ -6062,7 +6186,7 @@ if (0 == this.Bb) {
   d = p.Ia;
   b = this.ta.F;
   for (a = 0; a < c && (d = a++, d = this.S.Kn(b[O.dk[d]].a, O.Yk[d]), d == p.Ia); );
-  if(d!=p.Ia) console.log(this.Ma.Pi);//console.log("coś tu chyba gol",a,b,c,d,e,f,g,h,i,k);//k.a = piłka
+  if(d!=p.Ia) //console.log(this.Ma.Pi);//console.log("coś tu chyba gol",a,b,c,d,e,f,g,h,i,k);//k.a = piłka
   d != p.Ia ? (this.Bb = 2, this.vc = 150, this.ae = d, d == p.fa ? this.Kb++ : this.Pb++, null != this.Ma.Ni && this.Ma.Ni(d.pg), null != this.Ma.Ol && this.Ma.Ol(d.$))  : 0 < this.Da && this.Hc >= 60 * this.Da && this.Pb != this.Kb && (null != this.Ma.Pi && this.Ma.Pi(), this.um())
 } else if (2 == this.Bb) this.vc--,
 0 >= this.vc && (0 < this.ib && (this.Pb >= this.ib || this.Kb >= this.ib) || 0 < this.Da && this.Hc >= 60 * this.Da && this.Pb != this.Kb ? this.um()  : (this.Gk(), null != this.Ma.lq && this.Ma.lq()));
@@ -6080,6 +6204,7 @@ if (0 == this.Bb) {
 um: function () {
 this.vc = 300;
 this.Bb = 3;
+console.log(pileczka);
 //console.log("Chyba koniec meczu", match);
 null != this.Ma.Oi && this.Ma.Oi(this.Pb > this.Kb ? p.fa : p.xa)
 },
@@ -6809,6 +6934,7 @@ discs: g,
 playerPhysics: f,
 ballPhysics: 'disc0'
 };
+console.log("stadion",c);
 h.ka(c, 'maxViewWidth', this.Ye, 0);
 h.ka(c, 'cameraFollow', 1 == this.Ge ? 'player' : '', '');
 h.ka(c, 'spawnDistance', this.kc, 200);
@@ -11116,16 +11242,16 @@ Ka.N = '<div class=\'disconnected-view\'><div class=\'dialog basic-dialog\'><h1>
 hb.N = '<div id=\'game-state-view\' class=\'game-state-view\'><div class=\'bar-container\'><div class=\'bar\'><div class=\'scoreboard\'><div class=\'teamicon red\'></div><div class=\'score\' data-hook=\'red-score\'>0</div><div>-</div><div class=\'score\' data-hook=\'blue-score\'>0</div><div class=\'teamicon blue\'></div></div><div data-hook=\'timer\'></div></div></div><div class=\'canvas\' data-hook=\'canvas\'></div></div>';
 ja.N = '<div class=\'game-view\' tabindex=\'-1\'><div class=\'top-section\' data-hook=\'gameplay-section\'></div><div class=\'bottom-section\'><div data-hook=\'stats\'></div><div data-hook=\'chatbox\'></div><div class=\'buttons\'><button data-hook=\'menu\'><i class=\'icon-menu\'></i>Menu<span class=\'tooltip\'>Toggle room menu [Escape]</span></button><button data-hook=\'settings\'><i class=\'icon-cog\'></i>Settings</button><button id=\'button_staty\' data-hook=\'staty\'>📈 Game stats</button></div></div><div data-hook=\'popups\'></div></div>';
 gb.N = '<div class=\'dialog kick-player-view\'><h1 data-hook=\'title\'></h1><div class=label-input><label>Reason: </label><input type=\'text\' data-hook=\'reason\' /></div><button data-hook=\'ban-btn\'><i class=\'icon-block\'></i>Ban from rejoining: <span data-hook=\'ban-text\'></span></button><div class="row"><button data-hook=\'close\'>Cancel</button><button data-hook=\'kick\'>Kick</button></div></div>';
-gxd.N = '<div style=\'overflow-y: scroll; height: 700px\' class=\'dialog kick-player-view\'><h1 data-hook=\'title\'></h1><table id="div.tabela" style="width: 100%"><tr id=\'trosso\' style="text-align: center"><td style="font-size: 40px; color: red">RED</td><td id="div.wynik" style="font-size: 60px">-:-</td><td style="font-size: 40px; color: #5688e5">BLUE</td></tr><tr style="height: 30px"><td> </td></tr><tr style="font-size: 20px; text-align: center"><td style="width: 200px"></td><td style="width: 200px">GOALS</td><td style="width: 200px"></td></tr><tr style="height: 30px"><td> </td></tr><tr style="font-size: 20px; text-align: center"><td style="width: 200px"></td><td style="width: 200px">STATS</td><td style="width: 200px"></td></tr><tr style="height: 10px"><td> </td></tr><tr style="height: 30px"><td> </td></tr><tr style="font-size: 20px; text-align: center"><td style="width: 200px"></td><td style="width: 200px">PLAYERS</td><td style="width: 200px"></td></tr><tr style="height: 10px"><td> </td></tr></table><button id=\'button_close\' data-hook=\'close\'>❌ Close</button><div class="row"><button id=\'prevMatch\' data-hook=\'close2\'>◀️ Previous match</button><button id=\'nextMatch\' data-hook=\'kick\'>Next match ▶️</button></div></div>';
+gxd.N = '<div style=\'overflow-y: scroll; height: 700px\' class=\'dialog kick-player-view\'><h1 data-hook=\'title\'></h1><button id=\'button_close\' data-hook=\'close\' style=\'position:absolute;top:12px;right:10px\'>❌ Close</button><table id="div.tabela" style="width: 100%"><tr id=\'trosso\' style="text-align: center"><td style="font-size: 40px; color: red">RED</td><td id="div.wynik" style="font-size: 60px">-:-</td><td style="font-size: 40px; color: #5688e5">BLUE</td></tr><tr style="height: 30px"><td> </td></tr><tr style="font-size: 20px; text-align: center"><td style="width: 200px"></td><td style="width: 200px">GOALS</td><td style="width: 200px"></td></tr><tr style="height: 30px"><td> </td></tr><tr style="font-size: 20px; text-align: center"><td style="width: 200px"></td><td style="width: 200px">STATS</td><td style="width: 200px"></td></tr><tr style="height: 10px"><td> </td></tr><tr style="height: 30px"><td> </td></tr></table><table id=\'div.tabela2\'><tr style="font-size: 20px; text-align: center"><td style="width: 200px"></td><td></td><td style="width: 100px">PLAYERS</td><td style="width: 100px"></td></tr><tr style="height: 10px"><td> </td></tr></table><div class="row"><button id=\'prevMatch\' data-hook=\'close2\'>◀️ Previous match</button><button id=\'nextMatch\' data-hook=\'kick\'>Next match ▶️</button></div></div>';
 fb.N = '<div class=\'dialog basic-dialog leave-room-view\'><h1>Leave room?</h1><p>Are you sure you want to leave the room?</p><div class=\'buttons\'><button data-hook=\'cancel\'>Cancel</button><button data-hook=\'leave\'><i class=\'icon-logout\'></i>Leave</button></div></div>';
 eb.N = '<div class=\'dialog pick-stadium-view\'><h1>Pick a stadium</h1><div class=\'splitter\'><div class=\'list\' data-hook=\'list\'></div><div class=\'buttons\'><button data-hook=\'pick\'>Pick</button><button data-hook=\'delete\'>Delete</button><div class=\'file-btn\'><label for=\'stadfile\'>Load</label><input id=\'stadfile\' type=\'file\' accept=\'.hbs\' data-hook=\'file\'/></div><button data-hook=\'export\'>Export</button><div class=\'spacer\'></div><button data-hook=\'cancel\'>Cancel</button></div></div></div>';
 db.N = '<div class=\'dialog\' style=\'min-width:200px\'><h1 data-hook=\'name\'></h1><button data-hook=\'admin\'></button><button data-hook=\'kick\'>Kick</button><button data-hook=\'close\'>Close</button></div>';
 cb.N = '<div class=\'player-list-item\'><div data-hook=\'flag\' class=\'flagico\'></div><div data-hook=\'name\'></div><div data-hook=\'ping\'></div></div>';
 za.N = '<div class=\'player-list-view\'><div class=\'buttons\'><button data-hook=\'join-btn\'>Join</button><button data-hook=\'reset-btn\' class=\'admin-only\'></button></div><div class=\'list\' data-hook=\'list\'></div></div>';
-ha.N = '<div class=\'replay-controls-view\'><button id=\'reset_button\' data-hook=\'reset\'><i class=\'icon-to-start\'></i></button><button id=\'play_button\' data-hook=\'play\'><i data-hook=\'playicon\'></i></button><div data-hook=\'spd\'>1x</div><button id=\'spddown\' data-hook=\'spddn\'>-</button><button data-hook=\'spdup\'>+</button><div data-hook=\'time\'>00:00</div><div class=\'timebar\' data-hook=\'timebar\'><div class=\'barbg\'><div class=\'bar\' data-hook=\'progbar\'></div></div><div class=\'timetooltip\' data-hook=\'timetooltip\'></div></div><button data-hook=\'leave\'>Leave</button></div>';
+ha.N = '<div class=\'replay-controls-view\'><button id=\'reset_button\' data-hook=\'reset\'><i class=\'icon-to-start\'></i></button><button id=\'play_button\' data-hook=\'play\'><i data-hook=\'playicon\'></i></button><div data-hook=\'spd\'>1x</div><button id=\'spddown\' data-hook=\'spddn\'>-</button><button data-hook=\'spdup\'>+</button><div data-hook=\'time\'>00:00</div><div class=\'timebar\' data-hook=\'timebar\'><div class=\'barbg\'><div class=\'bar\' data-hook=\'progbar\'></div></div><div class=\'timetooltip\' data-hook=\'timetooltip\'></div></div><button id=\'button_leave\' data-hook=\'leave\'>Leave</button></div>';
 bb.N = '<div class=\'dialog basic-dialog room-link-view\'><h1>Room link</h1><p>Use this url to link others directly into this room.</p><input data-hook=\'link\' readonly></input><div class=\'buttons\'><button data-hook=\'close\'>Close</button><button data-hook=\'copy\'>Copy to clipboard</button></div></div>';
 ab.tj = '<tr><td><span data-hook=\'tag\'></span><span data-hook=\'name\'></span></td><td data-hook=\'players\'></td><td data-hook=\'pass\'></td><td><div data-hook=\'flag\' class=\'flagico\'></div><span data-hook=\'distance\'></span></td></tr>';
-Aa.tj = '<div class=\'roomlist-view\'><div class=\'notice\' data-hook=\'notice\' hidden><div data-hook=\'notice-contents\'>Testing the notice.</div><div data-hook=\'notice-close\'><i class=\'icon-cancel\'></i></div></div><div class=\'dialog\'><h1>Haxball Replay Analyzer v1.1</h1><p>Contact: <br>Discord: Falafel#3895, you can find me at discord.io/haxracing<br>turbofalafel@gmail.com</p><br><br><div class=\'splitter\'><div style=\'display: none\' class=\'list\'><table class=\'header\'><colgroup><col><col><col><col></colgroup><thead><tr><td>Name</td><td>Players</td><td>Pass</td><td>Distance</td></tr></thead></table><div class=\'separator\'></div><div class=\'content\' data-hook=\'listscroll\'><table><colgroup><col><col><col><col></colgroup><tbody data-hook=\'list\'></tbody></table></div><div class=\'filters\'><span class=\'bool\' data-hook=\'fil-pass\'>Show locked <i></i></span><span class=\'bool\' data-hook=\'fil-full\'>Show full <i></i></span></div></div><div class=\'buttons\'><button style=\'display: none\' data-hook=\'refresh\'><i class=\'icon-cw\'></i><div>Refresh</div></button><button style=\'display: none\' data-hook=\'join\'><i class=\'icon-login\'></i><div>Join Room</div></button><button style=\'display: none\' data-hook=\'create\'><i class=\'icon-plus\'></i><div>Create Room</div></button><div style=\'display: none\' class=\'spacer\'></div><div class=\'file-btn\'><label for=\'replayfile\'><i class=\'icon-play\'></i><div>Load replay</div></label><input id=\'replayfile\' type=\'file\' accept=\'.hbr2\' data-hook=\'replayfile\'/></div><button style=\'display: none\' data-hook=\'settings\'><i class=\'icon-cog\'></i><div>Settings</div></button><button style=\'display: none\' data-hook=\'changenick\'><i class=\'icon-cw\'></i><div>Change Nick</div></button><br><br><p style=\'font-size: 150%\'>v1.1 - 12.05.2020</p><p>• Fixed some bugs</p><br><br><p style=\'font-size: 150%\'>v1.0 - 08.05.2020</p><p>• Created the analyzer. Load replay and click "Game stats"</p></div></div></div></div>';
+Aa.tj = '<div class=\'roomlist-view\'><div class=\'notice\' data-hook=\'notice\' hidden><div data-hook=\'notice-contents\'>Testing the notice.</div><div data-hook=\'notice-close\'><i class=\'icon-cancel\'></i></div></div><div class=\'dialog\'><h1>Haxball Replay Analyzer v1.2</h1><p>Contact: <br>Discord: Falafel#3895, you can find me at discord.io/haxracing<br>turbofalafel@gmail.com</p><br><br><div class=\'splitter\'><div style=\'display: none\' class=\'list\'><table class=\'header\'><colgroup><col><col><col><col></colgroup><thead><tr><td>Name</td><td>Players</td><td>Pass</td><td>Distance</td></tr></thead></table><div class=\'separator\'></div><div class=\'content\' data-hook=\'listscroll\'><table><colgroup><col><col><col><col></colgroup><tbody data-hook=\'list\'></tbody></table></div><div class=\'filters\'><span class=\'bool\' data-hook=\'fil-pass\'>Show locked <i></i></span><span class=\'bool\' data-hook=\'fil-full\'>Show full <i></i></span></div></div><div class=\'buttons\'><button style=\'display: none\' data-hook=\'refresh\'><i class=\'icon-cw\'></i><div>Refresh</div></button><button style=\'display: none\' data-hook=\'join\'><i class=\'icon-login\'></i><div>Join Room</div></button><button style=\'display: none\' data-hook=\'create\'><i class=\'icon-plus\'></i><div>Create Room</div></button><div style=\'display: none\' class=\'spacer\'></div><div class=\'file-btn\'><label for=\'replayfile\'><i class=\'icon-play\'></i><div>Load replay</div></label><input id=\'replayfile\' type=\'file\' accept=\'.hbr2\' data-hook=\'replayfile\'/></div><button style=\'display: none\' data-hook=\'settings\'><i class=\'icon-cog\'></i><div>Settings</div></button><button style=\'display: none\' data-hook=\'changenick\'><i class=\'icon-cw\'></i><div>Change Nick</div></button><br><br><p style=\'font-size: 120%; font-weight:bold; color:#f57878\'>v1.2 - 15.05.2020</p><p>• Fixed bug with doubling stats when user rewatch the match<br>• Added Passes and Shots on Goal to statistics</p><br><br><p style=\'font-size: 120%; font-weight:bold; color:#f57878\'>v1.1 - 12.05.2020</p><p>• Fixed some bugs</p><br><br><p style=\'font-size: 120%; font-weight:bold; color:#f57878\'>v1.0 - 08.05.2020</p><p>• Created the analyzer. Load replay and click "Game stats"</p></div></div></div></div>';
 Za.N = '<div class=\'room-password-view\'><div class=\'dialog\'><h1>Password required</h1><div class=\'label-input\'><label>Password:</label><input data-hook=\'input\' /></div><div class=\'buttons\'><button data-hook=\'cancel\'>Cancel</button><button data-hook=\'ok\'>Ok</button></div></div></div>';
 Ya.N = '<div id=\'room-view\' class=\'room-view\'><div class=\'container\'><h1 data-hook=\'room-name\'></h1><div class=\'header-btns\'><button data-hook=\'rec-btn\'><i class=\'icon-circle\'></i>Rec</button><button data-hook=\'link-btn\'><i class=\'icon-link\'></i>Link</button><button data-hook=\'leave-btn\'><i class=\'icon-logout\'></i>Leave</button></div><div class=\'teams\'><div class=\'tools admin-only\'><button data-hook=\'auto-btn\'>Auto</button><button data-hook=\'rand-btn\'>Rand</button><button data-hook=\'lock-btn\'>Lock</button><button data-hook=\'reset-all-btn\'>Reset</button></div><div data-hook=\'red-list\'></div><div data-hook=\'spec-list\'></div><div data-hook=\'blue-list\'></div><div class=\'spacer admin-only\'></div></div><div class=\'settings\'><div><label class=\'lbl\'>Time limit</label><select data-hook=\'time-limit-sel\'></select></div><div><label class=\'lbl\'>Score limit</label><select data-hook=\'score-limit-sel\'></select></div><div><label class=\'lbl\'>Stadium</label><label class=\'val\' data-hook=\'stadium-name\'>testing the stadium name</label><button class=\'admin-only\' data-hook=\'stadium-pick\'>Pick</button></div></div><div class=\'controls admin-only\'><button data-hook=\'start-btn\'><i class=\'icon-play\'></i>Start game</button><button data-hook=\'stop-btn\'><i class=\'icon-stop\'></i>Stop game</button><button data-hook=\'pause-btn\'><i class=\'icon-pause\'></i>Pause</button></div></div></div>';
 aa.N = '<div class=\'dialog settings-view\'><h1>Settings</h1><button data-hook=\'close\'>Close</button><div class=\'tabs\'><button data-hook=\'soundbtn\'>Sound</button><button data-hook=\'videobtn\'>Video</button><button data-hook=\'inputbtn\'>Input</button><button data-hook=\'miscbtn\'>Misc</button></div><div data-hook=\'presskey\' tabindex=\'-1\'><div>Press a key</div></div><div class=\'tabcontents\'><div class=\'section\' data-hook=\'miscsec\'><div class=\'loc\' data-hook=\'loc\'></div><div class=\'loc\' data-hook=\'loc-ovr\'></div><button data-hook=\'loc-ovr-btn\'></button></div><div class=\'section\' data-hook=\'soundsec\'><div data-hook="tsound-main">Sounds enabled</div><div data-hook="tsound-chat">Chat sound enabled</div><div data-hook="tsound-highlight">Nick highlight sound enabled</div><div data-hook="tsound-crowd">Crowd sound enabled</div></div><div class=\'section\' data-hook=\'inputsec\'></div><div class=\'section\' data-hook=\'videosec\'><div>Viewport Mode:<select data-hook=\'viewmode\'><option>Dynamic</option><option>Restricted 840x410</option><option>Full 1x Zoom</option><option>Full 1.25x Zoom</option><option>Full 1.5x Zoom</option><option>Full 1.75x Zoom</option><option>Full 2x Zoom</option><option>Full 2.25x Zoom</option><option>Full 2.5x Zoom</option></select></div><div>FPS Limit:<select data-hook=\'fps\'><option>None (Recommended)</option><option>30</option></select></div><div>Resolution Scaling:<select data-hook=\'resscale\'><option>100%</option><option>75%</option><option>50%</option><option>25%</option></select></div><div data-hook="tvideo-teamcol">Custom team colors enabled</div><div data-hook="tvideo-showindicators">Show chat indicators</div><div data-hook="tvideo-showavatars">Show player avatars</div></div></div></div>';
