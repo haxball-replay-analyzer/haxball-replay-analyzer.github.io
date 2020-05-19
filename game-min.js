@@ -1,10 +1,231 @@
 (function (qc) {
-  var kicker, lastKicker, goals=[], match = [{started: true, stopped: false,kicks:[],shots:[],shotsRed:0,shotsBlue:0,passes:[],passesRed:0,passesBlue:0,kicksRed:0,kicksBlue:0, possRed:0, possBlue:0,scoreRed: 0, scoreBlue: 0, player: [], goals: []}], player=[], players=[], playerList=[], czyAktualizowacGraczy = true;
+  var kicker, lastKicker, goals=[], match = [{started: true, stopped: false,kicks:[],shots:[],redTeam:[],blueTeam:[],shotsRed:0,shotsBlue:0,passes:[],passesRed:0,passesBlue:0,kicksRed:0,kicksBlue:0, possRed:0, possBlue:0,scoreRed: 0, scoreBlue: 0, player: [], goals: []}], player=[], players=[], playerList=[], czyAktualizowacGraczy = true;
   var czasGry = 0, czasik=[], mtc=0, playSounds = false, pileczka=[], aktualizuj = true, aktualizujStadion = true;
-  var redGoalCord=[],blueGoalCord=[], redName = "RED",blueName="BLUE";
+  var redGoalCord=[],blueGoalCord=[], redName = "RED",blueName="BLUE", checkTeams=true;
   
   
   // ZWRÓCIĆ UWAGĘ NA ZMIENNĄ 'AKTUALIZUJ' PRZY WSZELKICH STATACH
+  
+  sortTable = function(par) {
+		  var tab = [];
+	  for (var i=0; i<match[mtc].player.length; i++) {
+		  var pr = match[mtc].player[i], prGoals=0, prAssists=0, prKicks=0, prPasses=0,prShots=0;
+		  for (var j=0; j<match[mtc].goals.length; j++) {
+			  //console.log(match[mtc].goals[j].scorer,match[mtc].goals[j].assist,pr.nick);
+			  if (match[mtc].goals[j].scorer==pr.nick) prGoals++;
+			  else if (match[mtc].goals[j].assist==pr.nick) prAssists++;
+		  }
+		  //console.log(pr, prGoals, prAssists, prKicks);
+		  for (var j=0; j<match[mtc].kicks.length; j++) if (match[mtc].kicks[j]==pr.nick) prKicks++;
+		  for (var j=0; j<match[mtc].passes.length; j++) if (match[mtc].passes[j]==pr.nick) prPasses++;
+		  for (var j=0; j<match[mtc].shots.length; j++) if (match[mtc].shots[j]==pr.nick) prShots++;
+		  tab.push([pr.nick,pr.nation,prGoals,prAssists,prKicks,prPasses,prShots]);
+	  }
+	  //console.log(tab);
+	  // TU SORTOWANIE WSTAWIĆ
+	  if (par>=0) {
+		  var tab2 = [[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]];
+		  for (var i=0; i<tab.length; i++) {
+			for (var j=0; j<tab2.length; j++) {
+				if (tab[i][par]>=tab2[j][par]) {
+					//console.log(tab2);
+					tab2.splice(j,0,tab[i]);
+					//console.log(tab2);
+					break;
+				}
+			}
+		  }
+		  tab2.splice(tab2.length-1,1);
+		  tab = tab2;
+	  }
+	  var tableRef = document.getElementById("div.tabela2").getElementsByTagName('tbody')[0];
+	  tableRef.innerHTML='<tr style="font-size: 20px; text-align: center"><td style="width: 200px"></td><td></td><td style="width: 100px">PLAYERS</td><td style="width: 100px"></td></tr><tr style="height: 10px"><td> </td></tr>';
+	  newRow = tableRef.insertRow();
+	  newCell_1 = newRow.insertCell();
+	  newCell_1.style="text-align: left; width: 100px";
+	  newCell_1.innerHTML="Players";
+	  newCell_2 = newRow.insertCell();
+	  newCell_2.style="text-align: center; width: 100px";
+	  newCell_2.id="cell1";
+	  newCell_2.innerHTML = "Goals";
+	  newCell_3 = newRow.insertCell();
+	  newCell_3.style="text-align: center; width: 100px";
+	  newCell_3.id="cell2";
+	  newCell_3.innerHTML = "Assists";
+	  newCell_3 = newRow.insertCell();
+	  newCell_3.style="text-align: center; width: 100px";
+	  newCell_3.id="cell3";
+	  newCell_3.innerHTML = "Kicks";
+	  newCell_3 = newRow.insertCell();
+	  newCell_3.style="text-align: center; width: 100px";
+	  newCell_3.id="cell4";
+	  newCell_3.innerHTML = "Passes";
+	  newCell_3 = newRow.insertCell();
+	  newCell_3.style="text-align: center; width: 100px";
+	  newCell_3.id="cell5";
+	  newCell_3.innerHTML = 'Shots on Goal';
+	  newRow = tableRef.insertRow();
+	  newRow.style="height: 6px";
+	  if (par>0) {
+		  for (var i=0; i<tab.length; i++) {
+			  if (match[mtc].redTeam.includes(tab[i][0])) {
+				  var bgc = "9c0603";
+			  } else if (match[mtc].blueTeam.includes(tab[i][0])) {
+				  var bgc = "244a67";
+			  } else continue;
+			  newRow = tableRef.insertRow();
+			  newCell_1 = newRow.insertCell();
+			  newCell_1.style="text-align: left; background-color: #"+bgc+"; width: 100px";
+			  newCell_1.innerHTML="<div class=\"flagico f-"+tab[i][1]+"\"></div> "+tab[i][0];
+			  newCell_2 = newRow.insertCell();
+			  newCell_2.style="text-align: center; background-color: #"+bgc+"; width: 100px";
+			  newCell_2.innerHTML = ""+tab[i][2];
+			  newCell_3 = newRow.insertCell();
+			  newCell_3.style="text-align: center; background-color: #"+bgc+"; width: 100px";
+			  newCell_3.innerHTML = ""+tab[i][3];
+			  var newCell_4 = newRow.insertCell();
+			  newCell_4.style="text-align: center; background-color: #"+bgc+"; width: 100px";
+			  newCell_4.innerHTML = ""+tab[i][4];
+			  
+			  newCell_4 = newRow.insertCell();
+			  newCell_4.style="text-align: center; background-color: #"+bgc+"; width: 100px";
+			  newCell_4.innerHTML = ""+tab[i][5];
+			  
+			  newCell_2 = newRow.insertCell();
+			  newCell_2.style="text-align: center; background-color: #"+bgc+"; width: 100px";
+			  newCell_2.innerHTML = ""+tab[i][6];
+			  
+			  newCell_3 = newRow.insertCell();
+			  newCell_3.innerHTML = " ";
+			  newCell_3 = newRow.insertCell();
+			  newCell_3.innerHTML = " ";
+			  
+			  newRow = tableRef.insertRow();
+			  newRow.style="height: 10px";
+			  newCell_4 = newRow.insertCell();
+			  newCell_4.innerHTML = "";
+			  newCell_4 = newRow.insertCell();
+			  newCell_4.innerHTML = "";
+		  }
+		  
+	  } else {
+		  
+		  for (var i=0; i<tab.length; i++) {
+			  if (match[mtc].redTeam.includes(tab[i][0])) {
+				  var bgc = "#9c0603";
+			  } else continue;
+			  newRow = tableRef.insertRow();
+			  newCell_1 = newRow.insertCell();
+			  newCell_1.style="text-align: left; background-color: #9c0603; width: 100px";
+			  newCell_1.innerHTML="<div class=\"flagico f-"+tab[i][1]+"\"></div> "+tab[i][0];
+			  newCell_2 = newRow.insertCell();
+			  newCell_2.style="text-align: center; background-color: #9c0603; width: 100px";
+			  newCell_2.innerHTML = ""+tab[i][2];
+			  newCell_3 = newRow.insertCell();
+			  newCell_3.style="text-align: center; background-color: #9c0603; width: 100px";
+			  newCell_3.innerHTML = ""+tab[i][3];
+			  var newCell_4 = newRow.insertCell();
+			  newCell_4.style="text-align: center; background-color: #9c0603; width: 100px";
+			  newCell_4.innerHTML = ""+tab[i][4];
+			  
+			  newCell_4 = newRow.insertCell();
+			  newCell_4.style="text-align: center; background-color: #9c0603; width: 100px";
+			  newCell_4.innerHTML = ""+tab[i][5];
+			  
+			  newCell_2 = newRow.insertCell();
+			  newCell_2.style="text-align: center; background-color: #9c0603; width: 100px";
+			  newCell_2.innerHTML = ""+tab[i][6];
+			  
+			  newCell_3 = newRow.insertCell();
+			  newCell_3.innerHTML = " ";
+			  newCell_3 = newRow.insertCell();
+			  newCell_3.innerHTML = " ";
+			  
+			  newRow = tableRef.insertRow();
+			  newRow.style="height: 10px";
+			  newCell_4 = newRow.insertCell();
+			  newCell_4.innerHTML = "";
+			  newCell_4 = newRow.insertCell();
+			  newCell_4.innerHTML = "";
+			  
+		  };
+	  for (var i=0; i<tab.length; i++) {
+		  if (!match[mtc].blueTeam.includes(tab[i][0])) continue;
+		  newRow = tableRef.insertRow();
+		  newCell_1 = newRow.insertCell();
+		  newCell_1.style="text-align: left; background-color: #244a67; width: 100px";
+		  newCell_1.innerHTML="<div class=\"flagico f-"+tab[i][1]+"\"></div> "+tab[i][0];
+		  newCell_2 = newRow.insertCell();
+		  newCell_2.style="text-align: center; background-color: #244a67; width: 100px";
+		  newCell_2.innerHTML = ""+tab[i][2];
+		  newCell_3 = newRow.insertCell();
+		  newCell_3.style="text-align: center; background-color: #244a67; width: 100px";
+		  newCell_3.innerHTML = ""+tab[i][3];
+		  var newCell_4 = newRow.insertCell();
+		  newCell_4.style="text-align: center; background-color: #244a67; width: 100px";
+		  newCell_4.innerHTML = ""+tab[i][4];
+		  
+		  newCell_4 = newRow.insertCell();
+		  newCell_4.style="text-align: center; background-color: #244a67; width: 100px";
+		  newCell_4.innerHTML = ""+tab[i][5];
+		  
+		  newCell_2 = newRow.insertCell();
+		  newCell_2.style="text-align: center; background-color: #244a67; width: 100px";
+		  newCell_2.innerHTML = ""+tab[i][6];
+		  
+		  newCell_3 = newRow.insertCell();
+		  newCell_3.innerHTML = " ";
+		  newCell_3 = newRow.insertCell();
+		  newCell_3.innerHTML = " ";
+		  
+		  newRow = tableRef.insertRow();
+		  newRow.style="height: 10px";
+		  newCell_4 = newRow.insertCell();
+		  newCell_4.innerHTML = "";
+		  newCell_4 = newRow.insertCell();
+		  newCell_4.innerHTML = "";
+		  
+	  };
+	  }
+	document.getElementById("cell1").setAttribute('onclick', 'sortTable(2);');
+	document.getElementById("cell1").setAttribute('onmouseover', 'this.style.cursor="pointer"');
+  
+	document.getElementById("cell2").setAttribute('onclick', 'sortTable(3);');
+	document.getElementById("cell2").setAttribute('onmouseover', 'this.style.cursor="pointer"');
+  
+	document.getElementById("cell3").setAttribute('onclick', 'sortTable(4);');
+	document.getElementById("cell3").setAttribute('onmouseover', 'this.style.cursor="pointer"');
+  
+	document.getElementById("cell4").setAttribute('onclick', 'sortTable(5);');
+	document.getElementById("cell4").setAttribute('onmouseover', 'this.style.cursor="pointer"');
+  
+	document.getElementById("cell5").setAttribute('onclick', 'sortTable(6);');
+	document.getElementById("cell5").setAttribute('onmouseover', 'this.style.cursor="pointer"');
+	var im = document.getElementsByClassName("dialog kick-player-view")[0];
+	//console.log(im);
+	var imx = (im.clientWidth/2)+im.offsetWidth-120;
+	var imxx = "position:absolute;top:15px;left:"+imx+"px";
+	document.getElementById("button_close").style=imxx;
+	aktualizuj = false;
+	/*document.getElementById("button_leave").onclick = function() {
+		aktualizuj = true;
+		A.i(c.de);
+	};*/
+		  
+		/*	  
+		  
+		  var tableRef = document.getElementById('myTable').getElementsByTagName('tbody')[0];
+
+// Insert a row in the table at the last row
+var newRow   = tableRef.insertRow();
+
+// Insert a cell in the row at index 0
+var newCell  = newRow.insertCell(0);
+
+// Append a text node to the cell
+var newText  = document.createTextNode('New row');
+newCell.appendChild(newText);*/
+	  };
   
   function dupa() {
 	  console.log("łado");
@@ -247,7 +468,8 @@
     }
   }
   function Ya(a) {
-    this.fk = !1;
+    //console.log(a);
+	this.fk = !1;
     this.qm = new za(p.Ia);
     this.Lj = new za(p.xa);
     this.Hl = new za(p.fa);
@@ -531,7 +753,7 @@
     this.fp.onclick = function () {
       A.i(c.de);
 	  aktualizuj = true;
-	  kicker, lastKicker, goals=[], match = [{started: true, stopped: false,kicks:[],shots:[],shotsRed:0,shotsBlue:0,passes:[],passesRed:0,passesBlue:0,kicksRed:0,kicksBlue:0, possRed:0, possBlue:0,scoreRed: 0, scoreBlue: 0, player: [], goals: []}], player=[], players=[], playerList=[], czyAktualizowacGraczy = true;
+	  kicker, lastKicker, goals=[], match = [{started: true, stopped: false,kicks:[],shots:[],redTeam:[],blueTeam:[],shotsRed:0,shotsBlue:0,passes:[],passesRed:0,passesBlue:0,kicksRed:0,kicksBlue:0, possRed:0, possBlue:0,scoreRed: 0, scoreBlue: 0, player: [], goals: []}], player=[], players=[], playerList=[], czyAktualizowacGraczy = true;
       czasGry = 0, czasik=[], mtc=0, playSounds = false, pileczka=[], aktualizuj = true, aktualizujStadion = true;
 	  redGoalCord=[],blueGoalCord=[], redName = "RED",blueName="BLUE";
     }
@@ -751,7 +973,7 @@
   function gxd(a) {
     var b = this;
     this.g = v.Ga(gxd.N);
-	console.log(redName);
+	//console.log(redName);
     var c = v.Ea(this.g);
 	//console.log(c);
     this.Ze = c.get('title');
@@ -799,7 +1021,8 @@
     f.textContent = a
   }
   function ja(a) {
-    this.Fb = new hb;
+    //console.log(a);
+	this.Fb = new hb;
     this.Gd = !1;
     this.pe = new Xa;
     this.Qa = new Da;
@@ -830,6 +1053,7 @@
       var cod = new gxd(a);
 	  //console.log(cod);
 	  //console.log("Wyświetlają się chyba");
+	  
 	  setTimeout(function() {
 		  document.getElementById("div.wynik").innerHTML=""+match[mtc].scoreRed+":"+match[mtc].scoreBlue;
 		  var tableRef = document.getElementById("div.tabela").getElementsByTagName('tbody')[0];
@@ -924,97 +1148,12 @@
 		  }
 		  document.getElementById("input_blueTeam").value = blueName;
 		  tableRef = document.getElementById("div.tabela2").getElementsByTagName('tbody')[0];
-		  newRow = tableRef.insertRow();
-		  newCell_1 = newRow.insertCell();
-		  newCell_1.style="text-align: left; width: 100px";
-		  newCell_1.innerHTML="Players";
-		  newCell_2 = newRow.insertCell();
-		  newCell_2.style="text-align: center; width: 100px";
-		  newCell_2.innerHTML = "Goals";
-		  newCell_3 = newRow.insertCell();
-		  newCell_3.style="text-align: center; width: 100px";
-		  newCell_3.innerHTML = "Assists";
-		  newCell_3 = newRow.insertCell();
-		  newCell_3.style="text-align: center; width: 100px";
-		  newCell_3.innerHTML = "Kicks";
-		  newCell_3 = newRow.insertCell();
-		  newCell_3.style="text-align: center; width: 100px";
-		  newCell_3.innerHTML = "Passes";
-		  newCell_3 = newRow.insertCell();
-		  newCell_3.style="text-align: center; width: 100px";
-		  newCell_3.innerHTML = "Shots on Goal";
-		  newRow = tableRef.insertRow();
-		  newRow.style="height: 6px";
-	  for (var i=0; i<match[mtc].player.length; i++) {
-		  var pr = match[mtc].player[i], prGoals=0, prAssists=0, prKicks=0, prPasses=0,prShots=0;
-		  for (var j=0; j<match[mtc].goals.length; j++) {
-			  //console.log(match[mtc].goals[j].scorer,match[mtc].goals[j].assist,pr.nick);
-			  if (match[mtc].goals[j].scorer==pr.nick) prGoals++;
-			  else if (match[mtc].goals[j].assist==pr.nick) prAssists++;
-		  }
-		  //console.log(pr, prGoals, prAssists, prKicks);
-		  for (var j=0; j<match[mtc].kicks.length; j++) if (match[mtc].kicks[j]==pr.nick) prKicks++;
-		  for (var j=0; j<match[mtc].passes.length; j++) if (match[mtc].passes[j]==pr.nick) prPasses++;
-		  for (var j=0; j<match[mtc].shots.length; j++) if (match[mtc].shots[j]==pr.nick) prShots++;
-		  newRow = tableRef.insertRow();
-		  newCell_1 = newRow.insertCell();
-		  newCell_1.style="text-align: left; background-color: #244a67; width: 100px";
-		  newCell_1.innerHTML="<div class=\"flagico f-"+pr.nation+"\"></div> "+pr.nick;
-		  newCell_2 = newRow.insertCell();
-		  newCell_2.style="text-align: center; background-color: #244a67; width: 100px";
-		  newCell_2.innerHTML = ""+prGoals;
-		  newCell_3 = newRow.insertCell();
-		  newCell_3.style="text-align: center; background-color: #244a67; width: 100px";
-		  newCell_3.innerHTML = ""+prAssists;
-		  var newCell_4 = newRow.insertCell();
-		  newCell_4.style="text-align: center; background-color: #244a67; width: 100px";
-		  newCell_4.innerHTML = ""+prKicks;
+		  //console.log("e",sortTable);
+		  sortTable(-1);
+		  //console.log("f",document.getElementById("thisCell"));
 		  
-		  newCell_4 = newRow.insertCell();
-		  newCell_4.style="text-align: center; background-color: #244a67; width: 100px";
-		  newCell_4.innerHTML = ""+prPasses;
-		  
-		  newCell_2 = newRow.insertCell();
-		  newCell_2.style="text-align: center; background-color: #244a67; width: 100px";
-		  newCell_2.innerHTML = ""+prShots;
-		  
-		  newCell_3 = newRow.insertCell();
-		  newCell_3.innerHTML = " ";
-		  newCell_3 = newRow.insertCell();
-		  newCell_3.innerHTML = " ";
-		  
-		  newRow = tableRef.insertRow();
-		  newRow.style="height: 10px";
-		  newCell_4 = newRow.insertCell();
-		  newCell_4.innerHTML = "";
-		  newCell_4 = newRow.insertCell();
-		  newCell_4.innerHTML = "";
-		  
-	  };
-	var im = document.getElementsByClassName("dialog kick-player-view")[0];
-	//console.log(im);
-	var imx = (im.clientWidth/2)+im.offsetWidth-120;
-	var imxx = "position:absolute;top:15px;left:"+imx+"px";
-	document.getElementById("button_close").style=imxx;
-	aktualizuj = false;
-	/*document.getElementById("button_leave").onclick = function() {
-		aktualizuj = true;
-		A.i(c.de);
-	};*/
-		  
-		/*	  
-		  
-		  var tableRef = document.getElementById('myTable').getElementsByTagName('tbody')[0];
-
-// Insert a row in the table at the last row
-var newRow   = tableRef.insertRow();
-
-// Insert a cell in the row at index 0
-var newCell  = newRow.insertCell(0);
-
-// Append a text node to the cell
-var newText  = document.createTextNode('New row');
-newCell.appendChild(newText);*/
+		  //console.log("g",document.getElementById("thisCell"));
+		  //console.log(match);
 	  }, 400);
       cod.qb = function () {
         b.bb(null)
@@ -1060,7 +1199,7 @@ newCell.appendChild(newText);*/
     this.Ke = 0;
     this.g = window.document.createElement('div');
     this.g.className = 'game-timer-view';
-    this.g.appendChild(this.bq = this.Wd('DOGRYWECZKA!', 'overtime'));
+    this.g.appendChild(this.bq = this.Wd('OVERTIME!', 'overtime'));
     this.g.appendChild(this.zp = this.Wd('0', 'digit'));
     this.g.appendChild(this.yp = this.Wd('0', 'digit'));
     this.g.appendChild(this.Wd(':', null));
@@ -4272,7 +4411,7 @@ newCell.appendChild(newText);*/
         var c = c + a.Ab(),
         e = a.B();
 		//console.log("TU",a,b,c,d,e);
-		if (aktualizuj) kicker=undefined, lastKicker=undefined, goals=[], match = [{started: true, stopped: false,kicks:[],shots:[],shotsRed:0,shotsBlue:0,passes:[],passesRed:0,passesBlue:0,kicksRed:0,kicksBlue:0, possRed:0, possBlue:0,scoreRed: 0, scoreBlue: 0, player: [], goals: []}], player=[], players=[], playerList=[], czyAktualizowacGraczy = true;
+		if (aktualizuj) kicker=undefined, lastKicker=undefined, goals=[], match = [{started: true, stopped: false,kicks:[],shots:[],redTeam:[],blueTeam:[],shotsRed:0,shotsBlue:0,passes:[],passesRed:0,passesBlue:0,kicksRed:0,kicksBlue:0, possRed:0, possBlue:0,scoreRed: 0, scoreBlue: 0, player: [], goals: []}], player=[], players=[], playerList=[], czyAktualizowacGraczy = true;
 		czasGry = 0, czasik=[], mtc=0;
         this.Vk.push({
           mj: c / this.mf,
@@ -4801,6 +4940,7 @@ ri: function (a) {
   };
   a.Pi = function () {
     var a = c.j.Fb.Eb.td;
+	if (aktualizuj) match[match.length-1].stopped = true;
     if (playSounds) a.Pa(a.Ar)
   };
   a.Ki = function (a) {
@@ -4814,7 +4954,7 @@ ri: function (a) {
 	match[match.length-1].goals = goals;
 	goals = [];*/
 	if (match[match.length-1].stopped && aktualizuj) {
-		match.push({started: true, stopped: false,kicks:[],shots:[],shotsRed:0,shotsBlue:0,passes:[],passesRed:0,passesBlue:0,kicksRed:0,kicksBlue:0,possRed:0,possBlue:0, scoreRed: 0, scoreBlue: 0, goals: [], player: match[match.length-1].player});
+		match.push({started: true, stopped: false,kicks:[],shots:[],redTeam:[],blueTeam:[],shotsRed:0,shotsBlue:0,passes:[],passesRed:0,passesBlue:0,kicksRed:0,kicksBlue:0,possRed:0,possBlue:0, scoreRed: 0, scoreBlue: 0, goals: [], player: match[match.length-1].player});
 		for (var i=0; i<match[match.length-1].player.length; i++) {
 			var pr = match[match.length-1].player[i];
 			match[match.length-1].player[i].goals = 0;
@@ -4827,6 +4967,7 @@ ri: function (a) {
   a.vf = function (a) {
     //console.log("Game stopped");
 	if (aktualizuj) match[match.length-1].stopped = true;
+	checkTeams = true;
 	//czyAktualizowacGraczy = true;
 	null != a && c.j.Qa.Gb('Game stopped' + b(a))
   };
@@ -4843,7 +4984,8 @@ ri: function (a) {
     c.j.Qa.Gb('' + a.w + ' ' + (a.Ld ? 'has desynchronized' : 'is back in sync'))
   };
   a.xl = function (d, e, f) {
-    null != a.K && c.j.Qa.Gb('' +
+    checkTeams = true;
+	null != a.K && c.j.Qa.Gb('' +
     e.w + ' was moved to ' + f.w + b(d))
   };
   a.ii = function (a, e) {
@@ -6104,7 +6246,7 @@ for (var b = this.Ma.I, c = 0; c < b.length; ) {
             t.x = h.x + f * l * n;
             t.y = h.y + m * l * n;//checkpoint kick
 			//console.log(t.x,t.y);
-			console.log("kopnięcie chyba",d);//,d.w,d.ea.w);
+			//console.log("kopnięcie chyba",d);//,d.w,d.ea.w);
 			//console.log(ball);
 			let rA = ball.vy/ball.vx;
 			let rB = 1;
@@ -6200,12 +6342,20 @@ if (0 == this.Bb) {
 		redGoalCord.splice(1,1);
 	}
 	if (blueGoalCord[2]<blueGoalCord[1]) {
-		blueGoalCord.push(blueGoalCord[2]);
+		blueGoalCord.push(blueGoalCord[1]);
 		blueGoalCord.splice(1,1);
 	}
 	aktualizujStadion = false;
+	//console.log(redGoalCord,blueGoalCord);
 }
   //console.log("coś",this.Hc);//checkpoint every tick
+  if (checkTeams && aktualizuj) {
+	  for (var i=0; i<b.length; i++) {
+		  if (b[i].ea.w=="Red" && !match[match.length-1].redTeam.includes(b[i].w)) match[match.length-1].redTeam.push(b[i].w);
+		  else if (b[i].ea.w=="Blue" && !match[match.length-1].blueTeam.includes(b[i].w)) match[match.length-1].blueTeam.push(b[i].w);
+	  }
+	  checkTeams = false;
+  }
   if (kicker!=undefined && aktualizuj) {
 	  if (kicker.team=="Red") match[match.length-1].possRed++;
 	  else match[match.length-1].possBlue++;
@@ -6217,7 +6367,7 @@ if (0 == this.Bb) {
   d = p.Ia;
   b = this.ta.F;
   for (a = 0; a < c && (d = a++, d = this.S.Kn(b[O.dk[d]].a, O.Yk[d]), d == p.Ia); );
-  if(d!=p.Ia) //console.log(this.Ma.Pi);//console.log("coś tu chyba gol",a,b,c,d,e,f,g,h,i,k);//k.a = piłka
+  //if(d!=p.Ia) //console.log(this.Ma.Pi);//console.log("coś tu chyba gol",a,b,c,d,e,f,g,h,i,k);//k.a = piłka
   d != p.Ia ? (this.Bb = 2, this.vc = 150, this.ae = d, d == p.fa ? this.Kb++ : this.Pb++, null != this.Ma.Ni && this.Ma.Ni(d.pg), null != this.Ma.Ol && this.Ma.Ol(d.$))  : 0 < this.Da && this.Hc >= 60 * this.Da && this.Pb != this.Kb && (null != this.Ma.Pi && this.Ma.Pi(), this.um())
 } else if (2 == this.Bb) this.vc--,
 0 >= this.vc && (0 < this.ib && (this.Pb >= this.ib || this.Kb >= this.ib) || 0 < this.Da && this.Hc >= 60 * this.Da && this.Pb != this.Kb ? this.um()  : (this.Gk(), null != this.Ma.lq && this.Ma.lq()));
@@ -6235,7 +6385,7 @@ if (0 == this.Bb) {
 um: function () {
 this.vc = 300;
 this.Bb = 3;
-console.log(pileczka);
+//console.log(pileczka);
 //console.log("Chyba koniec meczu", match);
 null != this.Ma.Oi && this.Ma.Oi(this.Pb > this.Kb ? p.fa : p.xa)
 },
@@ -11283,7 +11433,7 @@ za.N = '<div class=\'player-list-view\'><div class=\'buttons\'><button data-hook
 ha.N = '<div class=\'replay-controls-view\'><button id=\'reset_button\' data-hook=\'reset\'><i class=\'icon-to-start\'></i></button><button id=\'play_button\' data-hook=\'play\'><i data-hook=\'playicon\'></i></button><div data-hook=\'spd\'>1x</div><button id=\'spddown\' data-hook=\'spddn\'>-</button><button data-hook=\'spdup\'>+</button><div data-hook=\'time\'>00:00</div><div class=\'timebar\' data-hook=\'timebar\'><div class=\'barbg\'><div class=\'bar\' data-hook=\'progbar\'></div></div><div class=\'timetooltip\' data-hook=\'timetooltip\'></div></div><button id=\'button_leave\' data-hook=\'leave\'>Leave</button></div>';
 bb.N = '<div class=\'dialog basic-dialog room-link-view\'><h1>Room link</h1><p>Use this url to link others directly into this room.</p><input data-hook=\'link\' readonly></input><div class=\'buttons\'><button data-hook=\'close\'>Close</button><button data-hook=\'copy\'>Copy to clipboard</button></div></div>';
 ab.tj = '<tr><td><span data-hook=\'tag\'></span><span data-hook=\'name\'></span></td><td data-hook=\'players\'></td><td data-hook=\'pass\'></td><td><div data-hook=\'flag\' class=\'flagico\'></div><span data-hook=\'distance\'></span></td></tr>';
-Aa.tj = '<div class=\'roomlist-view\'><div class=\'notice\' data-hook=\'notice\' hidden><div data-hook=\'notice-contents\'>Testing the notice.</div><div data-hook=\'notice-close\'><i class=\'icon-cancel\'></i></div></div><div class=\'dialog\'><h1>Haxball Replay Analyzer v1.3</h1><p>Contact: <br>Discord: Falafel#3895, you can find me at discord.io/haxracing<br>turbofalafel@gmail.com</p><br><br><div class=\'splitter\'><div style=\'display: none\' class=\'list\'><table class=\'header\'><colgroup><col><col><col><col></colgroup><thead><tr><td>Name</td><td>Players</td><td>Pass</td><td>Distance</td></tr></thead></table><div class=\'separator\'></div><div class=\'content\' data-hook=\'listscroll\'><table><colgroup><col><col><col><col></colgroup><tbody data-hook=\'list\'></tbody></table></div><div class=\'filters\'><span class=\'bool\' data-hook=\'fil-pass\'>Show locked <i></i></span><span class=\'bool\' data-hook=\'fil-full\'>Show full <i></i></span></div></div><div class=\'buttons\'><button style=\'display: none\' data-hook=\'refresh\'><i class=\'icon-cw\'></i><div>Refresh</div></button><button style=\'display: none\' data-hook=\'join\'><i class=\'icon-login\'></i><div>Join Room</div></button><button style=\'display: none\' data-hook=\'create\'><i class=\'icon-plus\'></i><div>Create Room</div></button><div style=\'display: none\' class=\'spacer\'></div><div class=\'file-btn\'><label for=\'replayfile\'><i class=\'icon-play\'></i><div>Load replay</div></label><input id=\'replayfile\' type=\'file\' accept=\'.hbr2\' data-hook=\'replayfile\'/></div><button style=\'display: none\' data-hook=\'settings\'><i class=\'icon-cog\'></i><div>Settings</div></button><button style=\'display: none\' data-hook=\'changenick\'><i class=\'icon-cw\'></i><div>Change Nick</div></button><br><br><p style=\'font-size: 120%; font-weight:bold; color:#f57878\'>v1.3 - 17.05.2020</p><p>• Team names (RED/BLUE) are now editable, just click on them<br>• Fixed sounds and pop-up messages</p><br><br><p style=\'font-size: 120%; font-weight:bold; color:#f57878\'>v1.2 - 15.05.2020</p><p>• Fixed bug with doubling stats when user rewatch the match<br>• Added Passes and Shots on Goal to statistics</p><br><br><p style=\'font-size: 120%; font-weight:bold; color:#f57878\'>v1.1 - 12.05.2020</p><p>• Fixed some bugs</p><br><br><p style=\'font-size: 120%; font-weight:bold; color:#f57878\'>v1.0 - 08.05.2020</p><p>• Created the analyzer. Load replay and click "Game stats"</p></div></div></div></div>';
+Aa.tj = '<div class=\'roomlist-view\'><div class=\'notice\' data-hook=\'notice\' hidden><div data-hook=\'notice-contents\'>Testing the notice.</div><div data-hook=\'notice-close\'><i class=\'icon-cancel\'></i></div></div><div class=\'dialog\'><h1>Haxball Replay Analyzer v1.04</h1><p>Contact: <br>Discord: Falafel#3895, you can find me at discord.io/haxracing<br>turbofalafel@gmail.com</p><br><br><div class=\'splitter\'><div style=\'display: none\' class=\'list\'><table class=\'header\'><colgroup><col><col><col><col></colgroup><thead><tr><td>Name</td><td>Players</td><td>Pass</td><td>Distance</td></tr></thead></table><div class=\'separator\'></div><div class=\'content\' data-hook=\'listscroll\'><table><colgroup><col><col><col><col></colgroup><tbody data-hook=\'list\'></tbody></table></div><div class=\'filters\'><span class=\'bool\' data-hook=\'fil-pass\'>Show locked <i></i></span><span class=\'bool\' data-hook=\'fil-full\'>Show full <i></i></span></div></div><div class=\'buttons\'><button style=\'display: none\' data-hook=\'refresh\'><i class=\'icon-cw\'></i><div>Refresh</div></button><button style=\'display: none\' data-hook=\'join\'><i class=\'icon-login\'></i><div>Join Room</div></button><button style=\'display: none\' data-hook=\'create\'><i class=\'icon-plus\'></i><div>Create Room</div></button><div style=\'display: none\' class=\'spacer\'></div><div class=\'file-btn\'><label for=\'replayfile\'><i class=\'icon-play\'></i><div>Load replay</div></label><input id=\'replayfile\' type=\'file\' accept=\'.hbr2\' data-hook=\'replayfile\'/></div><button style=\'display: none\' data-hook=\'settings\'><i class=\'icon-cog\'></i><div>Settings</div></button><button style=\'display: none\' data-hook=\'changenick\'><i class=\'icon-cw\'></i><div>Change Nick</div></button><br><br><p style=\'font-size: 120%; font-weight:bold; color:#f57878\'>v1.04 - 19.05.2020</p><p>• Stats in PLAYERS table are now sortable, click on the header<br>• Fixed a bug occuring when game isn\'t manually stopped<br>• Each player\'s row has a color of team, Spectators aren\'t included in stats<br>• Fixed a bug that caused incorrect counting of red shots on goal</p><br><br><p style=\'font-size: 120%; font-weight:bold; color:#f57878\'>v1.03 - 17.05.2020</p><p>• Team names (RED/BLUE) are now editable, just click on them<br>• Fixed sounds and pop-up messages</p><br><br><p style=\'font-size: 120%; font-weight:bold; color:#f57878\'>v1.02 - 15.05.2020</p><p>• Fixed bug with doubling stats when user rewatch the match<br>• Added Passes and Shots on Goal to statistics</p><br><br><p style=\'font-size: 120%; font-weight:bold; color:#f57878\'>v1.01 - 12.05.2020</p><p>• Fixed some bugs</p><br><br><p style=\'font-size: 120%; font-weight:bold; color:#f57878\'>v1.00 - 08.05.2020</p><p>• Created the analyzer. Load replay and click "Game stats"</p></div></div></div></div>';
 Za.N = '<div class=\'room-password-view\'><div class=\'dialog\'><h1>Password required</h1><div class=\'label-input\'><label>Password:</label><input data-hook=\'input\' /></div><div class=\'buttons\'><button data-hook=\'cancel\'>Cancel</button><button data-hook=\'ok\'>Ok</button></div></div></div>';
 Ya.N = '<div id=\'room-view\' class=\'room-view\'><div class=\'container\'><h1 data-hook=\'room-name\'></h1><div class=\'header-btns\'><button data-hook=\'rec-btn\'><i class=\'icon-circle\'></i>Rec</button><button data-hook=\'link-btn\'><i class=\'icon-link\'></i>Link</button><button data-hook=\'leave-btn\'><i class=\'icon-logout\'></i>Leave</button></div><div class=\'teams\'><div class=\'tools admin-only\'><button data-hook=\'auto-btn\'>Auto</button><button data-hook=\'rand-btn\'>Rand</button><button data-hook=\'lock-btn\'>Lock</button><button data-hook=\'reset-all-btn\'>Reset</button></div><div data-hook=\'red-list\'></div><div data-hook=\'spec-list\'></div><div data-hook=\'blue-list\'></div><div class=\'spacer admin-only\'></div></div><div class=\'settings\'><div><label class=\'lbl\'>Time limit</label><select data-hook=\'time-limit-sel\'></select></div><div><label class=\'lbl\'>Score limit</label><select data-hook=\'score-limit-sel\'></select></div><div><label class=\'lbl\'>Stadium</label><label class=\'val\' data-hook=\'stadium-name\'>testing the stadium name</label><button class=\'admin-only\' data-hook=\'stadium-pick\'>Pick</button></div></div><div class=\'controls admin-only\'><button data-hook=\'start-btn\'><i class=\'icon-play\'></i>Start game</button><button data-hook=\'stop-btn\'><i class=\'icon-stop\'></i>Stop game</button><button data-hook=\'pause-btn\'><i class=\'icon-pause\'></i>Pause</button></div></div></div>';
 aa.N = '<div class=\'dialog settings-view\'><h1>Settings</h1><button data-hook=\'close\'>Close</button><div class=\'tabs\'><button data-hook=\'soundbtn\'>Sound</button><button data-hook=\'videobtn\'>Video</button><button data-hook=\'inputbtn\'>Input</button><button data-hook=\'miscbtn\'>Misc</button></div><div data-hook=\'presskey\' tabindex=\'-1\'><div>Press a key</div></div><div class=\'tabcontents\'><div class=\'section\' data-hook=\'miscsec\'><div class=\'loc\' data-hook=\'loc\'></div><div class=\'loc\' data-hook=\'loc-ovr\'></div><button data-hook=\'loc-ovr-btn\'></button></div><div class=\'section\' data-hook=\'soundsec\'><div data-hook="tsound-main">Sounds enabled</div><div data-hook="tsound-chat">Chat sound enabled</div><div data-hook="tsound-highlight">Nick highlight sound enabled</div><div data-hook="tsound-crowd">Crowd sound enabled</div></div><div class=\'section\' data-hook=\'inputsec\'></div><div class=\'section\' data-hook=\'videosec\'><div>Viewport Mode:<select data-hook=\'viewmode\'><option>Dynamic</option><option>Restricted 840x410</option><option>Full 1x Zoom</option><option>Full 1.25x Zoom</option><option>Full 1.5x Zoom</option><option>Full 1.75x Zoom</option><option>Full 2x Zoom</option><option>Full 2.25x Zoom</option><option>Full 2.5x Zoom</option></select></div><div>FPS Limit:<select data-hook=\'fps\'><option>None (Recommended)</option><option>30</option></select></div><div>Resolution Scaling:<select data-hook=\'resscale\'><option>100%</option><option>75%</option><option>50%</option><option>25%</option></select></div><div data-hook="tvideo-teamcol">Custom team colors enabled</div><div data-hook="tvideo-showindicators">Show chat indicators</div><div data-hook="tvideo-showavatars">Show player avatars</div></div></div></div>';
