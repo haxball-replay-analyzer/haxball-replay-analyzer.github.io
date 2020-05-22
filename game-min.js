@@ -235,7 +235,7 @@
 	document.getElementById("cell5").setAttribute('onclick', 'sortTable(6);');
 	document.getElementById("cell5").setAttribute('onmouseover', 'this.style.cursor="pointer"');
 	var im = document.getElementsByClassName("dialog kick-player-view")[0];
-	console.log(im);
+	//console.log(im);
 	var imx = (im.clientWidth/2)+im.offsetWidth-120;
 	var imxx = "width: 100px;position:relative;top:-55px;left:570px";
 	document.getElementById("button_close").style=imxx;
@@ -1096,7 +1096,7 @@ newCell.appendChild(newText);*/
 		  else document.getElementById("nextMatch").style="";
 		  document.getElementById("game-time").innerHTML="Game time: "+parseCzas(match[mtc].gameTicks);
 		  //console.log(tableRef);
-		  var wiersz = 3;
+		  var wiersz = 4;
 		  for (var j=0; j<match[mtc].goals.length; j++) {
 			  var newRow = tableRef.insertRow(wiersz);
 			  wiersz++;
