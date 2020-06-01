@@ -27,8 +27,8 @@
 	if (canvas2.getContext) {
 
 		ctx2 = canvas2.getContext('2d');
-		ctx2.canvas.width = 700;
-		ctx2.canvas.height = 350;
+		ctx2.canvas.width = 500;
+		ctx2.canvas.height = 250;
 
 		//Loading of the home test image - img1
 		var img2 = new Image();
@@ -44,13 +44,13 @@
 			for (var i=0; i<playerPos[mtc][playerList.indexOf(par)].length; i++) {
 				ctx2.beginPath();
 				//ctx2.arc((playerPos[0][2][i].x+606)*314/blueGoalCord[0],(playerPos[0][2][i].y+329)*1/2,7,0,2*Math.PI);
-				ctx2.arc((playerPos[mtc][playerList.indexOf(par)][i].x+stadion[0])*606/(2*stadion[0])+47,(playerPos[mtc][playerList.indexOf(par)][i].y+stadion[1])*306/(2*stadion[1])+21,7,0,2*Math.PI);
+				ctx2.arc((playerPos[mtc][playerList.indexOf(par)][i].x+stadion[0])*433/(2*stadion[0])+33,(playerPos[mtc][playerList.indexOf(par)][i].y+stadion[1])*218/(2*stadion[1])+15,7,0,2*Math.PI);
 				ctx2.fill();
 			}
-			ctx2.font = "25px Verdana";
+			ctx2.font = "20px Verdana";
 			ctx2.textAlign = "center";
 			ctx2.fillStyle = "rgba(0,0,0,1)";
-			ctx2.fillText(par, 350, 20);
+			ctx2.fillText(par, 250, 15);
 			/*ctx.fillRect(240, 0, 220, 350);
 			ctx.fillStyle = "rgba(255, 255, 255, 1)";
 			ctx.strokeStyle = "rgba(0, 0, 0, 1)";
@@ -60,7 +60,7 @@
 			document.getElementById("heatmap").appendChild(canvas2);
 
 		};
-		img2.src = 'https://haxball-replay-analyzer.github.io/images/haxpitch3.png';
+		img2.src = 'https://haxball-replay-analyzer.github.io/images/haxpitch4.png';
 	}
   }
   
@@ -1282,8 +1282,8 @@ newCell.appendChild(newText);*/
 		if (canvas.getContext) {
 
 			ctx = canvas.getContext('2d');
-			ctx.canvas.width = 700;
-			ctx.canvas.height = 350;
+			ctx.canvas.width = 500;
+			ctx.canvas.height = 250;
 
 			//Loading of the home test image - img1
 			var img1 = new Image();
@@ -1293,30 +1293,30 @@ newCell.appendChild(newText);*/
 				//draw background image
 				ctx.drawImage(img1, 0, 0);
 				//draw a box over the top
-				ctx.font = "60px Arial";
+				ctx.font = "45px Arial";
 				ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
-				ctx.fillRect(240, 0, 220, 350);
+				ctx.fillRect(175, 0, 150, 250);
 				ctx.fillStyle = "rgba(255, 255, 255, 1)";
 				ctx.strokeStyle = "rgba(0, 0, 0, 1)";
 				ctx.lineWidth = 8;
 				//console.log(match[mtc].thirds);
 				
 				for (var i=0; i<3; i++) {
-					ctx.strokeText(""+Math.round(100*(match[mtc].thirds[i]/(match[mtc].thirds[0]+match[mtc].thirds[1]+match[mtc].thirds[2])))+"%", 100+200*i, 200);
-					ctx.fillText(""+Math.round(100*(match[mtc].thirds[i]/(match[mtc].thirds[0]+match[mtc].thirds[1]+match[mtc].thirds[2])))+"%", 100+200*i, 200);
+					ctx.strokeText(""+Math.round(100*(match[mtc].thirds[i]/(match[mtc].thirds[0]+match[mtc].thirds[1]+match[mtc].thirds[2])))+"%", 70+140*i, 147);
+					ctx.fillText(""+Math.round(100*(match[mtc].thirds[i]/(match[mtc].thirds[0]+match[mtc].thirds[1]+match[mtc].thirds[2])))+"%", 70+140*i, 147);
 				}
 				document.getElementById("thirdStats").appendChild(canvas);
 
 			};
 
-			img1.src = 'https://haxball-replay-analyzer.github.io/images/haxpitch3.png';
+			img1.src = 'https://haxball-replay-analyzer.github.io/images/haxpitch4.png';
 		}
 		var canvas2 = document.createElement("canvas");
 		if (canvas2.getContext) {
 
 			ctx2 = canvas2.getContext('2d');
-			ctx2.canvas.width = 700;
-			ctx2.canvas.height = 350;
+			ctx2.canvas.width = 500;
+			ctx2.canvas.height = 250;
 
 			//Loading of the home test image - img1
 			var img2 = new Image();
@@ -1328,16 +1328,16 @@ newCell.appendChild(newText);*/
 				//draw a box over the top
 				ctx2.fillStyle = "rgba(255, 0, 0, 0.006)";
 				//console.log(redGoalCord);
-				for (var i=0; i<playerPos[0][5].length; i++) {
+				for (var i=0; i<playerPos[0][1].length; i++) {
 					ctx2.beginPath();
 					//ctx2.arc((playerPos[0][2][i].x+606)*314/blueGoalCord[0],(playerPos[0][2][i].y+329)*1/2,7,0,2*Math.PI);
-					ctx2.arc((playerPos[0][5][i].x+stadion[0])*606/(2*stadion[0])+47,(playerPos[0][5][i].y+stadion[1])*306/(2*stadion[1])+21,7,0,2*Math.PI);
+					ctx2.arc((playerPos[0][1][i].x+stadion[0])*433/(2*stadion[0])+33,(playerPos[0][1][i].y+stadion[1])*218/(2*stadion[1])+15,7,0,2*Math.PI);
 					ctx2.fill();
 				}
-				ctx2.font = "25px Verdana";
+				ctx2.font = "20px Verdana";
 				ctx2.textAlign = "center";
 				ctx2.fillStyle = "rgba(0,0,0,1)";
-				ctx2.fillText(playerList[5], 350, 20);
+				ctx2.fillText(playerList[1], 250, 15);
 				/*ctx.fillRect(240, 0, 220, 350);
 				ctx.fillStyle = "rgba(255, 255, 255, 1)";
 				ctx.strokeStyle = "rgba(0, 0, 0, 1)";
@@ -1347,7 +1347,7 @@ newCell.appendChild(newText);*/
 				document.getElementById("heatmap").appendChild(canvas2);
 
 			};
-			img2.src = 'https://haxball-replay-analyzer.github.io/images/haxpitch3.png';
+			img2.src = 'https://haxball-replay-analyzer.github.io/images/haxpitch4.png';
 		}
 		  
 		  //console.log("e",sortTable);
