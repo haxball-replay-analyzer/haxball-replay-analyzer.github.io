@@ -306,7 +306,7 @@
 	if (/*im.scrollTopMax>200 && */window.innerHeight>930) document.getElementsByClassName("dialog kick-player-view")[0].style="overflow-y: scroll; position:fixed; top:10px; height: 900px";
 	
 	var imx = (im.clientWidth/2)+im.offsetWidth-120;
-	var imxx = "width: 100px;position:relative;top:-55px;left:1270px";
+	var imxx = "width: 100px;position:relative;top:-55px;left:1070px";
 	document.getElementById("button_close").style=imxx;
 	aktualizuj = false;
 	/*document.getElementById("button_leave").onclick = function() {
