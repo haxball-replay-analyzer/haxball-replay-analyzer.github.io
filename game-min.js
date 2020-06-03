@@ -5161,6 +5161,7 @@ ri: function (a) {
 	goals = [];*/
 	if (match[match.length-1].stopped && aktualizuj) {
 		match.push({started: true, stopped: false,thirds:[0,0,0],changes:[],gameTicks:-1,kicks:[],shots:[],redTeam:[],blueTeam:[],shotsRed:0,shotsBlue:0,passes:[],passesRed:0,passesBlue:0,kicksRed:0,kicksBlue:0,possRed:0,possBlue:0, scoreRed: 0, scoreBlue: 0, goals: [], player: match[match.length-1].player});
+		playerPos.push([]);
 		for (var i=0; i<match[match.length-1].player.length; i++) {
 			var pr = match[match.length-1].player[i];
 			match[match.length-1].player[i].goals = 0;
