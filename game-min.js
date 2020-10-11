@@ -1242,14 +1242,15 @@ newCell.appendChild(newText);*/
 	  if (match.length>1 && match[0].gameTicks==-1) match.splice(0,1);
 	  
 	  setTimeout(function() {
-		  if (match[mtc].spaceMode) document.getElementById("tytul").innerHTML = "Match stats (space mode):";
-		  else document.getElementById("tytul").innerHTML = 'Match stats:<select onchange="selectChange()" id="displayedMatch"><option value="0">Red '+match[0].scoreRed+':'+match[0].scoreBlue+' Blue</option></select>';
+		  if (match[mtc].spaceMode) document.getElementById("tytul").innerHTML = 'Match stats (space mode):<select onchange="selectChange()" id="displayedMatch"><option value="0">1: Red '+match[0].scoreRed+':'+match[0].scoreBlue+' Blue</option></select>';
+		  else document.getElementById("tytul").innerHTML = 'Match stats:<select onchange="selectChange()" id="displayedMatch"><option value="0">1: Red '+match[0].scoreRed+':'+match[0].scoreBlue+' Blue</option></select>';
 		  for (var i=1; i<match.length; i++) {
 			  var mA = document.createElement("option");
 			  mA.value = i;
-			  mA.text = 'Red '+match[i].scoreRed+':'+match[i].scoreBlue+' Blue';
+			  mA.text = ''+(i+1)+': Red '+match[i].scoreRed+':'+match[i].scoreBlue+' Blue';
 			  document.getElementById('displayedMatch').add(mA);
 		  }
+		   document.getElementById('displayedMatch').selectedIndex = mtc;
 		  document.getElementById("div.wynik").innerHTML=""+match[mtc].scoreRed+":"+match[mtc].scoreBlue;
 		//console.log(document.getElementById('displayedMatch'));
 		//document.getElementById('dessert').[0]
