@@ -45,7 +45,7 @@
 		gif.addFrame(canv, {delay: 200});
 
 		gif.on('finished', function(blob) {
-		  var ah = window.document.createElement("ah");
+		  var ah = window.document.createElement("a");
 		  ah.href = window.URL.createObjectURL(blob);
 		  ah.download = 'gif from HBR Analyzer.gif';
 		  document.body.appendChild(ah);
