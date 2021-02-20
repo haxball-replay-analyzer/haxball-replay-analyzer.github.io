@@ -3,14 +3,15 @@
     script.src = 'pliki/gif.js';  // set its src to the provided URL
 
     document.head.appendChild(script);  // add it to the end of the head section of the page (could change 'head' to 'body' to add it to the end of the body section instead)
-
+var kanwasy = [];
   function createGif() {
 	  console.log('no niby robie');
-	  console.log(document.getElementById('game-state-view').lastChild);
+	  //console.log(document.getElementById('game-state-view').lastChild);
 	  var gif = new GIF({
 		  workers: 2,
 		  quality: 10
 	});
+	//console.log(kanwasy);
 	/*
 	var canv = document.createElement('canvas');
 	var ctx = canv.getContext('2d');
@@ -18,8 +19,11 @@
 	//console.log(ctx.canvas.width, ctx.canvas.height);
 	ctx.fillStyle = '#303030';
 	ctx.fillRect(0, 0, 10, 10);
-	*/
+	
 	gif.addFrame(document.getElementById('game-state-view').lastChild, {delay: 200});
+	*/
+	
+	for (var i=5000; i<5120; i++) gif.addFrame(kanwasy[i], {delay: 1000/60});
 
 	gif.on('finished', function(blob) {
 	  var ah = window.document.createElement("a");
@@ -31,6 +35,7 @@
 	});
 
 	gif.render();
+	
   }
 	
 (function (qc) {
@@ -6742,7 +6747,6 @@ if (0 == this.Bb) {
 } else if (1 == this.Bb) {
   this.Hc +=
   0.016666666666666666;
-  //console.log(this);
   if (aktualizujStadion) {
 	//console.log(a.S);//cały czas wyyświetlany stadion checkpoint
 	if (this.S.tc.length<2) {
@@ -6783,6 +6787,7 @@ if (0 == this.Bb) {
   //console.log("coś",this.Hc);//checkpoint every tick
   //if (Math.random()<0.01) console.log(b); // gracze są na v==4 i v==2 (redblue)
   if (aktualizuj) {
+	  kanwasy.push(document.getElementById('game-state-view').lastChild);
 	  match[match.length-1].gameTicks++;
 	  //if (match.length==11 && Math.random()<0.01) console.log(k.a.x);
 	  if (d[0].a.x<(redGoalCord[0]/3)) match[match.length-1].thirds[0]++;
