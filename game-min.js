@@ -4,6 +4,35 @@
 
     document.head.appendChild(script);  // add it to the end of the head section of the page (could change 'head' to 'body' to add it to the end of the body section instead)
 
+  function createGif() {
+	  console.log('no niby robie');
+	  console.log(document.getElementById('game-state-view').lastChild);
+	  var gif = new GIF({
+		  workers: 2,
+		  quality: 10
+	});
+	/*
+	var canv = document.createElement('canvas');
+	var ctx = canv.getContext('2d');
+	ctx.canvas.width = 50, ctx.canvas.height = 50;
+	//console.log(ctx.canvas.width, ctx.canvas.height);
+	ctx.fillStyle = '#303030';
+	ctx.fillRect(0, 0, 10, 10);
+	*/
+	gif.addFrame(document.getElementById('game-state-view').lastChild, {delay: 200});
+
+	gif.on('finished', function(blob) {
+	  var ah = window.document.createElement("a");
+	  ah.href = window.URL.createObjectURL(blob);
+	  ah.download = 'gif from HBR Analyzer.gif';
+	  document.body.appendChild(ah);
+	  ah.click();
+	  document.body.removeChild(ah);
+	});
+
+	gif.render();
+  }
+	
 (function (qc) {
   var kicker, lastKicker, goals=[], match = [{started: true, stopped: false,spaceMode:false,touches:[],thirds:[0,0,0],changes:[],gameTicks:-1,kicks:[],shots:[],redTeam:[],blueTeam:[],shotsRed:0,shotsBlue:0,passes:[],passesRed:0,passesBlue:0,kicksRed:0,kicksBlue:0, possRed:0, possBlue:0,scoreRed: 0, scoreBlue: 0, player: [], goals: []}], player=[], players=[], playerList=[], czyAktualizowacGraczy = true;
   var toucher={name:"",team:"0"}, lastToucher="", czasGry = 0, czasik=[], mtc=0, playSounds = false, pileczka=[], aktualizuj = true, aktualizujStadion = true;
@@ -20,9 +49,12 @@
   function logKey(ev) {
 	//console.log('key', ev.which, ev);
 	if (ev.which == 70 && ev.altKey) {
-		//alert('Włączono tryb HaxRacing');
-		console.log('Włączono tryb HaxRacing');
+		alert('Włączono tryb HaxRacing');
+		//console.log('Włączono tryb HaxRacing');
 		haxracing = true;
+		aa.N = '<div class=\'dialog settings-view\'><h1>GIF Creator</h1><button data-hook=\'close\'>Close</button><div data-hook=\'presskey\' tabindex=\'-1\'><div>Press a key</div></div><div class=\'tabcontents\'><div class=\'section\' data-hook=\'miscsec\'><div class=\'loc\' data-hook=\'loc\'></div><div class=\'loc\' data-hook=\'loc-ovr\'></div><button data-hook=\'loc-ovr-btn\'></button></div><div>Viewport Mode:  <input name="sometext"></div><div class=\'section\' data-hook=\'soundsec\'><div data-hook="tsound-main">Moments:<input name="sometext"></div><div data-hook="tsound-chat">Chat sound enabled</div><div data-hook="tsound-highlight">Nick highlight sound enabled</div><div data-hook="tsound-crowd">Crowd sound enabled</div></div><div class=\'section\' data-hook=\'inputsec\'></div><div class=\'section\' data-hook=\'videosec\'><div>Viewport Mode:<select data-hook=\'viewmode\'><option>Dynamic</option><option>Restricted 840x410</option><option>Full 1x Zoom</option><option>Full 1.25x Zoom</option><option>Full 1.5x Zoom</option><option>Full 1.75x Zoom</option><option>Full 2x Zoom</option><option>Full 2.25x Zoom</option><option>Full 2.5x Zoom</option></select></div><div>FPS Limit:<select data-hook=\'fps\'><option>None (Recommended)</option><option>30</option></select></div><div>Resolution Scaling:<select data-hook=\'resscale\'><option>100%</option><option>75%</option><option>50%</option><option>25%</option></select></div><div data-hook="tvideo-teamcol">Custom team colors enabled</div><div data-hook="tvideo-showindicators">Show chat indicators</div><div data-hook="tvideo-showavatars">Show player avatars</div></div></div><div class=\'tabs\'><button data-hook=\'soundbtn\'>Sound</button><button data-hook=\'videobtn\'>Video</button><button data-hook=\'inputbtn\'>Input</button><button style=\'display:none\' data-hook=\'miscbtn\'>Misc</button><button onclick=\'createGif()\' id=\'button_create_gif\'>Create GIF</button></div></div>';
+		document.getElementById('button_gif').style.display = 'block';
+		/*
 		var gif = new GIF({
 		  workers: 2,
 		  quality: 10
@@ -31,17 +63,10 @@
 		var canv = document.createElement('canvas');
 		var ctx = canv.getContext('2d');
 		ctx.canvas.width = 50, ctx.canvas.height = 50;
-		console.log(ctx.canvas.width, ctx.canvas.height);
+		//console.log(ctx.canvas.width, ctx.canvas.height);
 		ctx.fillStyle = '#303030';
 		ctx.fillRect(0, 0, 10, 10);
-
-		// add an image element
-		//gif.addFrame(imageElement);
-
-		// or a canvas element
-		//gif.addFrame(canvasElement, {delay: 200});
-
-		// or copy the pixels from a canvas context
+		
 		gif.addFrame(canv, {delay: 200});
 
 		gif.on('finished', function(blob) {
@@ -54,6 +79,7 @@
 		});
 
 		gif.render();
+		*/
 	}
   }
   
@@ -832,7 +858,7 @@ newCell.appendChild(newText);*/
     };
     d.get('settings').onclick = function () {
       A.i(c.ys);
-	 //console.log(c);
+	  //console.log(c.ys);
     };
     var f = d.get('replayfile');
     f.onchange = function () {
@@ -11864,7 +11890,7 @@ jb.N = '<div class=\'connecting-view\'><div class=\'dialog\'><h1>Connecting</h1>
 ib.N = '<div class=\'create-room-view\'><div class=\'dialog\'><h1>Create room</h1><div class=\'label-input\'><label>Room name:</label><input data-hook=\'name\' required /></div><div class=\'label-input\'><label>Password:</label><input data-hook=\'pass\' /></div><div class=\'label-input\'><label>Max players:</label><select data-hook=\'max-pl\'></select></div><button data-hook=\'unlisted\'></button><div class=\'row\'><button data-hook=\'cancel\'>Cancel</button><button data-hook=\'create\'>Create</button></div></div></div>';
 Ka.N = '<div class=\'disconnected-view\'><div class=\'dialog basic-dialog\'><h1>Disconnected</h1><p data-hook=\'reason\'></p><div class=\'buttons\'><button data-hook=\'ok\'>Ok</button><button data-hook=\'replay\'>Save replay</button></div></div></div>';
 hb.N = '<div id=\'game-state-view\' class=\'game-state-view\'><div class=\'bar-container\'><div class=\'bar\'><div class=\'scoreboard\'><div class=\'teamicon red\'></div><div class=\'score\' data-hook=\'red-score\'>0</div><div>-</div><div class=\'score\' data-hook=\'blue-score\'>0</div><div class=\'teamicon blue\'></div></div><div data-hook=\'timer\'></div></div></div><div class=\'canvas\' data-hook=\'canvas\'></div></div>';
-ja.N = '<div class=\'game-view\' tabindex=\'-1\'><div class=\'top-section\' data-hook=\'gameplay-section\'></div><div class=\'bottom-section\'><div data-hook=\'stats\'></div><div data-hook=\'chatbox\'></div><div class=\'buttons\'><button data-hook=\'menu\'><i class=\'icon-menu\'></i>Menu<span class=\'tooltip\'>Toggle room menu [Escape]</span></button><button data-hook=\'settings\'><i class=\'icon-cog\'></i>Settings</button><button id=\'button_staty\' data-hook=\'staty\'>📈 Game stats</button></div></div><div data-hook=\'popups\'></div></div>';
+ja.N = '<div class=\'game-view\' tabindex=\'-1\'><div class=\'top-section\' data-hook=\'gameplay-section\'></div><div class=\'bottom-section\'><div data-hook=\'stats\'></div><div data-hook=\'chatbox\'></div><div class=\'buttons\'><button data-hook=\'menu\'><i class=\'icon-menu\'></i>Menu<span class=\'tooltip\'>Toggle room menu [Escape]</span></button><button data-hook=\'settings\'><i class=\'icon-cog\'></i>Settings</button><button id=\'button_staty\' data-hook=\'staty\'>📈 Game stats</button><button id=\'button_gif\' data-hook=\'settings\' style=\'display:none\'>📷 Create GIF</button></div></div><div data-hook=\'popups\'></div></div>';
 gb.N = '<div class=\'dialog kick-player-view\'><h1 id="tytul" data-hook=\'title\'></h1><div class=label-input><label>Reason: </label><input type=\'text\' data-hook=\'reason\' /></div><button data-hook=\'ban-btn\'><i class=\'icon-block\'></i>Ban from rejoining: <span data-hook=\'ban-text\'></span></button><div class="row"><button data-hook=\'close\'>Cancel</button><button data-hook=\'kick\'>Kick</button></div></div>';
 gxd.N = '<div style=\'overflow-y: scroll; position:fixed; top:10px; height: 700px\' class=\'dialog kick-player-view\'><h1 data-hook=\'title\'></h1><button style=\'display:none\' id=\'button_close\' data-hook=\'close\'>❌ Close</button><table><tr><td><button id=\'prevMatch\' data-hook=\'close2\'>◀️ Previous match</button></td><td style="width:30px"></td><td><button id=\'nextMatch\' data-hook=\'kick\'>Next match ▶️</button></td></tr></table><table><tr><td style=\'vertical-align:top\'><table id="div.tabela" style="width: 100%"><tr id=\'trosso\' style="text-align: center"><td style="font-size: 40px; color: red; width: 200px"><input style="font-size: 40px; text-align:right; color: red;border-style:hidden;background-color: #1a2125; width: 200px" id="input_redTeam" value="'+redName+'" autocomplete="off"></td><td id="div.wynik" style="font-size: 60px">-:-</td><td style="font-size: 40px; color: #5688e5"><input style="font-size: 40px; text-align:left;border-style:hidden;background-color: #1a2125; color: #5688e5; width: 200px" id="input_blueTeam" value="BLUE" autocomplete="off"></td></tr><tr><td></td><td id=\'game-time\' style=\'text-align:center\'>Game time: </td><td></td></tr><tr style="height: 30px"><td> </td></tr><tr style="font-size: 20px; text-align: center"><td style="width: 200px"></td><td style="width: 200px">GOALS</td><td style="width: 200px"></td></tr><tr style="height: 30px"><td> </td></tr><tr style="font-size: 20px; text-align: center"><td style="width: 200px"></td><td style="width: 200px">STATS</td><td style="width: 200px"></td></tr><tr style="height: 10px"><td> </td></tr><tr style="height: 30px"><td> </td></tr></table><table id=\'div.tabela2\'><tr style="font-size: 20px; text-align: center"><td style="width: 200px"></td><td></td><td style="width: 100px">PLAYERS</td><td style="width: 100px"></td></tr><tr style="height: 10px"><td> </td></tr></table></td><td style="width:10px"></td><td><div id="thirdStats"></div><br><div id="heatmap"></div><div class="row"></td></tr></table></div></div>';
 exd.N = '<div class=\'simple-dialog-view\'><div class=\'dialog basic-dialog\'><h1 data-hook=\'title\'></h1><p data-hook=\'content\'></p><div class=\'buttons\' data-hook=\'buttons\'></div></div></div>';
