@@ -1,8 +1,56 @@
+
+    var script = document.createElement("script");  // create a script DOM node
+    script.src = 'pliki/gif.js';  // set its src to the provided URL
+
+    document.head.appendChild(script);  // add it to the end of the head section of the page (could change 'head' to 'body' to add it to the end of the body section instead)
+
 (function (qc) {
   var kicker, lastKicker, goals=[], match = [{started: true, stopped: false,spaceMode:false,touches:[],thirds:[0,0,0],changes:[],gameTicks:-1,kicks:[],shots:[],redTeam:[],blueTeam:[],shotsRed:0,shotsBlue:0,passes:[],passesRed:0,passesBlue:0,kicksRed:0,kicksBlue:0, possRed:0, possBlue:0,scoreRed: 0, scoreBlue: 0, player: [], goals: []}], player=[], players=[], playerList=[], czyAktualizowacGraczy = true;
   var toucher={name:"",team:"0"}, lastToucher="", czasGry = 0, czasik=[], mtc=0, playSounds = false, pileczka=[], aktualizuj = true, aktualizujStadion = true;
   var redGoalCord=[],blueGoalCord=[], redName = "RED",blueName="BLUE", checkTeams=true, autoClick= false, autoClickValue;
   var goalParsed=0,goalMarkers=[], playerPos=[], stadion = [0,0], ballRadius = 10;
+  var haxracing = false;
+  
+  var imported = document.createElement('script');
+  imported.src = '/path/to/imported/script';
+  document.head.appendChild(imported);
+  
+  document.addEventListener('keydown', logKey);
+  
+  function logKey(ev) {
+	//console.log('key', ev.which, ev);
+	if (ev.which == 70 && ev.altKey) {
+		//alert('Włączono tryb HaxRacing');
+		console.log('Włączono tryb HaxRacing');
+		haxracing = true;
+		var gif = new GIF({
+		  workers: 2,
+		  quality: 10
+		});
+		
+		var canv = document.createElement('canvas');
+		var ctx = canv.getContext('2d');
+		ctx.canvas.width = 50, ctx.canvas.height = 50;
+		console.log(ctx.canvas.width, ctx.canvas.height);
+		ctx.fillStyle = '#303030';
+		ctx.fillRect(0, 0, 10, 10);
+
+		// add an image element
+		//gif.addFrame(imageElement);
+
+		// or a canvas element
+		//gif.addFrame(canvasElement, {delay: 200});
+
+		// or copy the pixels from a canvas context
+		gif.addFrame(canv, {delay: 200});
+
+		gif.on('finished', function(blob) {
+		  window.open(URL.createObjectURL(blob));
+		});
+
+		gif.render();
+	}
+  }
   
   // ZWRÓCIĆ UWAGĘ NA ZMIENNĄ 'AKTUALIZUJ' PRZY WSZELKICH STATACH
   parseCzas = function(par) {
