@@ -5,8 +5,8 @@
     document.head.appendChild(script);  // add it to the end of the head section of the page (could change 'head' to 'body' to add it to the end of the body section instead)
 var kanwasy = [], pozycje;
   function createGif() {
-	  console.log('no niby robie');
-	  console.log(pozycje);
+	  //console.log('no niby robie');
+	  //console.log(pozycje);
 	  //console.log(document.getElementById('game-state-view').lastChild);
 	  var gif = new GIF({
 		  workers: 2,
@@ -23,9 +23,10 @@ var kanwasy = [], pozycje;
 		ctx.fillStyle = '#303030';
 		ctx.fillRect(0, 0, 2000, 2000);
 		ctx.fillStyle = 'blue';
+		console.log(Math.abs(pozycje[0][1][i].x),Math.abs(pozycje[0][1][i].y));
 		ctx.arc(Math.abs(pozycje[0][1][i].x),Math.abs(pozycje[0][1][i].y),15,0,2*Math.PI);
 		ctx.fill();
-		gif.addFrame(canv, {delay: 1000/60});
+		gif.addFrame(canv, {delay: 1000/6});
 	}
 
 	gif.on('finished', function(blob) {
@@ -1324,7 +1325,7 @@ newCell.appendChild(newText);*/
       a.qb = function () {
         b.bb(null)
       };
-	  console.log(a.g);
+	  //console.log(a.g);
       b.bb(a.g)
     };
 	a.get('staty').onclick = function () {
@@ -6752,7 +6753,7 @@ if (0 == this.Bb) {
   0.016666666666666666;
   if (aktualizujStadion) {
 	//console.log(a.S);//cały czas wyyświetlany stadion checkpoint
-	console.log('stadion',this.S);
+	//console.log('stadion',this.S);
 	if (this.S.tc.length<2) {
 		aktualizujStadion=false;
 		return;
