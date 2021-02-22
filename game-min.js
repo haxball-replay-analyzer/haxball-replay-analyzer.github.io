@@ -12,7 +12,7 @@ var kanwasy = [], pozycje;
 		  workers: 2,
 		  quality: 10
 	});
-	console.log('dupa');
+	console.log('dupa2');
 	
 	var canv = document.createElement('canvas');
 	var ctx = canv.getContext('2d');
@@ -29,26 +29,26 @@ var kanwasy = [], pozycje;
 		ctx.fill();
 		kanwasy.push(canv);
 	}
-	gif.addFrame(kanwasy[0], {delay: 1000/60});
-	gif.addFrame(kanwasy[1], {delay: 1000/60});
-	gif.addFrame(kanwasy[2], {delay: 1000/60});
-	gif.addFrame(kanwasy[3], {delay: 1000/60});
-	gif.addFrame(kanwasy[4], {delay: 1000/60});
-	gif.addFrame(kanwasy[5], {delay: 1000/60});
-	gif.addFrame(kanwasy[6], {delay: 1000/60});
-	gif.addFrame(kanwasy[7], {delay: 1000/60});
-	gif.addFrame(kanwasy[8], {delay: 1000/60});
-	gif.addFrame(kanwasy[9], {delay: 1000/60});
-	gif.addFrame(kanwasy[10], {delay: 1000/60});
-	gif.addFrame(kanwasy[11], {delay: 1000/60});
-	gif.addFrame(kanwasy[12], {delay: 1000/60});
-	gif.addFrame(kanwasy[13], {delay: 1000/60});
-	gif.addFrame(kanwasy[14], {delay: 1000/60});
-	gif.addFrame(kanwasy[15], {delay: 1000/60});
-	gif.addFrame(kanwasy[16], {delay: 1000/60});
-	gif.addFrame(kanwasy[17], {delay: 1000/60});
-	gif.addFrame(kanwasy[18], {delay: 1000/60});
-	gif.addFrame(kanwasy[19], {delay: 1000/60});
+	gif.addFrame(kanwasy[0], {delay: 16});
+	gif.addFrame(kanwasy[1], {delay: 16});
+	gif.addFrame(kanwasy[2], {delay: 16});
+	gif.addFrame(kanwasy[3], {delay: 16});
+	gif.addFrame(kanwasy[4], {delay: 16});
+	gif.addFrame(kanwasy[5], {delay: 16});
+	gif.addFrame(kanwasy[6], {delay: 16});
+	gif.addFrame(kanwasy[7], {delay: 16});
+	gif.addFrame(kanwasy[8], {delay: 16});
+	gif.addFrame(kanwasy[9], {delay: 16});
+	gif.addFrame(kanwasy[10], {delay: 16});
+	gif.addFrame(kanwasy[11], {delay: 16});
+	gif.addFrame(kanwasy[12], {delay: 16});
+	gif.addFrame(kanwasy[13], {delay: 16});
+	gif.addFrame(kanwasy[14], {delay: 16});
+	gif.addFrame(kanwasy[15], {delay: 16});
+	gif.addFrame(kanwasy[16], {delay: 16});
+	gif.addFrame(kanwasy[17], {delay: 16});
+	gif.addFrame(kanwasy[18], {delay: 16});
+	gif.addFrame(kanwasy[19], {delay: 16});
 	
 	/*
 	for (var i=0; i<120; i++) {
