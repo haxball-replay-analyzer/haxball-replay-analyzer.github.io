@@ -4,6 +4,9 @@
 
     document.head.appendChild(script);  // add it to the end of the head section of the page (could change 'head' to 'body' to add it to the end of the body section instead)
 var kanwasy = [], pozycje,canv,ctx,gif;
+  function addFrame() {
+	  gif.addFrame(canv, {delay: 1000/6})
+  }
   function dalejGif(i) {
 	  if (i==3120) {
 		  gif.render();
@@ -14,7 +17,7 @@ var kanwasy = [], pozycje,canv,ctx,gif;
 		console.log(Math.abs(pozycje[0][1][i].x),Math.abs(pozycje[0][1][i].y));
 		ctx.arc(Math.abs(pozycje[0][1][i].x),Math.abs(pozycje[0][1][i].y),15,0,2*Math.PI);
 		ctx.fill();
-		gif.addFrame(canv, {delay: 1000/6})
+		addFrame()
 		.then(dalejGif(i+1));
 	  }
   }
