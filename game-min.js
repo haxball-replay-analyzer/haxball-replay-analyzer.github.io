@@ -3,8 +3,8 @@
     script.src = 'pliki/gif.js';  // set its src to the provided URL
 
     document.head.appendChild(script);  // add it to the end of the head section of the page (could change 'head' to 'body' to add it to the end of the body section instead)
-var kanwasy = [], pozycje;
-  function dalejGif(i,canv,ctx,gif) {
+var kanwasy = [], pozycje,canv,ctx,gif;
+  function dalejGif(i) {
 	  if (i==3120) {
 		  gif.render();
 	  } else {
@@ -22,18 +22,18 @@ var kanwasy = [], pozycje;
 	  //console.log('no niby robie');
 	  //console.log(pozycje);
 	  //console.log(document.getElementById('game-state-view').lastChild);
-	  var gif = new GIF({
+	  gif = new GIF({
 		  workers: 2,
 		  quality: 10
 	});
 	//console.log(kanwasy);
 	
-	var canv = document.createElement('canvas');
-	var ctx = canv.getContext('2d');
+	canv = document.createElement('canvas');
+	ctx = canv.getContext('2d');
 	ctx.canvas.width = 2000, ctx.canvas.height = 2000;
 	//console.log(ctx.canvas.width, ctx.canvas.height);
 	
-	dalejGif(3000,canv,ctx,gif);
+	dalejGif(3000);
 
 	gif.on('finished', function(blob) {
 	  var ah = window.document.createElement("a");
