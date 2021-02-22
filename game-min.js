@@ -3,40 +3,35 @@
     script.src = 'pliki/gif.js';  // set its src to the provided URL
 
     document.head.appendChild(script);  // add it to the end of the head section of the page (could change 'head' to 'body' to add it to the end of the body section instead)
-var kanwasy = [], pozycje,canv,ctx,gif;
-  function addFrame() {
-	  gif.addFrame(canv, {delay: 1000/6})
-  }
-  function dalejGif(i) {
-	  if (i==3120) {
-		  gif.render();
-	  } else {
+var kanwasy = [], pozycje;
+  function createGif() {
+	  //console.log('no niby robie');
+	  //console.log(pozycje);
+	  //console.log(document.getElementById('game-state-view').lastChild);
+	  var gif = new GIF({
+		  workers: 2,
+		  quality: 10
+	});
+	//console.log(kanwasy);
+	
+	var canv = document.createElement('canvas');
+	var ctx = canv.getContext('2d');
+	ctx.canvas.width = 2000, ctx.canvas.height = 2000;
+	//console.log(ctx.canvas.width, ctx.canvas.height);
+	
+	for (var i=3000; i<3120; i++) {
 		ctx.fillStyle = '#303030';
 		ctx.fillRect(0, 0, 2000, 2000);
 		ctx.fillStyle = 'blue';
 		console.log(Math.abs(pozycje[0][1][i].x),Math.abs(pozycje[0][1][i].y));
 		ctx.arc(Math.abs(pozycje[0][1][i].x),Math.abs(pozycje[0][1][i].y),15,0,2*Math.PI);
 		ctx.fill();
-		addFrame()
-		.then(dalejGif(i+1));
-	  }
-  }
-  function createGif() {
-	  //console.log('no niby robie');
-	  //console.log(pozycje);
-	  //console.log(document.getElementById('game-state-view').lastChild);
-	  gif = new GIF({
-		  workers: 2,
-		  quality: 10
-	});
-	//console.log(kanwasy);
+		kanwasy.push(canv);
+	}
 	
-	canv = document.createElement('canvas');
-	ctx = canv.getContext('2d');
-	ctx.canvas.width = 2000, ctx.canvas.height = 2000;
-	//console.log(ctx.canvas.width, ctx.canvas.height);
-	
-	dalejGif(3000);
+	for (var i=0; i<120; i++) {
+		gif.addFrame(kanwasy[i], {delay: 1000/6});
+	}
 
 	gif.on('finished', function(blob) {
 	  var ah = window.document.createElement("a");
@@ -46,6 +41,8 @@ var kanwasy = [], pozycje,canv,ctx,gif;
 	  ah.click();
 	  document.body.removeChild(ah);
 	});
+
+	gif.render();
 	
   }
 	
