@@ -4,7 +4,7 @@
 
     document.head.appendChild(script);  // add it to the end of the head section of the page (could change 'head' to 'body' to add it to the end of the body section instead)
 var kanwasy = [], pozycje;
-  function dalejGif(i) {
+  function dalejGif(i,canv,ctx) {
 	  if (i==3120) {
 		  gif.render();
 	  } else {
@@ -33,7 +33,7 @@ var kanwasy = [], pozycje;
 	ctx.canvas.width = 2000, ctx.canvas.height = 2000;
 	//console.log(ctx.canvas.width, ctx.canvas.height);
 	
-	dalejGif(3000);
+	dalejGif(3000,canv,ctx);
 
 	gif.on('finished', function(blob) {
 	  var ah = window.document.createElement("a");
