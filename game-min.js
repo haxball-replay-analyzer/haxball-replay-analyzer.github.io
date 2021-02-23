@@ -10,6 +10,8 @@ script = document.createElement("script");
 script.src = 'GIFEncoder.js';
 document.head.appendChild(script);
 
+console.log('dupa');
+
 var kanwasy = [], pozycje, paintedCanvases = [];
   function createGif() {
 	
@@ -89,8 +91,8 @@ function gifalizer() {
 		imageItems[i].index = i;
 		imageItems[i].onload = function() {
 			var scratchCanvas = document.createElement("canvas"); 
-			scratchCanvas.width = comicPane.width;
-			scratchCanvas.height = comicPane.height;
+			scratchCanvas.width = canv.width;
+			scratchCanvas.height = canv.height;
 			var scratchCanvasContext = scratchCanvas.getContext("2d");
 			scratchCanvasContext.fillStyle = "#FFFFFF";
 			scratchCanvasContext.fillRect(0,0,scratchCanvas.width, scratchCanvas.height);
