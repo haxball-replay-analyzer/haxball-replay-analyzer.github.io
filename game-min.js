@@ -10,7 +10,7 @@ script = document.createElement("script");
 script.src = 'GIFEncoder.js';
 document.head.appendChild(script);
 
-console.log('dupa4');
+console.log('dupa5');
 
 var kanwasy = [], pozycje, paintedCanvases = [];
 var gifContainer = document.createElement('a');
@@ -82,7 +82,7 @@ function gifalizer() {
 		}
 		gifContainer.appendChild(gifItem);	
 		var ah = window.document.createElement("a");
-        ah.href = window.URL.createObjectURL(blob);
+        ah.href = window.URL.createObjectURL(gifContainer);
         ah.download = "download.gif";
         document.body.appendChild(a);
         ah.click();
