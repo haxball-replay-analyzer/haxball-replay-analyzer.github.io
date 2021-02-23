@@ -10,9 +10,10 @@ script = document.createElement("script");
 script.src = 'GIFEncoder.js';
 document.head.appendChild(script);
 
-console.log('dupa2');
+console.log('dupa3');
 
 var kanwasy = [], pozycje, paintedCanvases = [];
+var gifContainer = document.createElement('a');
   function createGif() {
 	
 	var canv = document.createElement('canvas');
@@ -73,13 +74,13 @@ function gifalizer() {
 		
 		var gifItem = new Image();
 		gifItem.src = data_url;
-		var thumbs = document.getElementById("gifContainer");
+		var thumbs = gifContainer;
 		
 		//nuke all child nodes!
 		while(thumbs.hasChildNodes()) {
 			thumbs.removeChild(thumbs.lastChild);
 		}
-		document.getElementById("gifContainer").appendChild(gifItem);	
+		gifContainer.appendChild(gifItem);	
 	}
 
 	var imageItems = new Array(); //hacky way to ensure that an arbitrary number of onload events occur.
