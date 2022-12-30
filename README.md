@@ -12,4 +12,7 @@ Analyzer let you switch between all games in single recording, change teamnames 
 2. Click 'Game Stats'
 3. Enjoy! :)
 
-![obraz](https://user-images.githubusercontent.com/65046449/161960226-44508bea-18aa-4c3d-813a-cfebbff76419.png)
+
+![28 12 2022 wejscia](https://user-images.githubusercontent.com/103112562/210099711-c48f5469-97c4-4fc9-a667-f00a818b2141.png)
+
+![28 12 2022 kraje](https://user-images.githubusercontent.com/103112562/210099722-f73dde4a-2fcf-47f2-a8e3-2eac5ec25d49.png)
