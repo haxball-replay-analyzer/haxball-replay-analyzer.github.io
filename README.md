@@ -6,7 +6,7 @@ A tool for analyzing haxball recordings (.hbr2). It decrypts Uint8Array files an
 • info about percentage of time the ball was in each third  
 • heatmaps for all players  
 
-Analyzer let you switch between all games in single recording, change teamnames (so you can easily create a Match Report), switch between different replay speed (from 0.1x to 10000x). You can find sample recordings [HERE](https://github.com/haxball-replay-analyzer/haxball-replay-analyzer.github.io/tree/master/sample%20recordings), on [THEHHAX Replays](https://thehax.pl/forum/powtorki.php?action=ostatnio_dodane), or record by yourself on haxball room (click "Rec" button).
+Analyzer let you switch between all games in single recording, change teamnames (so you can easily create a Match Report), switch between different replay speed (from 0.1x to 10000x). You can find sample recordings [HERE](https://github.com/haxball-replay-analyzer/haxball-replay-analyzer.github.io/tree/master/sample%20recordings), on [THEHAX Replays](https://thehax.pl/forum/powtorki.php?action=ostatnio_dodane), or record by yourself on haxball room (click "Rec" button).
 
 1. ► Load replay (.hbr2 file)
 2. Click 'Game Stats'
