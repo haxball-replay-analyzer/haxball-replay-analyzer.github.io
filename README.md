@@ -12,8 +12,13 @@ Analyzer let you switch between all games in single recording, change teamnames 
 2. Click 'Game Stats'
 3. Enjoy! :)
 
-![obraz](https://user-images.githubusercontent.com/65046449/161960226-44508bea-18aa-4c3d-813a-cfebbff76419.png)
+![start](https://user-images.githubusercontent.com/103112562/212660345-276bdce9-f989-43fb-8cc6-0957be54fe0a.png)
 
-![28 12 2022 wejscia](https://user-images.githubusercontent.com/103112562/210099711-c48f5469-97c4-4fc9-a667-f00a818b2141.png)
+![stats](https://user-images.githubusercontent.com/103112562/212660394-22d68dc2-66a2-4322-844f-23c260792691.PNG)
 
-![28 12 2022 kraje](https://user-images.githubusercontent.com/103112562/210099722-f73dde4a-2fcf-47f2-a8e3-2eac5ec25d49.png)
+- 1 - Drop-down list of matches played in a loaded recording. Choose the one you want to see stats from...
+- 2 - ... or click on the buttons Previous match and Next match.
+- 3 - All teamstats. Score, goals, ball possession, shots on goal, passes, kicks. Note: if the game was played on a map with SpaceBounce physics, goalscorer is the last player to touch the ball (not the last kicker), same with assist. If you want to change teamnames, just click on them (Red/Blue) and type new ones.
+- 4 - Players' stats. All of them are sortable by clicking on the header. In SpaceBounce mode, they also include Bump counter and Ball Touches counter.
+- 5 - Take a look on where did the ball spend its time.
+- 6 - Players' heatmaps. Move your mouse over each players nick to see their movement.
