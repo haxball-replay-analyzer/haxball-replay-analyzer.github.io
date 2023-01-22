@@ -127,7 +127,8 @@ function gifalizer() {
   var toucher = { name: "", team: "0" }, lastToucher = "", czasGry = 0, czasik = [], mtc = 0, playSounds = false, pileczka = [], aktualizuj = true, aktualizujStadion = true;
   var redGoalCord = [], blueGoalCord = [], redName = "RED", blueName = "BLUE", checkTeams = true, autoClick = false, autoClickValue;
   var goalParsed = 0, goalMarkers = [], playerPos = [], stadion = [0, 0], ballRadius = 10;
-  var haxracing = false, playerToFollow = 0;
+  var haxracing = false, playerToFollow = 0, mainCanvas, mousepos = { clientX: 0, clientY: 0 };
+  var globalPlayerHovered = false;
 
   var imported = document.createElement('script');
   imported.src = '/path/to/imported/script';
@@ -159,6 +160,27 @@ function gifalizer() {
     playerToFollow = document.getElementById('selectPlayerToFollow').value;
   }
 
+  getCanvas = function (a) {
+    mainCanvas = a;
+    mainCanvas.onmousemove = function (e) {
+      // clientX albo layerX
+      // if (e.clientX > 500) {
+      //   mainCanvas.style.cursor = 'pointer'
+      // } else {
+      //   mainCanvas.style.cursor = 'auto'
+      mousepos = e;
+    }
+    mainCanvas.onclick = function (e) {
+      if (globalPlayerHovered) {
+        playerToFollow = globalPlayerHovered;
+      }
+    }
+  }
+
+  function distanceBetween(a, b) {
+    return Math.sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y));
+  }
+
   function logKey(ev) {
     //console.log('key', ev.which, ev);
     if (ev.which == 70 && ev.altKey) {
@@ -181,7 +203,7 @@ function gifalizer() {
       ctx.fillRect(0, 0, 10, 10);
     	
       gif.addFrame(canv, {delay: 200});
-  
+   
       gif.on('finished', function(blob) {
         var ah = window.document.createElement("a");
         ah.href = window.URL.createObjectURL(blob);
@@ -190,7 +212,7 @@ function gifalizer() {
         ah.click();
         document.body.removeChild(ah);
       });
-  
+   
       gif.render();
       */
     }
@@ -582,16 +604,16 @@ function gifalizer() {
     /*	  
       
       var tableRef = document.getElementById('myTable').getElementsByTagName('tbody')[0];
-
-// Insert a row in the table at the last row
-var newRow   = tableRef.insertRow();
-
-// Insert a cell in the row at index 0
-var newCell  = newRow.insertCell(0);
-
-// Append a text node to the cell
-var newText  = document.createTextNode('New row');
-newCell.appendChild(newText);*/
+  
+  // Insert a row in the table at the last row
+  var newRow   = tableRef.insertRow();
+  
+  // Insert a cell in the row at index 0
+  var newCell  = newRow.insertCell(0);
+  
+  // Append a text node to the cell
+  var newText  = document.createTextNode('New row');
+  newCell.appendChild(newText);*/
   };
 
   function dupa() {
@@ -1923,6 +1945,7 @@ newCell.appendChild(newText);*/
     this.c = this.sa.getContext('2d', {
       alpha: !1
     });
+    getCanvas(this.sa);
     this.Lo = this.c.createPattern(n.Ko, null);
     this.Wn = this.c.createPattern(n.Vn, null);
     this.Un = this.c.createPattern(n.Tn, null)
@@ -9576,16 +9599,53 @@ newCell.appendChild(newText);*/
 
         // this.c.translate(-a.I[1].H.a.x, -a.I[1].H.a.y)
 
-        var followedPlayer = players.find(element => element.V == playerToFollow)
-        followedPlayer = players.indexOf(followedPlayer);
-        // console.log(b[1].H.a.x, b[1].H.a.y)
-        // console.log(a, b, c, d, e, f)
-        // console.log(a.I[1].H.a.x)
+        var translatetoDisc = {
+          x: this.Ya.x,
+          y: this.Ya.y
+        }
+        if (playerToFollow != 0) {
+          var followedPlayer = players.find(element => element.V == playerToFollow)
+          followedPlayer = players.indexOf(followedPlayer);
+          if (a.I[followedPlayer] && a.I[followedPlayer].H != null) {
+            translatetoDisc.x = a.I[followedPlayer].H.a.x;
+            translatetoDisc.y = a.I[followedPlayer].H.a.y;
+          }
+        }
+        this.c.translate(- translatetoDisc.x, - translatetoDisc.y);
 
-        if (playerToFollow != 0 && a.I[followedPlayer].H != null) {
-          this.c.translate(- a.I[followedPlayer].H.a.x, - a.I[followedPlayer].H.a.y);
-        } else this.c.translate(- this.Ya.x, - this.Ya.y);
+        // var mouseTranslated = {
+        //   x: (mousepos.clientX + this.Ya.x) - (this.sa.width / 2) / k,
+        //   y: (mousepos.clientY + this.Ya.y) - ((this.sa.height + h) / 2) / k
+        // }       // TO JEST DOBRE DLA 1.25
 
+        var mouseTranslated = {
+          x: (mousepos.clientX + translatetoDisc.x) - (this.sa.width / 2) / k,
+          y: (mousepos.clientY + translatetoDisc.y) - ((this.sa.height + h) / 2) / k
+        }
+
+        if (k == 1.5625) {
+          mouseTranslated.x = ((mousepos.clientX + translatetoDisc.x) - (this.sa.width / 2) / k) // 1.25;
+          mouseTranslated.x = ((mousepos.clientX + translatetoDisc.x) * k - (this.sa.width / 2)) / k;
+          mouseTranslated.y = ((mousepos.clientY + translatetoDisc.y) - ((this.sa.height + h) / 2) / k) / 1.25
+        } else if (k == 1.875) {
+          mouseTranslated.x = ((mousepos.clientX + translatetoDisc.x) - (this.sa.width / 2) / k) // 1.5;
+          mouseTranslated.y = ((mousepos.clientY + translatetoDisc.y) - ((this.sa.height + h) / 2) / k) // 1.5
+        }
+
+        // console.log(k, a.I[1].H.a, mouseTranslated)
+        // var playerHovered = false
+        // for (var i = 0; i < a.I.length; i++) {
+        //   if (a.I[i].H != null) {
+        //     if (distanceBetween(a.I[i].H.a, mouseTranslated) < a.I[i].H.Z) {
+        //       playerHovered = a.I[i].V; // CHECKPOINT - na razie działa tylko na powiększeniu 1 (k) i promień gracza 15
+        //       globalPlayerHovered = playerHovered;
+        //     }
+        //   }
+        // }
+        // if (playerHovered) mainCanvas.style.cursor = 'pointer'
+        // else mainCanvas.style.cursor = 'default'
+
+        // console.log(a.I[1].H.a.x, (mousepos.clientX + this.Ya.x) - (this.sa.width / 2) / k) - przełożenie myszki na mapę
         // CHECKPOINT moment, w którym widok centruje się na piłce
         this.c.lineWidth = 3;
         this.Sq(c.S);
@@ -9597,11 +9657,13 @@ newCell.appendChild(newText);*/
         this.Nq(a, f);
         null != g && this.Pq(g.a);
         this.c.lineWidth = 2;
+        ///// odtąd rysuje kulki każdego gracza (bez nicków)
         f = 0;
         for (g = a.I; f < g.length;) n = g[f],
           ++f,
           m = n.H,
           null != m && this.Ll(m, this.dd.get(n.V));
+        /////////////////////////////////////////// dotąd
         f = 0;
         for (e = e.F; f < e.length;) g = e[f],
           ++f,
@@ -9965,7 +10027,7 @@ newCell.appendChild(newText);*/
       a.font = '26px sans-serif';
       a.fillStyle = 'white';
       160 < a.measureText(this.w).width ? (a.textAlign = 'left', a.translate(2, 29)) : (a.textAlign = 'center', a.translate(80, 29));
-      a.fillText(this.w, 0, 0)
+      a.fillText(this.w, 0, 0) //CHECKPOINT w tym miejscu podpisuje kulkę gracza
     },
     so: function (a, b, c) {
       a.drawImage(this.vl.canvas, 0, 0, 160, 34, b - 40, c - 34, 80, 17)
@@ -12025,7 +12087,7 @@ newCell.appendChild(newText);*/
     3,
     1]);
   mb.N = '<div class=\'dialog change-location-view\'><h1>Change Location</h1><div class=\'splitter\'><div class=\'list\' data-hook=\'list\'></div><div class=\'buttons\'><button data-hook=\'change\'>Change</button><button data-hook=\'cancel\'>Cancel</button></div></div></div>';
-  Da.N = '<div class=\'chatbox-view\'><div data-hook=\'log\' class=\'log\'><p>Controls:<br/>Move: WASD or DUPA or Arrows<br/>Kick: X, Space, Ctrl, Shift, Numpad 0<br/>View: Numbers 1 to 4</p></div><div class=\'autocompletebox\' data-hook=\'autocompletebox\'></div><div class=\'input\'><input data-hook=\'input\' type=\'text\' /><button data-hook=\'send\'>Send</button></div></div>';
+  Da.N = '<div class=\'chatbox-view\'><div data-hook=\'log\' class=\'log\'><p>Controls:<br/>Move: WASD or Arrows<br/>Kick: X, Space, Ctrl, Shift, Numpad 0<br/>View: Numbers 1 to 4</p></div><div class=\'autocompletebox\' data-hook=\'autocompletebox\'></div><div class=\'input\'><input data-hook=\'input\' type=\'text\' /><button data-hook=\'send\'>Send</button></div></div>';
   kb.N = '<div class=\'choose-nickname-view\'><img src="https://haxball-replay-analyzer.github.io/images/falafcio.png" /><div class=\'dialog\'><h1>Haxball Replay Analyzer</h1><div style=\'display: none\' class=\'label-input\'><label>Nick:</label><input data-hook=\'input\' type=\'text\' /></div><button id=\'button_ok\' data-hook=\'ok\'>Start</button></div></div>';
   jb.N = '<div class=\'connecting-view\'><div class=\'dialog\'><h1>Connecting</h1><div class=\'connecting-view-log\' data-hook=\'log\'></div><button data-hook=\'cancel\'>Cancel</button></div></div>';
   ib.N = '<div class=\'create-room-view\'><div class=\'dialog\'><h1>Create room</h1><div class=\'label-input\'><label>Room name:</label><input data-hook=\'name\' required /></div><div class=\'label-input\'><label>Password:</label><input data-hook=\'pass\' /></div><div class=\'label-input\'><label>Max players:</label><select data-hook=\'max-pl\'></select></div><button data-hook=\'unlisted\'></button><div class=\'row\'><button data-hook=\'cancel\'>Cancel</button><button data-hook=\'create\'>Create</button></div></div></div>';
