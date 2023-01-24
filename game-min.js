@@ -123,7 +123,7 @@ function gifalizer() {
 }
 
 (function (qc) {
-  var kicker, lastKicker, goals = [], match = [{ started: true, stopped: false, spaceMode: false, touches: [], thirds: [0, 0, 0], changes: [], gameTicks: -1, kicks: [], shots: [], redTeam: [], blueTeam: [], shotsRed: 0, shotsBlue: 0, passes: [], passesRed: 0, passesBlue: 0, kicksRed: 0, kicksBlue: 0, possRed: 0, possBlue: 0, scoreRed: 0, scoreBlue: 0, player: [], goals: [] }], player = [], players = [], playerList = [], czyAktualizowacGraczy = true;
+  var kicker, lastKicker, goals = [], match = [{ stadium: false, started: true, stopped: false, spaceMode: false, touches: [], thirds: [0, 0, 0], changes: [], gameTicks: -1, kicks: [], shots: [], redTeam: [], blueTeam: [], shotsRed: 0, shotsBlue: 0, passes: [], passesRed: 0, passesBlue: 0, kicksRed: 0, kicksBlue: 0, possRed: 0, possBlue: 0, scoreRed: 0, scoreBlue: 0, player: [], goals: [] }], player = [], players = [], playerList = [], czyAktualizowacGraczy = true;
   var toucher = { name: "", team: "0" }, lastToucher = "", czasGry = 0, czasik = [], mtc = 0, playSounds = false, pileczka = [], aktualizuj = true, aktualizujStadion = true;
   var redGoalCord = [], blueGoalCord = [], redName = "RED", blueName = "BLUE", checkTeams = true, autoClick = false, autoClickValue;
   var goalParsed = 0, goalMarkers = [], playerPos = [], stadion = [0, 0], ballRadius = 10;
@@ -236,6 +236,16 @@ function gifalizer() {
 
   odleglosc = function (a, b) {
     return Math.sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y));
+  }
+
+  downloadMap = function () {
+    var blob = new Blob([JSON.stringify(match[mtc].stadium, null, "\t")], { type: 'text' });
+    var a = window.document.createElement("a");
+    a.href = window.URL.createObjectURL(blob);
+    a.download = match[mtc].stadium.name + ".hbs";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   }
 
   watchGoal = function (par) {
@@ -1164,7 +1174,7 @@ function gifalizer() {
     this.fp.onclick = function () {
       A.i(c.de);
       aktualizuj = true;
-      kicker, lastKicker, goals = [], match = [{ started: true, stopped: false, spaceMode: false, touches: [], thirds: [0, 0, 0], changes: [], gameTicks: -1, kicks: [], shots: [], redTeam: [], blueTeam: [], shotsRed: 0, shotsBlue: 0, passes: [], passesRed: 0, passesBlue: 0, kicksRed: 0, kicksBlue: 0, possRed: 0, possBlue: 0, scoreRed: 0, scoreBlue: 0, player: [], goals: [] }], player = [], players = [], playerList = [], czyAktualizowacGraczy = true;
+      kicker, lastKicker, goals = [], match = [{ stadium: false, started: true, stopped: false, spaceMode: false, touches: [], thirds: [0, 0, 0], changes: [], gameTicks: -1, kicks: [], shots: [], redTeam: [], blueTeam: [], shotsRed: 0, shotsBlue: 0, passes: [], passesRed: 0, passesBlue: 0, kicksRed: 0, kicksBlue: 0, possRed: 0, possBlue: 0, scoreRed: 0, scoreBlue: 0, player: [], goals: [] }], player = [], players = [], playerList = [], czyAktualizowacGraczy = true;
       czasGry = 0, czasik = [], mtc = 0, playSounds = false, pileczka = [], aktualizuj = true, aktualizujStadion = true;
       redGoalCord = [], blueGoalCord = [], redName = "RED", blueName = "BLUE", goalParsed = 0, goalMarkers = [], playerPos = [];
     }
@@ -1468,7 +1478,7 @@ function gifalizer() {
 
       setTimeout(function () {
         if (match[mtc].spaceMode) document.getElementById("tytul").innerHTML = 'Match stats (space mode):<select onchange="selectChange()" id="displayedMatch"><option value="0">1: Red ' + match[0].scoreRed + ':' + match[0].scoreBlue + ' Blue</option></select>';
-        else document.getElementById("tytul").innerHTML = 'Match stats:<select onchange="selectChange()" id="displayedMatch"><option value="0">1: Red ' + match[0].scoreRed + ':' + match[0].scoreBlue + ' Blue</option></select>';
+        else document.getElementById("tytul").innerHTML = 'Match stats:<select onchange="selectChange()" id="displayedMatch"><option value="0">1: Red ' + match[0].scoreRed + ':' + match[0].scoreBlue + ' Blue</option></select>' + (match[mtc].stadium ? '<button onclick="downloadMap()" style="margin: 0 10px 0 30px">Download map</button>' : '');
         for (var i = 1; i < match.length; i++) {
           var mA = document.createElement("option");
           mA.value = i;
@@ -4920,7 +4930,7 @@ function gifalizer() {
         var c = c + a.Ab(),
           e = a.B();
         //console.log("TU",a,b,c,d,e);
-        if (aktualizuj) kicker = undefined, lastKicker = undefined, goals = [], match = [{ started: true, stopped: false, spaceMode: false, touches: [], thirds: [0, 0, 0], changes: [], gameTicks: -1, kicks: [], shots: [], redTeam: [], blueTeam: [], shotsRed: 0, shotsBlue: 0, passes: [], passesRed: 0, passesBlue: 0, kicksRed: 0, kicksBlue: 0, possRed: 0, possBlue: 0, scoreRed: 0, scoreBlue: 0, player: [], goals: [] }], player = [], players = [], playerList = [], czyAktualizowacGraczy = true;
+        if (aktualizuj) kicker = undefined, lastKicker = undefined, goals = [], match = [{ stadium: false, started: true, stopped: false, spaceMode: false, touches: [], thirds: [0, 0, 0], changes: [], gameTicks: -1, kicks: [], shots: [], redTeam: [], blueTeam: [], shotsRed: 0, shotsBlue: 0, passes: [], passesRed: 0, passesBlue: 0, kicksRed: 0, kicksBlue: 0, possRed: 0, possBlue: 0, scoreRed: 0, scoreBlue: 0, player: [], goals: [] }], player = [], players = [], playerList = [], czyAktualizowacGraczy = true;
         czasGry = 0, czasik = [], mtc = 0;
         this.Vk.push({
           mj: c / this.mf,
@@ -6887,13 +6897,153 @@ function gifalizer() {
             0.016666666666666666;
           if (aktualizujStadion) {
             //console.log(a.S);//cały czas wyyświetlany stadion checkpoint
-            //console.log('stadion',this.S);
+            // console.log('stadion', match, p.fa, this.S);
+            // console.log(this.S)
+            var st = this.S;
+            // console.log(h.qg.toString())
+            function getColor(x) {
+              if (x < 0) return 'transparent'
+              else if (x == 0) return '000000'
+              else {
+                for (
+                  var c = "";
+                  (c = "0123456789ABCDEF".charAt(x & 15) + c), (x >>>= 4), 0 < x;
+
+                );
+                // if (null != b) for (; c.length < b; ) c = "0" + c;
+                return c;
+              }
+            }
+            function getCMask(x) {
+              if (63 == x) return ["all"];
+              var b = [];
+              0 != (x & 2) && b.push("red");
+              0 != (x & 4) && b.push("blue");
+              0 != (x & 1) && b.push("ball");
+              0 != (x & 8) && b.push("redKO");
+              0 != (x & 16) && b.push("blueKO");
+              0 != (x & 32) && b.push("wall");
+              0 != (x & 64) && b.push("kick");
+              0 != (x & 128) && b.push("score");
+              0 != (x & 268435456) && b.push("c0");
+              0 != (x & 536870912) && b.push("c1");
+              0 != (x & 1073741824) && b.push("c2");
+              0 != (x & -2147483648) && b.push("c3");
+              return b;
+            }
+            if (st.Lf) {
+              match[match.length - 1].stadium = {
+                name: st.w,
+                height: st.qc,
+                width: st.$b,
+                maxViewWidth: st.Ye,
+                cameraFollow: (st.Ge == 1 ? 'player' : 'ball'),
+                spawnDistance: st.kc,
+                kickOffReset: (st.pf ? 'full' : 'partial'),
+                bg: {
+                  type: (st.ld == 1 ? 'grass' : (st.ld == 2 ? 'hockey' : 'none')),
+                  width: st.Td,
+                  height: st.Sd,
+                  kickOffRadius: st.kd,
+                  cornerRadius: st.Uc,
+                  color: getColor(st.jd),
+                  goalLine: st.Fe
+                },
+                canBeStored: st.Lf,
+                redSpawnPoints: st.Dd.map((a) => ([a.x, a.y])),
+                blueSpawnPoints: st.md.map((a) => ([a.x, a.y])),
+                playerPhysics: {
+                  bCoef: st.ge.m,
+                  invMass: st.ge.aa,
+                  damping: st.ge.Ca,
+                  acceleration: st.ge.Ce,
+                  kickingAcceleration: st.ge.Te,
+                  kickingDamping: st.ge.Ue,
+                  kickStrength: st.ge.Re,
+                  cGroup: getCMask(st.ge.v),
+                  gravity: [st.ge.oa.x, st.ge.oa.y],
+                  radius: st.ge.Z,
+                  kickback: st.ge.Se
+                },
+                segments: st.U.map((a) => ({
+                  v0: a.W.ud,
+                  v1: a.ca.ud,
+                  bias: a.Cc,
+                  bCoef: a.m,
+                  curve: (0 != 0 * a.vb ? 0 : Math.abs(114.59155902616465 * Math.atan(1 / a.vb))),
+                  vis: a.Za,
+                  cMask: getCMask(a.h),
+                  cGroup: getCMask(a.v),
+                  color: getColor(a.R)
+                })),
+                vertexes: st.J.map((a) => ({
+                  x: a.a.x,
+                  y: a.a.y,
+                  bCoef: a.m,
+                  cMask: getCMask(a.h),
+                  cGroup: getCMask(a.v)
+                })),
+                goals: st.tc.map((a) => ({
+                  p0: [a.W.x, a.W.y],
+                  p1: [a.ca.x, a.ca.y],
+                  team: (a.qe == p.fa ? "red" : "blue")
+                })),
+                planes: st.qa.map((a) => ({
+                  normal: [a.wa.x, a.wa.y],
+                  dist: a.Ua,
+                  bCoef: a.m,
+                  cMask: getCMask(a.h),
+                  cGroup: getCMask(a.v)
+                })),
+                discs: st.F.map((a) => ({
+                  pos: [a.a.x, a.a.y],
+                  speed: [a.D.x, a.D.y],
+                  gravity: [a.oa.x, a.oa.y],
+                  radius: a.Z,
+                  bCoef: a.m,
+                  invMass: a.aa,
+                  damping: a.Ca,
+                  color: getColor(a.R),
+                  cMask: getCMask(a.h),
+                  cGroup: getCMask(a.v)
+                })),
+                joints: st.pb.map((a) => ({
+                  d0: a.Yd,
+                  d1: a.Zd,
+                  length: a.Hb >= a.ec ? a.Hb : [a.Hb, a.ec],
+                  color: getColor(a.R),
+                  strength: a.ne == Infinity ? 'rigid' : a.ne
+                }))
+              }
+
+              match[match.length - 1].stadium.ballPhysics = match[match.length - 1].stadium.discs.splice(0, 1)[0];
+              delete match[match.length - 1].stadium.ballPhysics.pos;
+              if (match[match.length - 1].stadium.bg.type != 'grass' && match[match.length - 1].stadium.bg.color == '718C5A') {
+                delete match[match.length - 1].stadium.bg.color;
+              }
+              var segments = match[match.length - 1].stadium.segments;
+              var trueSegments = st.U;
+              var vertexes = match[match.length - 1].stadium.vertexes;
+              for (var i = 0; i < segments.length; i++) {
+                // console.log('in', segments[i])
+                if (segments[i].v0 == 0 && segments[i].v1 == 0) {
+                  for (var j = 0; j < vertexes.length; j++) {
+                    if (vertexes[j].x == trueSegments[i].W.a.x && vertexes[j].y == trueSegments[i].W.a.y) segments[i].v0 = j;
+                    else if (vertexes[j].x == trueSegments[i].ca.a.x && vertexes[j].y == trueSegments[i].ca.a.y) segments[i].v1 = j;
+                    if (segments[i].v0 != 0 && segments[i].v1 != 0) break;
+                  }
+                }
+                // console.log('out', segments[i])
+              }
+            }
+            // console.log('segmenty', st.U)
+            // console.log(segments, trueSegments)
+            // console.log(match);
             if (this.S.tc.length < 2) {
               aktualizujStadion = false;
               return;
             }
             var std = this.S.tc[0];
-            //console.log(this.S);
             ballRadius = this.S.F[0].Z;
             //console.log(ballRadius);
             //console.log(this.S.ge.m);// bCoef graczów
