@@ -3,6 +3,13 @@ var a = '<p style=\'font-size: 120%; font-weight:bold; color:#f57878\'>v1.13 - 1
 
 var b = [
   [
+    '1.17',
+    '24.01.2023',
+    'Change the camera focus to a specific player - click [Settings] > [Video] > [Player To Follow]',
+    'Download map extracted from recording - button will appear on top of Game Stats tab only if author of the stadium didn\'t set the "canBeStored" property to false',
+    'Fixed Settings button bug and display of icons'
+  ],
+  [
     '1.16',
     '07.01.2023',
     'Small fixes'
@@ -10,7 +17,7 @@ var b = [
   [
     '1.15',
     '30.12.2022',
-    'Some visual changes' // tu coś innego weź wymyśl
+    'Some visual changes'
   ],
   [
     '1.14',

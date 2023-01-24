@@ -18,6 +18,7 @@ document.head.appendChild(script);
 
 var kanwasy = [], pozycje, paintedCanvases = [];
 var gifContainer = document.createElement('a');
+
 function createGif() {
 
   var canv = document.createElement('canvas');
@@ -122,17 +123,63 @@ function gifalizer() {
 }
 
 (function (qc) {
-  var kicker, lastKicker, goals = [], match = [{ started: true, stopped: false, spaceMode: false, touches: [], thirds: [0, 0, 0], changes: [], gameTicks: -1, kicks: [], shots: [], redTeam: [], blueTeam: [], shotsRed: 0, shotsBlue: 0, passes: [], passesRed: 0, passesBlue: 0, kicksRed: 0, kicksBlue: 0, possRed: 0, possBlue: 0, scoreRed: 0, scoreBlue: 0, player: [], goals: [] }], player = [], players = [], playerList = [], czyAktualizowacGraczy = true;
+  var kicker, lastKicker, goals = [], match = [{ stadium: false, started: true, stopped: false, spaceMode: false, touches: [], thirds: [0, 0, 0], changes: [], gameTicks: -1, kicks: [], shots: [], redTeam: [], blueTeam: [], shotsRed: 0, shotsBlue: 0, passes: [], passesRed: 0, passesBlue: 0, kicksRed: 0, kicksBlue: 0, possRed: 0, possBlue: 0, scoreRed: 0, scoreBlue: 0, player: [], goals: [] }], player = [], players = [], playerList = [], czyAktualizowacGraczy = true;
   var toucher = { name: "", team: "0" }, lastToucher = "", czasGry = 0, czasik = [], mtc = 0, playSounds = false, pileczka = [], aktualizuj = true, aktualizujStadion = true;
   var redGoalCord = [], blueGoalCord = [], redName = "RED", blueName = "BLUE", checkTeams = true, autoClick = false, autoClickValue;
   var goalParsed = 0, goalMarkers = [], playerPos = [], stadion = [0, 0], ballRadius = 10;
-  var haxracing = false;
+  var haxracing = false, playerToFollow = 0, mainCanvas, mousepos = { clientX: 0, clientY: 0 };
+  var globalPlayerHovered = false;
 
   var imported = document.createElement('script');
   imported.src = '/path/to/imported/script';
   document.head.appendChild(imported);
 
   document.addEventListener('keydown', logKey);
+
+  function playersToFollowList() {
+    var a = [
+      {
+        id: 0,
+        name: 'ball'
+      }
+    ];
+    var b = '<option value=0>[0] ball</option>';
+    for (var i = 0; i < players.length; i++) {
+      if (players[i].V == 0) continue;
+      a.push({
+        id: players[i].V,
+        name: players[i].w
+      });
+      b = b + '<option value=' + a[a.length - 1].id + (playerToFollow == a[a.length - 1].id ? ' selected=true> [' : ' > [') + a[a.length - 1].id + '] ' + a[a.length - 1].name + '</option > ';
+    }
+    return b;
+  }
+
+  setPlayerToFollow = function () {
+    // console.log(document.getElementById('selectPlayerToFollow').value);
+    playerToFollow = document.getElementById('selectPlayerToFollow').value;
+  }
+
+  getCanvas = function (a) {
+    mainCanvas = a;
+    mainCanvas.onmousemove = function (e) {
+      // clientX albo layerX
+      // if (e.clientX > 500) {
+      //   mainCanvas.style.cursor = 'pointer'
+      // } else {
+      //   mainCanvas.style.cursor = 'auto'
+      mousepos = e;
+    }
+    mainCanvas.onclick = function (e) {
+      if (globalPlayerHovered) {
+        playerToFollow = globalPlayerHovered;
+      }
+    }
+  }
+
+  function distanceBetween(a, b) {
+    return Math.sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y));
+  }
 
   function logKey(ev) {
     //console.log('key', ev.which, ev);
@@ -156,7 +203,7 @@ function gifalizer() {
       ctx.fillRect(0, 0, 10, 10);
     	
       gif.addFrame(canv, {delay: 200});
-  
+   
       gif.on('finished', function(blob) {
         var ah = window.document.createElement("a");
         ah.href = window.URL.createObjectURL(blob);
@@ -165,7 +212,7 @@ function gifalizer() {
         ah.click();
         document.body.removeChild(ah);
       });
-  
+   
       gif.render();
       */
     }
@@ -189,6 +236,16 @@ function gifalizer() {
 
   odleglosc = function (a, b) {
     return Math.sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y));
+  }
+
+  downloadMap = function () {
+    var blob = new Blob([JSON.stringify(match[mtc].stadium, null, "\t")], { type: 'text' });
+    var a = window.document.createElement("a");
+    a.href = window.URL.createObjectURL(blob);
+    a.download = match[mtc].stadium.name + ".hbs";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   }
 
   watchGoal = function (par) {
@@ -557,16 +614,16 @@ function gifalizer() {
     /*	  
       
       var tableRef = document.getElementById('myTable').getElementsByTagName('tbody')[0];
-
-// Insert a row in the table at the last row
-var newRow   = tableRef.insertRow();
-
-// Insert a cell in the row at index 0
-var newCell  = newRow.insertCell(0);
-
-// Append a text node to the cell
-var newText  = document.createTextNode('New row');
-newCell.appendChild(newText);*/
+  
+  // Insert a row in the table at the last row
+  var newRow   = tableRef.insertRow();
+  
+  // Insert a cell in the row at index 0
+  var newCell  = newRow.insertCell(0);
+  
+  // Append a text node to the cell
+  var newText  = document.createTextNode('New row');
+  newCell.appendChild(newText);*/
   };
 
   function dupa() {
@@ -729,6 +786,7 @@ newCell.appendChild(newText);*/
     }
     null == a && (a = !1);
     var k = this;
+    aa.N = '<div class=\'dialog settings-view\'><h1>Settings</h1><button data-hook=\'close\'>Close</button><div class=\'tabs\'><button data-hook=\'soundbtn\'>Sound</button><button data-hook=\'videobtn\'>Video</button><button data-hook=\'inputbtn\'>Input</button><button data-hook=\'miscbtn\'>Misc</button></div><div data-hook=\'presskey\' tabindex=\'-1\'><div>Press a key</div></div><div class=\'tabcontents\'><div class=\'section\' data-hook=\'miscsec\'><div class=\'loc\' data-hook=\'loc\'></div><div class=\'loc\' data-hook=\'loc-ovr\'></div><button data-hook=\'loc-ovr-btn\'></button></div><div class=\'section\' data-hook=\'soundsec\'><div data-hook="tsound-main">Sounds enabled</div><div data-hook="tsound-chat">Chat sound enabled</div><div data-hook="tsound-highlight">Nick highlight sound enabled</div><div data-hook="tsound-crowd">Crowd sound enabled</div></div><div class=\'section\' data-hook=\'inputsec\'></div><div class=\'section\' data-hook=\'videosec\'><div>Viewport Mode:<select data-hook=\'viewmode\'><option>Dynamic</option><option>Restricted 840x410</option><option>Full 1x Zoom</option><option>Full 1.25x Zoom</option><option>Full 1.5x Zoom</option><option>Full 1.75x Zoom</option><option>Full 2x Zoom</option><option>Full 2.25x Zoom</option><option>Full 2.5x Zoom</option></select></div><div>FPS Limit:<select data-hook=\'fps\'><option>None (Recommended)</option><option>30</option></select></div><div>Resolution Scaling:<select data-hook=\'resscale\'><option>100%</option><option>75%</option><option>50%</option><option>25%</option></select></div><div>Player To Follow:<select id="selectPlayerToFollow" onchange="setPlayerToFollow()">' + playersToFollowList() + '</select></div><div data-hook="tvideo-teamcol">Custom team colors enabled</div><div data-hook="tvideo-showindicators">Show chat indicators</div><div data-hook="tvideo-showavatars">Show player avatars</div></div></div></div>';
     this.g = v.Ga(aa.N);
     var l = v.Ea(this.g);
     this.nd = l.get('close');
@@ -932,7 +990,7 @@ newCell.appendChild(newText);*/
     var c = this;
     this.gs = a;
     // console.log(ListaZmian);
-    Aa.tj = '<div class=\'roomlist-view\'><div class=\'notice\' data-hook=\'notice\' hidden><div data-hook=\'notice-contents\'>Testing the notice.</div><div data-hook=\'notice-close\'><i class=\'icon-cancel\'></i></div></div><div class=\'dialog\'><h1>Haxball Replay Analyzer v1.16</h1><p>Contact: <br>Discord: Falafel#3895, you can find me at discord.io/haxracing<br>turbofalafel@gmail.com</p><br><br><div class=\'splitter\'><div style=\'display: none\' class=\'list\'><table class=\'header\'><colgroup><col><col><col><col></colgroup><thead><tr><td>Name</td><td>Players</td><td>Pass</td><td>Distance</td></tr></thead></table><div class=\'separator\'></div><div class=\'content\' data-hook=\'listscroll\'><table><colgroup><col><col><col><col></colgroup><tbody data-hook=\'list\'></tbody></table></div><div class=\'filters\'><span class=\'bool\' data-hook=\'fil-pass\'>Show locked <i></i></span><span class=\'bool\' data-hook=\'fil-full\'>Show full <i></i></span></div></div><div class=\'buttons\'><button style=\'display: none\' data-hook=\'refresh\'><i class=\'icon-cw\'></i><div>Refresh</div></button><button style=\'display: none\' data-hook=\'join\'><i class=\'icon-login\'></i><div>Join Room</div></button><button style=\'display: none\' data-hook=\'create\'><i class=\'icon-plus\'></i><div>Create Room</div></button><div style=\'display: none\' class=\'spacer\'></div><div class=\'file-btn\'><label for=\'replayfile\'>►<div>Load replay</div></label><input id=\'replayfile\' type=\'file\' accept=\'.hbr2\' data-hook=\'replayfile\'/></div><button style=\'display: none\' data-hook=\'settings\'><i class=\'icon-cog\'></i><div>Settings</div></button><button style=\'display: none\' data-hook=\'changenick\'><i class=\'icon-cw\'></i><div>Change Nick</div></button><br><br>' + ListaZmian + '</div></div></div></div>';
+    Aa.tj = '<div class=\'roomlist-view\'><div class=\'notice\' data-hook=\'notice\' hidden><div data-hook=\'notice-contents\'>Testing the notice.</div><div data-hook=\'notice-close\'><i class=\'icon-cancel\'></i></div></div><div class=\'dialog\'><h1>Haxball Replay Analyzer v1.17</h1><p>Contact: <br>Discord: Falafel#3895, you can find me at discord.io/haxracing<br>turbofalafel@gmail.com</p><br><br><div class=\'splitter\'><div style=\'display: none\' class=\'list\'><table class=\'header\'><colgroup><col><col><col><col></colgroup><thead><tr><td>Name</td><td>Players</td><td>Pass</td><td>Distance</td></tr></thead></table><div class=\'separator\'></div><div class=\'content\' data-hook=\'listscroll\'><table><colgroup><col><col><col><col></colgroup><tbody data-hook=\'list\'></tbody></table></div><div class=\'filters\'><span class=\'bool\' data-hook=\'fil-pass\'>Show locked <i></i></span><span class=\'bool\' data-hook=\'fil-full\'>Show full <i></i></span></div></div><div class=\'buttons\'><button style=\'display: none\' data-hook=\'refresh\'><i class=\'icon-cw\'></i><div>Refresh</div></button><button style=\'display: none\' data-hook=\'join\'><i class=\'icon-login\'></i><div>Join Room</div></button><button style=\'display: none\' data-hook=\'create\'><i class=\'icon-plus\'></i><div>Create Room</div></button><div style=\'display: none\' class=\'spacer\'></div><div class=\'file-btn\'><label for=\'replayfile\'>►<div>Load replay</div></label><input id=\'replayfile\' type=\'file\' accept=\'.hbr2\' data-hook=\'replayfile\'/></div><button style=\'display: none\' data-hook=\'settings\'><i class=\'icon-cog\'></i><div>Settings</div></button><button style=\'display: none\' data-hook=\'changenick\'><i class=\'icon-cw\'></i><div>Change Nick</div></button><br><br>' + ListaZmian + '</div></div></div></div>';
     this.Ja = v.Ga(Aa.tj);
     // console.log(Aa.tj);
     var d = v.Ea(this.Ja),
@@ -1051,12 +1109,12 @@ newCell.appendChild(newText);*/
     //k.classList.add('icon-pause');
     d.get('play').onclick = function () {
       e = !e;
-	  /*
-      var a = k.classList;
-      a.toggle('icon-play', !e);
-      a.toggle('icon-pause', e);
-	  */
-	  e ? k.innerHTML = '⏸' : k.innerHTML = '⏵' ;
+      /*
+        var a = k.classList;
+        a.toggle('icon-play', !e);
+        a.toggle('icon-pause', e);
+      */
+      e ? k.innerHTML = '⏸' : k.innerHTML = '⏵';
       b()
     };
     d.get('spdup').onclick = function () {
@@ -1116,7 +1174,7 @@ newCell.appendChild(newText);*/
     this.fp.onclick = function () {
       A.i(c.de);
       aktualizuj = true;
-      kicker, lastKicker, goals = [], match = [{ started: true, stopped: false, spaceMode: false, touches: [], thirds: [0, 0, 0], changes: [], gameTicks: -1, kicks: [], shots: [], redTeam: [], blueTeam: [], shotsRed: 0, shotsBlue: 0, passes: [], passesRed: 0, passesBlue: 0, kicksRed: 0, kicksBlue: 0, possRed: 0, possBlue: 0, scoreRed: 0, scoreBlue: 0, player: [], goals: [] }], player = [], players = [], playerList = [], czyAktualizowacGraczy = true;
+      kicker, lastKicker, goals = [], match = [{ stadium: false, started: true, stopped: false, spaceMode: false, touches: [], thirds: [0, 0, 0], changes: [], gameTicks: -1, kicks: [], shots: [], redTeam: [], blueTeam: [], shotsRed: 0, shotsBlue: 0, passes: [], passesRed: 0, passesBlue: 0, kicksRed: 0, kicksBlue: 0, possRed: 0, possBlue: 0, scoreRed: 0, scoreBlue: 0, player: [], goals: [] }], player = [], players = [], playerList = [], czyAktualizowacGraczy = true;
       czasGry = 0, czasik = [], mtc = 0, playSounds = false, pileczka = [], aktualizuj = true, aktualizujStadion = true;
       redGoalCord = [], blueGoalCord = [], redName = "RED", blueName = "BLUE", goalParsed = 0, goalMarkers = [], playerPos = [];
     }
@@ -1420,7 +1478,7 @@ newCell.appendChild(newText);*/
 
       setTimeout(function () {
         if (match[mtc].spaceMode) document.getElementById("tytul").innerHTML = 'Match stats (space mode):<select onchange="selectChange()" id="displayedMatch"><option value="0">1: Red ' + match[0].scoreRed + ':' + match[0].scoreBlue + ' Blue</option></select>';
-        else document.getElementById("tytul").innerHTML = 'Match stats:<select onchange="selectChange()" id="displayedMatch"><option value="0">1: Red ' + match[0].scoreRed + ':' + match[0].scoreBlue + ' Blue</option></select>';
+        else document.getElementById("tytul").innerHTML = 'Match stats:<select onchange="selectChange()" id="displayedMatch"><option value="0">1: Red ' + match[0].scoreRed + ':' + match[0].scoreBlue + ' Blue</option></select>' + (match[mtc].stadium ? '<button onclick="downloadMap()" style="margin: 0 10px 0 30px">Download map</button>' : '');
         for (var i = 1; i < match.length; i++) {
           var mA = document.createElement("option");
           mA.value = i;
@@ -1897,6 +1955,7 @@ newCell.appendChild(newText);*/
     this.c = this.sa.getContext('2d', {
       alpha: !1
     });
+    getCanvas(this.sa);
     this.Lo = this.c.createPattern(n.Ko, null);
     this.Wn = this.c.createPattern(n.Vn, null);
     this.Un = this.c.createPattern(n.Tn, null)
@@ -4871,7 +4930,7 @@ newCell.appendChild(newText);*/
         var c = c + a.Ab(),
           e = a.B();
         //console.log("TU",a,b,c,d,e);
-        if (aktualizuj) kicker = undefined, lastKicker = undefined, goals = [], match = [{ started: true, stopped: false, spaceMode: false, touches: [], thirds: [0, 0, 0], changes: [], gameTicks: -1, kicks: [], shots: [], redTeam: [], blueTeam: [], shotsRed: 0, shotsBlue: 0, passes: [], passesRed: 0, passesBlue: 0, kicksRed: 0, kicksBlue: 0, possRed: 0, possBlue: 0, scoreRed: 0, scoreBlue: 0, player: [], goals: [] }], player = [], players = [], playerList = [], czyAktualizowacGraczy = true;
+        if (aktualizuj) kicker = undefined, lastKicker = undefined, goals = [], match = [{ stadium: false, started: true, stopped: false, spaceMode: false, touches: [], thirds: [0, 0, 0], changes: [], gameTicks: -1, kicks: [], shots: [], redTeam: [], blueTeam: [], shotsRed: 0, shotsBlue: 0, passes: [], passesRed: 0, passesBlue: 0, kicksRed: 0, kicksBlue: 0, possRed: 0, possBlue: 0, scoreRed: 0, scoreBlue: 0, player: [], goals: [] }], player = [], players = [], playerList = [], czyAktualizowacGraczy = true;
         czasGry = 0, czasik = [], mtc = 0;
         this.Vk.push({
           mj: c / this.mf,
@@ -6838,13 +6897,153 @@ newCell.appendChild(newText);*/
             0.016666666666666666;
           if (aktualizujStadion) {
             //console.log(a.S);//cały czas wyyświetlany stadion checkpoint
-            //console.log('stadion',this.S);
+            // console.log('stadion', match, p.fa, this.S);
+            // console.log(this.S)
+            var st = this.S;
+            // console.log(h.qg.toString())
+            function getColor(x) {
+              if (x < 0) return 'transparent'
+              else if (x == 0) return '000000'
+              else {
+                for (
+                  var c = "";
+                  (c = "0123456789ABCDEF".charAt(x & 15) + c), (x >>>= 4), 0 < x;
+
+                );
+                // if (null != b) for (; c.length < b; ) c = "0" + c;
+                return c;
+              }
+            }
+            function getCMask(x) {
+              if (63 == x) return ["all"];
+              var b = [];
+              0 != (x & 2) && b.push("red");
+              0 != (x & 4) && b.push("blue");
+              0 != (x & 1) && b.push("ball");
+              0 != (x & 8) && b.push("redKO");
+              0 != (x & 16) && b.push("blueKO");
+              0 != (x & 32) && b.push("wall");
+              0 != (x & 64) && b.push("kick");
+              0 != (x & 128) && b.push("score");
+              0 != (x & 268435456) && b.push("c0");
+              0 != (x & 536870912) && b.push("c1");
+              0 != (x & 1073741824) && b.push("c2");
+              0 != (x & -2147483648) && b.push("c3");
+              return b;
+            }
+            if (st.Lf) {
+              match[match.length - 1].stadium = {
+                name: st.w,
+                height: st.qc,
+                width: st.$b,
+                maxViewWidth: st.Ye,
+                cameraFollow: (st.Ge == 1 ? 'player' : 'ball'),
+                spawnDistance: st.kc,
+                kickOffReset: (st.pf ? 'full' : 'partial'),
+                bg: {
+                  type: (st.ld == 1 ? 'grass' : (st.ld == 2 ? 'hockey' : 'none')),
+                  width: st.Td,
+                  height: st.Sd,
+                  kickOffRadius: st.kd,
+                  cornerRadius: st.Uc,
+                  color: getColor(st.jd),
+                  goalLine: st.Fe
+                },
+                canBeStored: st.Lf,
+                redSpawnPoints: st.Dd.map((a) => ([a.x, a.y])),
+                blueSpawnPoints: st.md.map((a) => ([a.x, a.y])),
+                playerPhysics: {
+                  bCoef: st.ge.m,
+                  invMass: st.ge.aa,
+                  damping: st.ge.Ca,
+                  acceleration: st.ge.Ce,
+                  kickingAcceleration: st.ge.Te,
+                  kickingDamping: st.ge.Ue,
+                  kickStrength: st.ge.Re,
+                  cGroup: getCMask(st.ge.v),
+                  gravity: [st.ge.oa.x, st.ge.oa.y],
+                  radius: st.ge.Z,
+                  kickback: st.ge.Se
+                },
+                segments: st.U.map((a) => ({
+                  v0: a.W.ud,
+                  v1: a.ca.ud,
+                  bias: a.Cc,
+                  bCoef: a.m,
+                  curve: (0 != 0 * a.vb ? 0 : Math.abs(114.59155902616465 * Math.atan(1 / a.vb))),
+                  vis: a.Za,
+                  cMask: getCMask(a.h),
+                  cGroup: getCMask(a.v),
+                  color: getColor(a.R)
+                })),
+                vertexes: st.J.map((a) => ({
+                  x: a.a.x,
+                  y: a.a.y,
+                  bCoef: a.m,
+                  cMask: getCMask(a.h),
+                  cGroup: getCMask(a.v)
+                })),
+                goals: st.tc.map((a) => ({
+                  p0: [a.W.x, a.W.y],
+                  p1: [a.ca.x, a.ca.y],
+                  team: (a.qe == p.fa ? "red" : "blue")
+                })),
+                planes: st.qa.map((a) => ({
+                  normal: [a.wa.x, a.wa.y],
+                  dist: a.Ua,
+                  bCoef: a.m,
+                  cMask: getCMask(a.h),
+                  cGroup: getCMask(a.v)
+                })),
+                discs: st.F.map((a) => ({
+                  pos: [a.a.x, a.a.y],
+                  speed: [a.D.x, a.D.y],
+                  gravity: [a.oa.x, a.oa.y],
+                  radius: a.Z,
+                  bCoef: a.m,
+                  invMass: a.aa,
+                  damping: a.Ca,
+                  color: getColor(a.R),
+                  cMask: getCMask(a.h),
+                  cGroup: getCMask(a.v)
+                })),
+                joints: st.pb.map((a) => ({
+                  d0: a.Yd,
+                  d1: a.Zd,
+                  length: a.Hb >= a.ec ? a.Hb : [a.Hb, a.ec],
+                  color: getColor(a.R),
+                  strength: a.ne == Infinity ? 'rigid' : a.ne
+                }))
+              }
+
+              match[match.length - 1].stadium.ballPhysics = match[match.length - 1].stadium.discs.splice(0, 1)[0];
+              delete match[match.length - 1].stadium.ballPhysics.pos;
+              if (match[match.length - 1].stadium.bg.type != 'grass' && match[match.length - 1].stadium.bg.color == '718C5A') {
+                delete match[match.length - 1].stadium.bg.color;
+              }
+              var segments = match[match.length - 1].stadium.segments;
+              var trueSegments = st.U;
+              var vertexes = match[match.length - 1].stadium.vertexes;
+              for (var i = 0; i < segments.length; i++) {
+                // console.log('in', segments[i])
+                if (segments[i].v0 == 0 && segments[i].v1 == 0) {
+                  for (var j = 0; j < vertexes.length; j++) {
+                    if (vertexes[j].x == trueSegments[i].W.a.x && vertexes[j].y == trueSegments[i].W.a.y) segments[i].v0 = j;
+                    else if (vertexes[j].x == trueSegments[i].ca.a.x && vertexes[j].y == trueSegments[i].ca.a.y) segments[i].v1 = j;
+                    if (segments[i].v0 != 0 && segments[i].v1 != 0) break;
+                  }
+                }
+                // console.log('out', segments[i])
+              }
+            }
+            // console.log('segmenty', st.U)
+            // console.log(segments, trueSegments)
+            // console.log(match);
             if (this.S.tc.length < 2) {
               aktualizujStadion = false;
               return;
             }
             var std = this.S.tc[0];
-            //console.log(this.S);
             ballRadius = this.S.F[0].Z;
             //console.log(ballRadius);
             //console.log(this.S.ge.m);// bCoef graczów
@@ -9542,7 +9741,62 @@ newCell.appendChild(newText);*/
         }
         this.c.translate(this.sa.width / 2, (this.sa.height + h) / 2);
         this.c.scale(k, k);
-        this.c.translate(- this.Ya.x, - this.Ya.y);
+
+        // console.log(a, b, c, d, e)
+        // console.log(a.I[1].H.D, a.I[1].H.a)
+        // a.I[i].V - id gracza
+        // a.I[i].H nie może być null
+
+        // this.c.translate(-a.I[1].H.a.x, -a.I[1].H.a.y)
+
+        var translatetoDisc = {
+          x: this.Ya.x,
+          y: this.Ya.y
+        }
+        if (playerToFollow != 0) {
+          var followedPlayer = players.find(element => element.V == playerToFollow)
+          followedPlayer = players.indexOf(followedPlayer);
+          if (a.I[followedPlayer] && a.I[followedPlayer].H != null) {
+            translatetoDisc.x = a.I[followedPlayer].H.a.x;
+            translatetoDisc.y = a.I[followedPlayer].H.a.y;
+          }
+        }
+        this.c.translate(- translatetoDisc.x, - translatetoDisc.y);
+
+        // var mouseTranslated = {
+        //   x: (mousepos.clientX + this.Ya.x) - (this.sa.width / 2) / k,
+        //   y: (mousepos.clientY + this.Ya.y) - ((this.sa.height + h) / 2) / k
+        // }       // TO JEST DOBRE DLA 1.25
+
+        var mouseTranslated = {
+          x: (mousepos.clientX + translatetoDisc.x) - (this.sa.width / 2) / k,
+          y: (mousepos.clientY + translatetoDisc.y) - ((this.sa.height + h) / 2) / k
+        }
+
+        if (k == 1.5625) {
+          mouseTranslated.x = ((mousepos.clientX + translatetoDisc.x) - (this.sa.width / 2) / k) // 1.25;
+          mouseTranslated.x = ((mousepos.clientX + translatetoDisc.x) * k - (this.sa.width / 2)) / k;
+          mouseTranslated.y = ((mousepos.clientY + translatetoDisc.y) - ((this.sa.height + h) / 2) / k) / 1.25
+        } else if (k == 1.875) {
+          mouseTranslated.x = ((mousepos.clientX + translatetoDisc.x) - (this.sa.width / 2) / k) // 1.5;
+          mouseTranslated.y = ((mousepos.clientY + translatetoDisc.y) - ((this.sa.height + h) / 2) / k) // 1.5
+        }
+
+        // console.log(k, a.I[1].H.a, mouseTranslated)
+        // var playerHovered = false
+        // for (var i = 0; i < a.I.length; i++) {
+        //   if (a.I[i].H != null) {
+        //     if (distanceBetween(a.I[i].H.a, mouseTranslated) < a.I[i].H.Z) {
+        //       playerHovered = a.I[i].V; // CHECKPOINT - na razie działa tylko na powiększeniu 1 (k) i promień gracza 15
+        //       globalPlayerHovered = playerHovered;
+        //     }
+        //   }
+        // }
+        // if (playerHovered) mainCanvas.style.cursor = 'pointer'
+        // else mainCanvas.style.cursor = 'default'
+
+        // console.log(a.I[1].H.a.x, (mousepos.clientX + this.Ya.x) - (this.sa.width / 2) / k) - przełożenie myszki na mapę
+        // CHECKPOINT moment, w którym widok centruje się na piłce
         this.c.lineWidth = 3;
         this.Sq(c.S);
         this.Rq(c.S);
@@ -9553,11 +9807,13 @@ newCell.appendChild(newText);*/
         this.Nq(a, f);
         null != g && this.Pq(g.a);
         this.c.lineWidth = 2;
+        ///// odtąd rysuje kulki każdego gracza (bez nicków)
         f = 0;
         for (g = a.I; f < g.length;) n = g[f],
           ++f,
           m = n.H,
           null != m && this.Ll(m, this.dd.get(n.V));
+        /////////////////////////////////////////// dotąd
         f = 0;
         for (e = e.F; f < e.length;) g = e[f],
           ++f,
@@ -9921,7 +10177,7 @@ newCell.appendChild(newText);*/
       a.font = '26px sans-serif';
       a.fillStyle = 'white';
       160 < a.measureText(this.w).width ? (a.textAlign = 'left', a.translate(2, 29)) : (a.textAlign = 'center', a.translate(80, 29));
-      a.fillText(this.w, 0, 0)
+      a.fillText(this.w, 0, 0) //CHECKPOINT w tym miejscu podpisuje kulkę gracza
     },
     so: function (a, b, c) {
       a.drawImage(this.vl.canvas, 0, 0, 160, 34, b - 40, c - 34, 80, 17)
@@ -11981,13 +12237,13 @@ newCell.appendChild(newText);*/
     3,
     1]);
   mb.N = '<div class=\'dialog change-location-view\'><h1>Change Location</h1><div class=\'splitter\'><div class=\'list\' data-hook=\'list\'></div><div class=\'buttons\'><button data-hook=\'change\'>Change</button><button data-hook=\'cancel\'>Cancel</button></div></div></div>';
-  Da.N = '<div class=\'chatbox-view\'><div data-hook=\'log\' class=\'log\'><p>Controls:<br/>Move: WASD or DUPA or Arrows<br/>Kick: X, Space, Ctrl, Shift, Numpad 0<br/>View: Numbers 1 to 4</p></div><div class=\'autocompletebox\' data-hook=\'autocompletebox\'></div><div class=\'input\'><input data-hook=\'input\' type=\'text\' /><button data-hook=\'send\'>Send</button></div></div>';
+  Da.N = '<div class=\'chatbox-view\'><div data-hook=\'log\' class=\'log\'><p>Controls:<br/>Move: WASD or Arrows<br/>Kick: X, Space, Ctrl, Shift, Numpad 0<br/>View: Numbers 1 to 4</p></div><div class=\'autocompletebox\' data-hook=\'autocompletebox\'></div><div class=\'input\'><input data-hook=\'input\' type=\'text\' /><button data-hook=\'send\'>Send</button></div></div>';
   kb.N = '<div class=\'choose-nickname-view\'><img src="https://haxball-replay-analyzer.github.io/images/falafcio.png" /><div class=\'dialog\'><h1>Haxball Replay Analyzer</h1><div style=\'display: none\' class=\'label-input\'><label>Nick:</label><input data-hook=\'input\' type=\'text\' /></div><button id=\'button_ok\' data-hook=\'ok\'>Start</button></div></div>';
   jb.N = '<div class=\'connecting-view\'><div class=\'dialog\'><h1>Connecting</h1><div class=\'connecting-view-log\' data-hook=\'log\'></div><button data-hook=\'cancel\'>Cancel</button></div></div>';
   ib.N = '<div class=\'create-room-view\'><div class=\'dialog\'><h1>Create room</h1><div class=\'label-input\'><label>Room name:</label><input data-hook=\'name\' required /></div><div class=\'label-input\'><label>Password:</label><input data-hook=\'pass\' /></div><div class=\'label-input\'><label>Max players:</label><select data-hook=\'max-pl\'></select></div><button data-hook=\'unlisted\'></button><div class=\'row\'><button data-hook=\'cancel\'>Cancel</button><button data-hook=\'create\'>Create</button></div></div></div>';
   Ka.N = '<div class=\'disconnected-view\'><div class=\'dialog basic-dialog\'><h1>Disconnected</h1><p data-hook=\'reason\'></p><div class=\'buttons\'><button data-hook=\'ok\'>Ok</button><button data-hook=\'replay\'>Save replay</button></div></div></div>';
   hb.N = '<div id=\'game-state-view\' class=\'game-state-view\'><div class=\'bar-container\'><div class=\'bar\'><div class=\'scoreboard\'><div class=\'teamicon red\'></div><div class=\'score\' data-hook=\'red-score\'>0</div><div>-</div><div class=\'score\' data-hook=\'blue-score\'>0</div><div class=\'teamicon blue\'></div></div><div data-hook=\'timer\'></div></div></div><div class=\'canvas\' data-hook=\'canvas\'></div></div>';
-  ja.N = '<div class=\'game-view\' tabindex=\'-1\'><div class=\'top-section\' data-hook=\'gameplay-section\'></div><div class=\'bottom-section\'><div data-hook=\'stats\'></div><div data-hook=\'chatbox\'></div><div class=\'buttons\'><button data-hook=\'menu\'>☰ Menu<span class=\'tooltip\'>Toggle room menu [Escape]</span></button><button data-hook=\'settings\'>⛭ Settings</button><button id=\'button_staty\' data-hook=\'staty\'>📈 Game stats</button><button id=\'button_gif\' data-hook=\'settings\' style=\'display:none\'>📷 Create GIF</button></div></div><div data-hook=\'popups\'></div></div>';
+  ja.N = '<div class=\'game-view\' tabindex=\'-1\'><div class=\'top-section\' data-hook=\'gameplay-section\'></div><div class=\'bottom-section\'><div data-hook=\'stats\'></div><div data-hook=\'chatbox\'></div><div class=\'buttons\'><button data-hook=\'menu\'>☰ Menu<span class=\'tooltip\'>Toggle room menu [Escape]</span></button><button data-hook=\'settings\'>⛭ Settings</button><button id=\'button_staty\' data-hook=\'staty\'>📈 Game stats</button><button id=\'button_gif\' data-hook=\'gif_creator\' style=\'display:none\'>📷 Create GIF</button></div></div><div data-hook=\'popups\'></div></div>';
   gb.N = '<div class=\'dialog kick-player-view\'><h1 id="tytul" data-hook=\'title\'></h1><div class=label-input><label>Reason: </label><input type=\'text\' data-hook=\'reason\' /></div><button data-hook=\'ban-btn\'><i class=\'icon-block\'></i>Ban from rejoining: <span data-hook=\'ban-text\'></span></button><div class="row"><button data-hook=\'close\'>Cancel</button><button data-hook=\'kick\'>Kick</button></div></div>';
   gxd.N = '<div style=\'overflow-y: scroll; position:fixed; top:10px; height: 700px\' class=\'dialog kick-player-view\'><h1 data-hook=\'title\'></h1><button style=\'display:none\' id=\'button_close\' data-hook=\'close\'>❌ Close</button><table><tr><td><button id=\'prevMatch\' data-hook=\'close2\'>◀️ Previous match</button></td><td style="width:30px"></td><td><button id=\'nextMatch\' data-hook=\'kick\'>Next match ▶️</button></td></tr></table><table><tr><td style=\'vertical-align:top\'><table id="div.tabela" style="width: 100%"><tr id=\'trosso\' style="text-align: center"><td style="font-size: 40px; color: red; width: 200px"><input style="font-size: 40px; text-align:right; color: red;border-style:hidden;background-color: #1a2125; width: 200px" id="input_redTeam" value="' + redName + '" autocomplete="off"></td><td id="div.wynik" style="font-size: 60px">-:-</td><td style="font-size: 40px; color: #5688e5"><input style="font-size: 40px; text-align:left;border-style:hidden;background-color: #1a2125; color: #5688e5; width: 200px" id="input_blueTeam" value="BLUE" autocomplete="off"></td></tr><tr><td></td><td id=\'game-time\' style=\'text-align:center\'>Game time: </td><td></td></tr><tr style="height: 30px"><td> </td></tr><tr style="font-size: 20px; text-align: center"><td style="width: 200px"></td><td style="width: 200px">GOALS</td><td style="width: 200px"></td></tr><tr style="height: 30px"><td> </td></tr><tr style="font-size: 20px; text-align: center"><td style="width: 200px"></td><td style="width: 200px">STATS</td><td style="width: 200px"></td></tr><tr style="height: 10px"><td> </td></tr><tr style="height: 30px"><td> </td></tr></table><table id=\'div.tabela2\'><tr style="font-size: 20px; text-align: center"><td style="width: 200px"></td><td></td><td style="width: 100px">PLAYERS</td><td style="width: 100px"></td></tr><tr style="height: 10px"><td> </td></tr></table></td><td style="width:10px"></td><td><div id="thirdStats"></div><br><div id="heatmap"></div><div class="row"></td></tr></table></div></div>';
   exd.N = '<div class=\'simple-dialog-view\'><div class=\'dialog basic-dialog\'><h1 data-hook=\'title\'></h1><p data-hook=\'content\'></p><div class=\'buttons\' data-hook=\'buttons\'></div></div></div>';
@@ -11999,10 +12255,10 @@ newCell.appendChild(newText);*/
   ha.N = '<div class=\'replay-controls-view\'><button id=\'reset_button\' data-hook=\'reset\'>⏮</button><button id=\'play_button\' data-hook=\'play\'><i data-hook=\'playicon\'></i></button><div data-hook=\'spd\'>1x</div><button id=\'spddown\' data-hook=\'spddn\'>-</button><button data-hook=\'spdup\'>+</button><div data-hook=\'time\'>00:00</div><div class=\'timebar\' data-hook=\'timebar\'><div class=\'barbg\'><div class=\'bar\' data-hook=\'progbar\'></div></div><div class=\'timetooltip\' data-hook=\'timetooltip\'></div></div><button id=\'button_leave\' data-hook=\'leave\'>Leave</button></div>';
   bb.N = '<div class=\'dialog basic-dialog room-link-view\'><h1>Room link</h1><p>Use this url to link others directly into this room.</p><input data-hook=\'link\' readonly></input><div class=\'buttons\'><button data-hook=\'close\'>Close</button><button data-hook=\'copy\'>Copy to clipboard</button></div></div>';
   ab.tj = '<tr><td><span data-hook=\'tag\'></span><span data-hook=\'name\'></span></td><td data-hook=\'players\'></td><td data-hook=\'pass\'></td><td><div data-hook=\'flag\' class=\'flagico\'></div><span data-hook=\'distance\'></span></td></tr>';
-  Aa.tj = '<div class=\'roomlist-view\'><div class=\'notice\' data-hook=\'notice\' hidden><div data-hook=\'notice-contents\'>Testing the notice.</div><div data-hook=\'notice-close\'><i class=\'icon-cancel\'></i></div></div><div class=\'dialog\'><h1>Haxball Replay Analyzer v1.16</h1><p>Contact: <br>Discord: Falafel#3895, you can find me at discord.io/haxracing<br>turbofalafel@gmail.com</p><br><br><div class=\'splitter\'><div style=\'display: none\' class=\'list\'><table class=\'header\'><colgroup><col><col><col><col></colgroup><thead><tr><td>Name</td><td>Players</td><td>Pass</td><td>Distance</td></tr></thead></table><div class=\'separator\'></div><div class=\'content\' data-hook=\'listscroll\'><table><colgroup><col><col><col><col></colgroup><tbody data-hook=\'list\'></tbody></table></div><div class=\'filters\'><span class=\'bool\' data-hook=\'fil-pass\'>Show locked <i></i></span><span class=\'bool\' data-hook=\'fil-full\'>Show full <i></i></span></div></div><div class=\'buttons\'><button style=\'display: none\' data-hook=\'refresh\'><i class=\'icon-cw\'></i><div>Refresh</div></button><button style=\'display: none\' data-hook=\'join\'><i class=\'icon-login\'></i><div>Join Room</div></button><button style=\'display: none\' data-hook=\'create\'><i class=\'icon-plus\'></i><div>Create Room</div></button><div style=\'display: none\' class=\'spacer\'></div><div class=\'file-btn\'><label for=\'replayfile\'>►<div>Load replay</div></label><input id=\'replayfile\' type=\'file\' accept=\'.hbr2\' data-hook=\'replayfile\'/></div><button style=\'display: none\' data-hook=\'settings\'><i class=\'icon-cog\'></i><div>Settings</div></button><button style=\'display: none\' data-hook=\'changenick\'><i class=\'icon-cw\'></i><div>Change Nick</div></button><br><br>' + ListaZmian + '</div></div></div></div>';
+  Aa.tj = '<div class=\'roomlist-view\'><div class=\'notice\' data-hook=\'notice\' hidden><div data-hook=\'notice-contents\'>Testing the notice.</div><div data-hook=\'notice-close\'><i class=\'icon-cancel\'></i></div></div><div class=\'dialog\'><h1>Haxball Replay Analyzer v1.17</h1><p>Contact: <br>Discord: Falafel#3895, you can find me at discord.io/haxracing<br>turbofalafel@gmail.com</p><br><br><div class=\'splitter\'><div style=\'display: none\' class=\'list\'><table class=\'header\'><colgroup><col><col><col><col></colgroup><thead><tr><td>Name</td><td>Players</td><td>Pass</td><td>Distance</td></tr></thead></table><div class=\'separator\'></div><div class=\'content\' data-hook=\'listscroll\'><table><colgroup><col><col><col><col></colgroup><tbody data-hook=\'list\'></tbody></table></div><div class=\'filters\'><span class=\'bool\' data-hook=\'fil-pass\'>Show locked <i></i></span><span class=\'bool\' data-hook=\'fil-full\'>Show full <i></i></span></div></div><div class=\'buttons\'><button style=\'display: none\' data-hook=\'refresh\'><i class=\'icon-cw\'></i><div>Refresh</div></button><button style=\'display: none\' data-hook=\'join\'><i class=\'icon-login\'></i><div>Join Room</div></button><button style=\'display: none\' data-hook=\'create\'><i class=\'icon-plus\'></i><div>Create Room</div></button><div style=\'display: none\' class=\'spacer\'></div><div class=\'file-btn\'><label for=\'replayfile\'>►<div>Load replay</div></label><input id=\'replayfile\' type=\'file\' accept=\'.hbr2\' data-hook=\'replayfile\'/></div><button style=\'display: none\' data-hook=\'settings\'><i class=\'icon-cog\'></i><div>Settings</div></button><button style=\'display: none\' data-hook=\'changenick\'><i class=\'icon-cw\'></i><div>Change Nick</div></button><br><br>' + ListaZmian + '</div></div></div></div>';
   Za.N = '<div class=\'room-password-view\'><div class=\'dialog\'><h1>Password required</h1><div class=\'label-input\'><label>Password:</label><input data-hook=\'input\' /></div><div class=\'buttons\'><button data-hook=\'cancel\'>Cancel</button><button data-hook=\'ok\'>Ok</button></div></div></div>';
   Ya.N = '<div id=\'room-view\' class=\'room-view\'><div class=\'container\'><h1 data-hook=\'room-name\'></h1><div class=\'header-btns\'><button data-hook=\'rec-btn\'><i class=\'icon-circle\'></i>Rec</button><button data-hook=\'link-btn\'><i class=\'icon-link\'></i>Link</button><button data-hook=\'leave-btn\'><i class=\'icon-logout\'></i>Leave</button></div><div class=\'teams\'><div class=\'tools admin-only\'><button data-hook=\'auto-btn\'>Auto</button><button data-hook=\'rand-btn\'>Rand</button><button data-hook=\'lock-btn\'>Lock</button><button data-hook=\'reset-all-btn\'>Reset</button></div><div data-hook=\'red-list\'></div><div data-hook=\'spec-list\'></div><div data-hook=\'blue-list\'></div><div class=\'spacer admin-only\'></div></div><div class=\'settings\'><div><label class=\'lbl\'>Time limit</label><select data-hook=\'time-limit-sel\'></select></div><div><label class=\'lbl\'>Score limit</label><select data-hook=\'score-limit-sel\'></select></div><div><label class=\'lbl\'>Stadium</label><label class=\'val\' data-hook=\'stadium-name\'>testing the stadium name</label><button class=\'admin-only\' data-hook=\'stadium-pick\'>Pick</button></div></div><div class=\'controls admin-only\'><button data-hook=\'start-btn\'><i class=\'icon-play\'></i>Start game</button><button data-hook=\'stop-btn\'><i class=\'icon-stop\'></i>Stop game</button><button data-hook=\'pause-btn\'><i class=\'icon-pause\'></i>Pause</button></div></div></div>';
-  aa.N = '<div class=\'dialog settings-view\'><h1>Settings</h1><button data-hook=\'close\'>Close</button><div class=\'tabs\'><button data-hook=\'soundbtn\'>Sound</button><button data-hook=\'videobtn\'>Video</button><button data-hook=\'inputbtn\'>Input</button><button data-hook=\'miscbtn\'>Misc</button></div><div data-hook=\'presskey\' tabindex=\'-1\'><div>Press a key</div></div><div class=\'tabcontents\'><div class=\'section\' data-hook=\'miscsec\'><div class=\'loc\' data-hook=\'loc\'></div><div class=\'loc\' data-hook=\'loc-ovr\'></div><button data-hook=\'loc-ovr-btn\'></button></div><div class=\'section\' data-hook=\'soundsec\'><div data-hook="tsound-main">Sounds enabled</div><div data-hook="tsound-chat">Chat sound enabled</div><div data-hook="tsound-highlight">Nick highlight sound enabled</div><div data-hook="tsound-crowd">Crowd sound enabled</div></div><div class=\'section\' data-hook=\'inputsec\'></div><div class=\'section\' data-hook=\'videosec\'><div>Viewport Mode:<select data-hook=\'viewmode\'><option>Dynamic</option><option>Restricted 840x410</option><option>Full 1x Zoom</option><option>Full 1.25x Zoom</option><option>Full 1.5x Zoom</option><option>Full 1.75x Zoom</option><option>Full 2x Zoom</option><option>Full 2.25x Zoom</option><option>Full 2.5x Zoom</option></select></div><div>FPS Limit:<select data-hook=\'fps\'><option>None (Recommended)</option><option>30</option></select></div><div>Resolution Scaling:<select data-hook=\'resscale\'><option>100%</option><option>75%</option><option>50%</option><option>25%</option></select></div><div data-hook="tvideo-teamcol">Custom team colors enabled</div><div data-hook="tvideo-showindicators">Show chat indicators</div><div data-hook="tvideo-showavatars">Show player avatars</div></div></div></div>';
+  aa.N = '<div class=\'dialog settings-view\'><h1>Settings</h1><button data-hook=\'close\'>Close</button><div class=\'tabs\'><button data-hook=\'soundbtn\'>Sound</button><button data-hook=\'videobtn\'>Video</button><button data-hook=\'inputbtn\'>Input</button><button data-hook=\'miscbtn\'>Misc</button></div><div data-hook=\'presskey\' tabindex=\'-1\'><div>Press a key</div></div><div class=\'tabcontents\'><div class=\'section\' data-hook=\'miscsec\'><div class=\'loc\' data-hook=\'loc\'></div><div class=\'loc\' data-hook=\'loc-ovr\'></div><button data-hook=\'loc-ovr-btn\'></button></div><div class=\'section\' data-hook=\'soundsec\'><div data-hook="tsound-main">Sounds enabled</div><div data-hook="tsound-chat">Chat sound enabled</div><div data-hook="tsound-highlight">Nick highlight sound enabled</div><div data-hook="tsound-crowd">Crowd sound enabled</div></div><div class=\'section\' data-hook=\'inputsec\'></div><div class=\'section\' data-hook=\'videosec\'><div>Viewport Mode:<select data-hook=\'viewmode\'><option>Dynamic</option><option>Restricted 840x410</option><option>Full 1x Zoom</option><option>Full 1.25x Zoom</option><option>Full 1.5x Zoom</option><option>Full 1.75x Zoom</option><option>Full 2x Zoom</option><option>Full 2.25x Zoom</option><option>Full 2.5x Zoom</option></select></div><div>FPS Limit:<select data-hook=\'fps\'><option>None (Recommended)</option><option>30</option></select></div><div>Resolution Scaling:<select data-hook=\'resscale\'><option>100%</option><option>75%</option><option>50%</option><option>25%</option></select></div><div>Player To Follow:<select data-hook=\'follow\'>' + playersToFollowList() + '</select></div><div data-hook="tvideo-teamcol">Custom team colors enabled</div><div data-hook="tvideo-showindicators">Show chat indicators</div><div data-hook="tvideo-showavatars">Show player avatars</div></div></div></div>';
   aa.$l = 0;
   P.N = '<div class=\'simple-dialog-view\'><div class=\'dialog basic-dialog\'><h1 data-hook=\'title\'></h1><p data-hook=\'content\'></p><div class=\'buttons\' data-hook=\'buttons\'></div></div></div>';
   Xa.N = '<div class=\'stats-view\'><p>Ping: <span data-hook=\'ping\'></span></p><p>Max Ping: <span data-hook=\'max-ping\'></span></p><p>Fps: <span data-hook=\'fps\'></span></p><div data-hook=\'graph\'></div></div>';
