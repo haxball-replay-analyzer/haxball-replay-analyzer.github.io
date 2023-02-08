@@ -1,4 +1,6 @@
 import Changes from './Changes.js';
+import { useContext } from "react";
+import { AnalyzerContext } from "../../App";
 
 const changelog = [
   {
@@ -145,6 +147,8 @@ const changelog = [
 const newChanges = changelog.map(change => <Changes key={change.version} change={change} />)
 
 function Changelog() {
+
+  const { mainMode, setMainMode } = useContext(AnalyzerContext)
   return (
     <div id="lista-zmian" style={{ fontFamily: 'roboto', fontSize: '110%', overflowY: 'scroll', maxWidth: '630px' }}>
       {newChanges}

@@ -1,7 +1,5 @@
 import Change from "./Change";
 
-
-
 function Changes(props) {
 
   function changeList(z) {
