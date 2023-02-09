@@ -2686,6 +2686,7 @@ Jb.prototype = C(V.prototype, {
       a = this.Lc.Ab();
       this.hg += a;
       a = this.Lc.Ob();
+      // console.log(this.Lc)
       this.gg = m.fh(this.Lc);
       this.gg.P = a
     } else {
@@ -2793,10 +2794,13 @@ m.lj = function (a, b) {
 
 // JEST PROBLEM Z TĄ FUNKCJĄ, TRZEBA USIĄŚĆ
 m.fh = function (a) {
+  // console.log(a);
   var b = a.B();
+  // console.log(b);
   b = Object.create(m.Qm.get(b).prototype);
   b.da = 0;
   b.mb = 0;
+  // console.log(b.va.toString());
   b.va(a);
   return b
 }
