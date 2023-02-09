@@ -2801,6 +2801,7 @@ m.fh = function (a) {
   b.da = 0;
   b.mb = 0;
   // console.log(b.va.toString());
+  // console.log(b.va)
   b.va(a);
   return b
 }
@@ -4715,7 +4716,9 @@ O.prototype = {
                   m = t.x - h.x,
                   t = t.y - h.y,
                   h = Math.sqrt(m * m + t * t);
+                // console.log('w pętli', h, l.Z, d.H.Z)
                 if (4 > h - l.Z - d.H.Z) {
+                  console.log('jestem w pętli')
                   //console.log("pileczka",l.a.x,l.a.y); TU KORDY PILKI
                   let ball = { x: l.a.x, y: l.a.y };
                   var f = m / h,
@@ -4735,16 +4738,17 @@ O.prototype = {
                   t.x = h.x + f * l * n;
                   t.y = h.y + m * l * n;//checkpoint kick
                   //console.log(t.x,t.y);
-                  //console.log("kopnięcie chyba",d);//,d.w,d.ea.w);
+                  // console.log("kopnięcie chyba", d);//,d.w,d.ea.w);
                   //console.log(ball);
                   let rA = ball.vy / ball.vx;
                   let rB = 1;
                   let rC = ball.y - (ball.vy / ball.vx) * ball.x;
+                  console.log(aktualizuj)
                   if (aktualizuj) {
                     if (d.ea.w == "Red" && ball.vx > 0 && 99.762 * ball.vx + ball.x > blueGoalCord[0] && ball.x < blueGoalCord[0]) {
                       let poz = rA * blueGoalCord[0] + rC;
                       if (poz > blueGoalCord[1] && poz < blueGoalCord[2]) {
-                        //console.log("Celny strzał "+d.w);
+                        // console.log("Celny strzał " + d.w);
                         match[match.length - 1].shots.push(d.w);
                         match[match.length - 1].shotsRed++;
                       }

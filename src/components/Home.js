@@ -3,7 +3,7 @@ import { useContext, useEffect } from "react";
 import { AnalyzerContext } from "../App";
 import $ from 'jquery'
 // import "../game-original";
-import { handleFile } from "../game";
+import { handleFile } from "../game2.js";
 // import '../game-original.js'
 
 export function setMode(e) {
@@ -12,7 +12,8 @@ export function setMode(e) {
 
 function Home() {
 
-  const { mainMode, setMainMode } = useContext(AnalyzerContext)
+  const { mainMode, setMainMode } = useContext(AnalyzerContext);
+  console.log(handleFile)
 
   useEffect(() => {
     setMode = setMainMode;
