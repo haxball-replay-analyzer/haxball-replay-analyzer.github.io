@@ -7,12 +7,25 @@ import Replay from './components/Replay';
 
 export const AnalyzerContext = createContext(null);
 
+export function setName() {
+  console.log('nic sie nie zmienia')
+}
+
+export function setRec() {
+  console.log('error')
+}
+
 function App() {
 
   const [mainMode, setMainMode] = useState("home");
+  const [roomName, setRoomName] = useState('room name');
+  const [recInfo, setRecInfo] = useState({})
+
+  setName = setRoomName;
+  setRec = setRecInfo;
 
   return (
-    <AnalyzerContext.Provider value={{ mainMode, setMainMode }}>
+    <AnalyzerContext.Provider value={{ mainMode, setMainMode, roomName, setRoomName }}>
       <div className="container flexCol">
         <Header />
         {mainMode === 'home' && <Home />}

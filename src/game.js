@@ -2,6 +2,7 @@
 import $ from 'jquery';
 import { setMode } from './components/Home';
 import './vendor/pako-jszip.min.js';
+import { setName, setRec } from './App';
 
 /* eslint-disable no-undef */
 /* eslint-disable no-unused-expressions */
@@ -291,6 +292,7 @@ var redGoalCord = [], blueGoalCord = [], redName = "RED", blueName = "BLUE", che
 var goalParsed = 0, goalMarkers = [], playerPos = [], stadion = [0, 0], ballRadius = 10;
 var haxracing = false;
 var kanwasy = [], pozycje, paintedCanvases = [];
+const RecInfo = { kicks: [] }
 
 export function handleFile(e) {
   var name = e.target.files[0].name;
@@ -475,21 +477,29 @@ var x = {
   }
 }
 
+var napisz = 0;
 function Vb(a) {
   this.$c = window.performance.now();
   this.sd = this.De = 0;
   var b = this;
   this.ya = a;
+  console.log(a)
   this.j = new ja(a.uc);
   var c = new Gb(this.j);
   c.ri(a.T);
   window.document.addEventListener('keydown', G(this, this.Bd));
   window.document.addEventListener('keyup', G(this, this.Cd));
+  if (napisz < 1000) {
+    console.log(this, this.bf);
+    napisz++;
+  }
   window.requestAnimationFrame(G(this, this.bf));
-  this.Gh = window.setInterval(function () {
-    b.j.pe.hm(b.sd);
-    b.sd = 0
-  }, 1000);
+  // CHECKPOINT po co ten interval
+  // this.Gh = window.setInterval(function () {
+  //   b.j.pe.hm(b.sd);
+  //   console.log('czy to co sekundę coś robi')
+  //   b.sd = 0
+  // }, 1000);
   this.uf(n.A.Tb.L());
   this.j.g.classList.add('replayer');
   this.je = new ha(a);
@@ -727,6 +737,7 @@ Gb.prototype = {
       //console.log("GOOOOOOOOOOOOOOOOOOOOOOOOOOOOL",kicker.name, kicker.team, lastKicker.name, match[match.length-1].scoreRed, match[match.length-1].scoreBlue);
       //console.log(ha.Wk(20494*16.6666666666666));
       if (aktualizuj) {
+        console.log('gooooooool')
         if (a.w == "Red") match[match.length - 1].scoreRed++;//aktualny wynik red lub blue = a.$
         else match[match.length - 1].scoreBlue++;
         if (match[match.length - 1].spaceMode) {
@@ -867,16 +878,21 @@ Gb.prototype = {
   f: Gb
 };
 
-var J = {
-  replace: function (a, b, c) {
-    return a.split(b).join(c)
-  }
+function J() {
+}
+J.replace = function (a, b, c) {
+  return a.split(b).join(c)
 }
 J.Af = function (a) {
   var b,
     c = '';
   for (b = 2 - a.length; c.length < b;) c += '0';
   return c + (null == a ? 'null' : '' + a)
+};
+J.Vg = function (a, b) {
+  for (var c = ''; c = '0123456789ABCDEF'.charAt(a & 15) + c, a >>>= 4, 0 < a;);
+  if (null != b) for (; c.length < b;) c = '0' + c;
+  return c
 };
 
 function ja(a) {
@@ -1997,7 +2013,6 @@ var v = {
     return b
   },
   xe: function (a, b) {
-    console.log('podmieniam', b, 'na', a)
     a.parentElement.replaceChild(b, a)
   }
 }
@@ -2134,6 +2149,7 @@ N.prototype = {
       d = (c - this.$c) / 1000;
     this.$c = c;
     this.Jg.clear();
+    console.log('chyba se próbuje rysować')
     this.Pr();
     N.Gi(this.c, !0);
     this.c.resetTransform();
@@ -2177,6 +2193,7 @@ N.prototype = {
         ++f,
         m = n.H,
         null != m && this.Ll(m, this.dd.get(n.V));
+      console.log('rysuje każdego gracza')
       f = 0;
       for (e = e.F; f < e.length;) g = e[f],
         ++f,
@@ -2347,6 +2364,7 @@ N.prototype = {
     this.c.beginPath();
     null == b ? (this.c.fillStyle = N.lc(a.R), this.c.strokeStyle = 'black') : (this.c.fillStyle = b.Ij, this.c.strokeStyle = b.lo);
     this.c.beginPath();
+    console.log('tu chyba próbuje rysować każdego gracza')
     this.c.arc(a.a.x, a.a.y, a.Z, 0, 2 * Math.PI, !1);
     if (null != b) {
       this.c.save();
@@ -2687,6 +2705,7 @@ Jb.prototype = C(V.prototype, {
     return a
   },
   C: function () {
+    // console.log('chyba wykonuję ważną funkcję')
     var a = window.performance.now(),
       b = a - this.Wh;
     this.Wh = a;
@@ -2706,6 +2725,9 @@ Jb.prototype = C(V.prototype, {
     for (this.sk = b - a; this.Y < a;) {
       for (; null != this.gg && this.hg == this.Y;) {
         b = this.gg;
+        // CHECKPOINT warunkuję
+        // if (typeof b.apply !== 'function') continue;
+        // console.log(b.apply)
         b.apply(this.T);
         null != this.fc && this.fc(b);
         this.Dl();
@@ -2768,6 +2790,8 @@ m.lj = function (a, b) {
   a.ua(b)
 };
 
+
+// JEST PROBLEM Z TĄ FUNKCJĄ, TRZEBA USIĄŚĆ
 m.fh = function (a) {
   var b = a.B();
   b = Object.create(m.Qm.get(b).prototype);
@@ -3756,6 +3780,11 @@ h.prototype = {
   },
   Sj: function () {
     var a = h.Fr;
+    //CHECKPOINT dodaje ten warunek
+    if (a == undefined) {
+      console.log('nie mogę tu')
+      return;
+    }
     a.a = 0;
     this.ga(a);
     var b = new dc;
@@ -4374,6 +4403,7 @@ sb.prototype = {
 
 Vb.prototype = {
   ia: function () {
+    console.log('czyżby tu koniec')
     window.document.removeEventListener('keydown', G(this, this.Bd));
     window.document.removeEventListener('keyup', G(this, this.Cd));
     window.onbeforeunload = null;
@@ -4382,6 +4412,7 @@ Vb.prototype = {
   },
   bf: function () {
     this.De = window.requestAnimationFrame(G(this, this.bf));
+    // CHECKPOINT BARDZO WAŻNY
     this.ya.C();
     this.Kc()
   },
@@ -4502,6 +4533,7 @@ fa.prototype = {
   },
   ja: function (a) {
     this.jc = a.zb();
+    setName(this.jc)
     this.Pc = 0 != a.B();
     this.ib = a.M();
     this.Da = a.M();
@@ -4667,7 +4699,9 @@ O.prototype = {
           0 < d.Sc && d.Sc--;
           d.yc < this.Ma.ce && d.yc++;
           if (d.Wb && 0 >= d.Sc && 0 <= d.yc) {
-            // console.log("iksnął", d.w, d.Wb, d.Sc, d.yc);
+            // CHECKPOINT console.log("iksnął", d.w, d.Wb, d.Sc, d.yc);
+            RecInfo.kicks.push({ player: d.w, Wb: d.Wb })
+            // console.log(RecInfo)
             for (var f = !1, g = 0, k = this.ta.F; g < k.length;) {
               var l = k[g];
               ++g;
@@ -4957,7 +4991,7 @@ O.prototype = {
   um: function () {
     this.vc = 300;
     this.Bb = 3;
-    //console.log(pileczka);
+    // CHECKPOINT console.log(pileczka);
     //console.log("Chyba koniec meczu", match);
     null != this.Ma.Oi && this.Ma.Oi(this.Pb > this.Kb ? p.fa : p.xa)
   },
@@ -6990,6 +7024,13 @@ O.dk = function () {
     a.push(0);
   return a
 }(this);
+
+function ia() {
+}
+ia.b = !0;
+ia.i = function (a, b, c) {
+  null != a && a(b, c)
+};
 
 // mb.N = '<div class=\'dialog change-location-view\'><h1>Change Location</h1><div class=\'splitter\'><div class=\'list\' data-hook=\'list\'></div><div class=\'buttons\'><button data-hook=\'change\'>Change</button><button data-hook=\'cancel\'>Cancel</button></div></div></div>';
 Da.N = '<div class=\'chatbox-view\'><div data-hook=\'log\' class=\'log\'><p>Controls:<br/>Move: WASD or Arrows<br/>Kick: X, Space, Ctrl, Shift, Numpad 0<br/>View: Numbers 1 to 4</p></div><div class=\'autocompletebox\' data-hook=\'autocompletebox\'></div><div class=\'input\'><input data-hook=\'input\' type=\'text\' /><button data-hook=\'send\'>Send</button></div></div>';

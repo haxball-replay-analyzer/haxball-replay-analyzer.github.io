@@ -4,6 +4,7 @@ import { AnalyzerContext } from "../App";
 import $ from 'jquery'
 // import "../game-original";
 import { handleFile } from "../game";
+// import '../game-original.js'
 
 export function setMode(e) {
   console.log('xd')
