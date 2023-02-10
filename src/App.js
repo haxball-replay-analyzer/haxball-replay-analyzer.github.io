@@ -28,8 +28,10 @@ function App() {
     <AnalyzerContext.Provider value={{ mainMode, setMainMode, roomName, setRoomName }}>
       <div className="container flexCol">
         <Header />
-        {mainMode === 'home' && <Home />}
-        {mainMode === 'replay' && <Replay />}
+        <div className="flexRow flexGrow">
+          {mainMode === 'home' && <Home />}
+          {mainMode === 'replay' && <Replay />}
+        </div>
       </div>
     </AnalyzerContext.Provider>
   );

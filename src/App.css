@@ -3229,7 +3229,7 @@ a:hover {
   font-size: 15px;
   /* font-size: 2vh; */
   /* display: inline-block; */
-  overflow: hidden;
+  overflow: hidden
 }
 
 .header-logo {
@@ -3261,6 +3261,28 @@ a:hover {
 
 .header>* {
   margin-right: 15px;
+}
+
+.container {
+  overflow: hidden;
+  position: absolute;
+  top: 0px;
+  bottom: 0px;
+  width: 100%
+}
+
+.flexCol {
+  display: flex;
+  flex-direction: column
+}
+
+.flexRow {
+  display: flex;
+  flex-direction: row
+}
+
+.flexGrow {
+  flex-grow: 1
 }
 
 .material-icons {
