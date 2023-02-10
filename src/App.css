@@ -592,7 +592,7 @@ th {
   border-radius: 5px;
   position: absolute;
   top: calc(50% - 7.5vh);
-  left: 110%;
+  left: 100%;
 }
 
 .dialog>h1,
@@ -1965,8 +1965,10 @@ th {
 
 .game-view {
   position: absolute;
+  /* left: 50%; */
+  top: 35px;
   width: 100vw;
-  height: 100vh;
+  height: calc(100vh - 35px);
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -1976,6 +1978,7 @@ th {
 .game-view>.top-section {
   position: relative;
   flex-grow: 1;
+  left: 100%;
   min-height: 0
 }
 
@@ -1983,7 +1986,9 @@ th {
   flex-shrink: 0;
   display: flex;
   justify-content: center;
-  background-color: #1A2125
+  background-color: #1A2125;
+  position: relative;
+  left: 100%
 }
 
 .game-view>.bottom-section>.buttons {
@@ -3115,6 +3120,7 @@ th {
   bottom: 0;
   height: 40px;
   width: 100%;
+  left: 100%;
   background-color: black;
   display: flex;
   flex-direction: row;

@@ -15,6 +15,16 @@
 /* eslint-disable no-undef */
 /* eslint-disable no-unused-expressions */
 
+import $ from 'jquery';
+import { setLoadingProgress2 } from './components/LoadingScreen';
+
+var loading = {
+  recLength: 1,
+  progress: 0,
+  analyzed: 0,
+  done: false
+}
+
 
 // var script = document.createElement("script");  // create a script DOM node
 // script.src = 'LZWEncoder.js';  // set its src to the provided URL
@@ -1264,7 +1274,6 @@ function $a(a) {
   this.Il()
 }
 export function handleFile(e) {
-  console.log('jestem');
   console.log(e);
   var c = this;
   var a = e.target.files;
@@ -2115,7 +2124,6 @@ function kb(a) {
     //document.getElementById("button_ok").click();
   }
   var c = this;
-  console.log('coś próbuję')
   //CHECKPOINT komentuję niżej i returnuję
   // this.g = v.Ga(kb.N);
   return;
@@ -2577,7 +2585,6 @@ function Vb(a) {
   c.ri(a.T);
   window.document.addEventListener('keydown', G(this, this.Bd));
   window.document.addEventListener('keyup', G(this, this.Cd));
-  console.log('probuje')
   window.requestAnimationFrame(G(this, this.bf));
   this.Gh = window.setInterval(function () {
     b.j.pe.hm(b.sd);
@@ -5250,6 +5257,27 @@ xa.prototype = C(V.prototype, {
   },
   Dl: function () {
     var a = this.Lc;
+    // CHECKPOINT WAŻNY tu leci nagranie, całe byteLength
+    // console.log('coś', a.o.byteLength - a.a)
+    if (loading.recLength == 1) {
+      loading.recLength = a.o.byteLength - a.a;
+      // console.log(loading.recLength)
+    }
+    else if (!loading.done) {
+      loading.analyzed = loading.recLength - a.o.byteLength + a.a;
+      const progress = Math.floor(loading.analyzed / loading.recLength * 100);
+      if (progress < loading.progress) {
+        console.log('koniec analizy');
+        loading.done = true;
+      } else if (progress !== loading.progress) {
+        loading.progress = progress;
+        // document.getElementById('loading-progress').style.width = '' + progress + '%'
+        // setLoadingProgress2(progress + '%')
+        // $('#loading-progress').css('width', progress + '%')
+        console.log(progress + '%')
+        // console.log(loading.analyzed, loading.recLength, a.o.byteLength - a.a)
+      }
+    }
     0 < a.o.byteLength - a.a ? (a = this.Lc.Ab(), this.hg += a, a = this.Lc.Ob(), this.gg = m.fh(this.Lc), this.gg.P = a) : this.gg = null
   },
   Go: function () {
@@ -5737,7 +5765,6 @@ Gb.prototype = {
       czasik.push(c.j.Fb.xc.Ke);
       var dupsko = this;
       //console.log("Tu niby gol",czasGry, match[match.length-1].goals/*a,b,c.j.Fb.xc.Ke,d,e,f,g,h,i,j,k*/);
-      console.log('gol')
       //console.log("GOOOOOOOOOOOOOOOOOOOOOOOOOOOOL",kicker.name, kicker.team, lastKicker.name, match[match.length-1].scoreRed, match[match.length-1].scoreBlue);
       //console.log(ha.Wk(20494*16.6666666666666));
       if (aktualizuj) {
@@ -6518,11 +6545,8 @@ x.Wg = function (a) {
   })
 };
 x.fj = function (a) {
-  console.log('to się powinno wykonać')
-  console.log(x.ks())
   x.ks() && x.es(function () {
     kc.fj();
-    console.log('no i się wykonuje')
     var b;
     null == n.A.Me.L() ? T.Fo().then(function (a) {
       n.A.Me.Xa(a)

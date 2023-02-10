@@ -14,11 +14,23 @@ export function setMode(e) {
 function Home() {
 
   const { mainMode, setMainMode } = useContext(AnalyzerContext);
-  console.log(handleFile)
 
   function callbackFn(e) {
-    console.log('zrobiene')
     handleFile(e);
+  }
+
+  function bringReplayer() {
+    $('.top-section').animate({
+      left: 0,
+    }, { duration: 700, easing: 'swing', queue: false });
+
+    $('.bottom-section').animate({
+      left: 0,
+    }, { duration: 700, easing: 'swing', queue: false });
+
+    $('.replay-controls-view').animate({
+      left: 0,
+    }, { duration: 700, easing: 'swing', queue: false });
   }
 
   function handleChange(e) {
@@ -36,6 +48,10 @@ function Home() {
       $('#loading-screen').animate({
         left: '35vw',
       }, { duration: 700, easing: 'swing', queue: false, complete: function () { callbackFn(e) } });
+
+      $('#loading-progress').animate({
+        width: '100%',
+      }, { duration: 1500, easing: 'linear', queue: false, complete: function () { bringReplayer() } });
     })
 
   }
