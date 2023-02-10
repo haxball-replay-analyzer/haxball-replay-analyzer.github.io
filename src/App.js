@@ -4,6 +4,7 @@ import Home from './components/Home';
 import { useState, createContext } from 'react';
 import './game.js'
 import Replay from './components/Replay';
+import LoadingScreen from './components/LoadingScreen';
 
 export const AnalyzerContext = createContext(null);
 
@@ -30,6 +31,7 @@ function App() {
         <Header />
         <div className="flexRow flexGrow">
           {mainMode === 'home' && <Home />}
+          {mainMode === 'loading' && <LoadingScreen />}
           {mainMode === 'replay' && <Replay />}
         </div>
       </div>
