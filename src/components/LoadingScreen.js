@@ -11,7 +11,7 @@ function LoadingScreen() {
   }, [])
 
   useEffect(() => {
-    console.log(loadingProgress)
+    // console.log(loadingProgress)
   }, [loadingProgress])
 
   return (

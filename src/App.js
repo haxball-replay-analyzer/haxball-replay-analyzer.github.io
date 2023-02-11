@@ -1,10 +1,11 @@
 import './App.css';
 import Header from './components/Header';
 import Home from './components/Home';
-import { useState, createContext } from 'react';
+import { useState, createContext, useEffect } from 'react';
 import './game.js'
 import Replay from './components/Replay';
 import LoadingScreen from './components/LoadingScreen';
+import $ from 'jquery'
 
 export const AnalyzerContext = createContext(null);
 
@@ -25,9 +26,13 @@ function App() {
   setName = setRoomName;
   setRec = setRecInfo;
 
+  useEffect(() => {
+    $('#mainDiv').fadeIn(700)
+  }, [])
+
   return (
     <AnalyzerContext.Provider value={{ mainMode, setMainMode, roomName, setRoomName }}>
-      <div className="container flexCol">
+      <div id='mainDiv' className="container flexCol" style={{ display: 'none' }}>
         <Header />
         <div className="flexRow flexGrow">
           {mainMode === 'home' && <Home />}

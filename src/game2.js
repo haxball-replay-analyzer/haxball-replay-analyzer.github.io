@@ -1293,7 +1293,6 @@ function $a(a) {
   this.Il()
 }
 export function handleFile(e) {
-  console.log(e);
   var c = this;
   var a = e.target.files;
   if (!(1 > a.length)) {
@@ -1929,7 +1928,7 @@ function ja(a) {
       var canvas = document.createElement("canvas");
       if (canvas.getContext) {
 
-        ctx = canvas.getContext('2d');
+        var ctx = canvas.getContext('2d');
         ctx.canvas.width = 500;
         ctx.canvas.height = 250;
 
@@ -1962,7 +1961,7 @@ function ja(a) {
       var canvas2 = document.createElement("canvas");
       if (canvas2.getContext) {
 
-        ctx2 = canvas2.getContext('2d');
+        var ctx2 = canvas2.getContext('2d');
         ctx2.canvas.width = 500;
         ctx2.canvas.height = 250;
 
@@ -5286,7 +5285,7 @@ xa.prototype = C(V.prototype, {
       loading.analyzed = loading.recLength - a.o.byteLength + a.a;
       const progress = Math.floor(loading.analyzed / loading.recLength * 100);
       if (progress < loading.progress) {
-        console.log('koniec analizy');
+        // console.log('koniec analizy');
         loading.done = true;
         bringReplayer();
       } else if (progress !== loading.progress) {
@@ -5296,7 +5295,7 @@ xa.prototype = C(V.prototype, {
         // setLoadingProgress2(progress + '%')
         // $('#loading-progress').css('width', progress + '%')
         // document.getElementById('progress').innerHTML = '' + progress;
-        console.log(progress + '%')
+        // console.log(progress + '%')
         // console.log(loading.analyzed, loading.recLength, a.o.byteLength - a.a)
       }
     }
