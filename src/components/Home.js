@@ -19,25 +19,19 @@ function Home() {
     handleFile(e);
   }
 
-  function bringReplayer() {
-    $('.top-section').animate({
-      left: 0,
-    }, { duration: 700, easing: 'swing', queue: false });
-
-    $('.bottom-section').animate({
-      left: 0,
-    }, { duration: 700, easing: 'swing', queue: false });
-
-    $('.replay-controls-view').animate({
-      left: 0,
-    }, { duration: 700, easing: 'swing', queue: false });
-  }
-
   function handleChange(e) {
     // $('.roomlist-view').slideUp(400, 'swing', function () {
     //   setMode('replay');
     //   handleFile(e)
     // })
+
+    // var a = 1;
+
+    // const interval = setInterval(function () {
+    //   document.getElementById('progress').innerHTML = a.toString();
+    //   a++;
+    //   if (a == 100) clearInterval(interval)
+    // }, 50)
 
     $(function () {
 
@@ -49,9 +43,9 @@ function Home() {
         left: '35vw',
       }, { duration: 700, easing: 'swing', queue: false, complete: function () { callbackFn(e) } });
 
-      $('#loading-progress').animate({
-        width: '100%',
-      }, { duration: 1500, easing: 'linear', queue: false, complete: function () { bringReplayer() } });
+      // $('#loading-progress').animate({
+      //   width: '100%',
+      // }, { duration: 1500, easing: 'linear', queue: false, complete: function () { bringReplayer() } });
     })
 
   }

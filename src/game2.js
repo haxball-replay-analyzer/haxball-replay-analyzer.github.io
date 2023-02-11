@@ -22,7 +22,26 @@ var loading = {
   recLength: 1,
   progress: 0,
   analyzed: 0,
+  changed: false,
   done: false
+}
+
+function bringReplayer() {
+  $('.top-section').animate({
+    left: 0,
+  }, { duration: 700, easing: 'swing', queue: false });
+
+  $('.bottom-section').animate({
+    left: 0,
+  }, { duration: 700, easing: 'swing', queue: false });
+
+  $('.replay-controls-view').animate({
+    left: 0,
+  }, { duration: 700, easing: 'swing', queue: false });
+
+  $('#loading-screen').animate({
+    left: '-150%',
+  }, { duration: 700, easing: 'swing', queue: false });
 }
 
 
@@ -5269,11 +5288,14 @@ xa.prototype = C(V.prototype, {
       if (progress < loading.progress) {
         console.log('koniec analizy');
         loading.done = true;
+        bringReplayer();
       } else if (progress !== loading.progress) {
         loading.progress = progress;
+        loading.changed = true;
         // document.getElementById('loading-progress').style.width = '' + progress + '%'
         // setLoadingProgress2(progress + '%')
         // $('#loading-progress').css('width', progress + '%')
+        // document.getElementById('progress').innerHTML = '' + progress;
         console.log(progress + '%')
         // console.log(loading.analyzed, loading.recLength, a.o.byteLength - a.a)
       }

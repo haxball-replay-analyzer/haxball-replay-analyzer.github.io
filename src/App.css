@@ -1971,6 +1971,7 @@ th {
   height: calc(100vh - 35px);
   overflow: hidden;
   display: flex;
+  /* display: none; */
   flex-direction: column;
   align-items: stretch
 }
