@@ -148,7 +148,6 @@ const newChanges = changelog.map(change => <Changes key={change.version} change=
 
 function Changelog() {
 
-  const { mainMode, setMainMode } = useContext(AnalyzerContext)
   return (
     <div id="lista-zmian" style={{ fontFamily: 'roboto', fontSize: '110%', overflowY: 'scroll', maxWidth: '630px' }}>
       {newChanges}

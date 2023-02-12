@@ -1,9 +1,6 @@
-import { useContext } from "react";
-import { AnalyzerContext } from "../App";
-
 function RoomView() {
 
-  const context = useContext(AnalyzerContext)
+  const context = {} // potem przypiszemy useSelector
   // console.log(context.roomName)
 
   return (

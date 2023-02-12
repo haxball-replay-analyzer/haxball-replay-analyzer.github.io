@@ -1,37 +1,16 @@
 import Changelog from "./changelog/Changelog";
-import { useContext, useEffect } from "react";
-import { AnalyzerContext } from "../App";
 import $ from 'jquery'
 // import "../game-original";
 import { handleFile } from "../game2.js";
 import LoadingScreen from "./LoadingScreen";
-// import '../game-original.js'
-
-export function setMode(e) {
-  console.log('xd')
-}
 
 function Home() {
-
-  const { mainMode, setMainMode } = useContext(AnalyzerContext);
 
   function callbackFn(e) {
     handleFile(e);
   }
 
   function handleChange(e) {
-    // $('.roomlist-view').slideUp(400, 'swing', function () {
-    //   setMode('replay');
-    //   handleFile(e)
-    // })
-
-    // var a = 1;
-
-    // const interval = setInterval(function () {
-    //   document.getElementById('progress').innerHTML = a.toString();
-    //   a++;
-    //   if (a == 100) clearInterval(interval)
-    // }, 50)
 
     $(function () {
 
@@ -43,16 +22,9 @@ function Home() {
         left: '35vw',
       }, { duration: 700, easing: 'swing', queue: false, complete: function () { callbackFn(e) } });
 
-      // $('#loading-progress').animate({
-      //   width: '100%',
-      // }, { duration: 1500, easing: 'linear', queue: false, complete: function () { bringReplayer() } });
     })
 
   }
-
-  useEffect(() => {
-    setMode = setMainMode;
-  }, []);
 
   return (
     <>

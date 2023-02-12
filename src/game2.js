@@ -17,6 +17,9 @@
 
 import $ from 'jquery';
 import { setLoadingProgress2 } from './components/LoadingScreen';
+import { setMainMode } from './slices/mainModeSlice';
+import './vendor/pako-jszip.min.js';
+import { useDispatch } from 'react-redux';
 
 var loading = {
   recLength: 1,
@@ -1803,6 +1806,12 @@ function ja(a) {
     b.bb(a.g)
   };
   a.get('staty').onclick = function () {
+
+    // CHECKPOINT WAŻNY
+    // const dispatch = useDispatch();
+    // dispatch(setMainMode('stats'));
+    // return;
+
     var cod = new gxd(a);
     //console.log(cod);
     if (match.length > 1 && match[0].gameTicks == -1) match.splice(0, 1);

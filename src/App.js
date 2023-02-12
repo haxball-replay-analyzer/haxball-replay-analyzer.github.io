@@ -1,46 +1,29 @@
 import './App.css';
 import Header from './components/Header';
 import Home from './components/Home';
-import { useState, createContext, useEffect } from 'react';
-import './game.js'
+import React, { useEffect } from 'react';
 import Replay from './components/Replay';
 import LoadingScreen from './components/LoadingScreen';
 import $ from 'jquery'
-
-export const AnalyzerContext = createContext(null);
-
-export function setName() {
-  console.log('nic sie nie zmienia')
-}
-
-export function setRec() {
-  console.log('error')
-}
+import { useSelector } from 'react-redux'
+import GameStats from './components/game stats/GameStats';
 
 function App() {
 
-  const [mainMode, setMainMode] = useState("home");
-  const [roomName, setRoomName] = useState('room name');
-  const [recInfo, setRecInfo] = useState({})
-
-  setName = setRoomName;
-  setRec = setRecInfo;
+  const mainMode = useSelector((state) => state.mainMode.value)
 
   useEffect(() => {
     $('#mainDiv').fadeIn(700)
   }, [])
 
   return (
-    <AnalyzerContext.Provider value={{ mainMode, setMainMode, roomName, setRoomName }}>
-      <div id='mainDiv' className="container flexCol" style={{ display: 'none' }}>
-        <Header />
-        <div className="flexRow flexGrow">
-          {mainMode === 'home' && <Home />}
-          {mainMode === 'loading' && <LoadingScreen />}
-          {mainMode === 'replay' && <Replay />}
-        </div>
+    <div id='mainDiv' className="container flexCol" style={{ display: 'none' }}>
+      <Header />
+      <div className="flexRow flexGrow">
+        <Home />
+        {mainMode === 'stats' && <GameStats />}
       </div>
-    </AnalyzerContext.Provider>
+    </div>
   );
 }
 

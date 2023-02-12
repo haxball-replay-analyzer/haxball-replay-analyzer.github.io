@@ -1,18 +1,4 @@
-import { useEffect, useState } from "react";
-
-export function setLoadingProgress2(x) { }
-
 function LoadingScreen() {
-
-  const [loadingProgress, setLoadingProgress] = useState('0%')
-
-  useEffect(() => {
-    setLoadingProgress2 = setLoadingProgress;
-  }, [])
-
-  useEffect(() => {
-    // console.log(loadingProgress)
-  }, [loadingProgress])
 
   return (
     <div id='loading-screen' className="loading">
