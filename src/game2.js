@@ -1808,7 +1808,7 @@ function ja(a) {
     if (match.length > 1 && match[0].gameTicks == -1) match.splice(0, 1);
 
     setTimeout(function () {
-      if (match[mtc].spaceMode) document.getElementById("tytul").innerHTML = 'Match stats (space mode):<select onchange="selectChange()" id="displayedMatch"><option value="0">1: Red ' + match[0].scoreRed + ':' + match[0].scoreBlue + ' Blue</option></select>';
+      if (match[mtc].spaceMode) document.getElementById("tytul").innerHTML = 'Match stats (space mode):<select onchange="selectChange()" id="displayedMatch"><option value="0">1: Red ' + match[0].scoreRed + ':' + match[0].scoreBlue + ' Blue</option></select>' + (match[mtc].stadium ? '<button onclick="downloadMap()" style="margin: 0 10px 0 30px">Download map</button>' : '');
       else document.getElementById("tytul").innerHTML = 'Match stats:<select onchange="selectChange()" id="displayedMatch"><option value="0">1: Red ' + match[0].scoreRed + ':' + match[0].scoreBlue + ' Blue</option></select>' + (match[mtc].stadium ? '<button onclick="downloadMap()" style="margin: 0 10px 0 30px">Download map</button>' : '');
       for (var i = 1; i < match.length; i++) {
         var mA = document.createElement("option");
