@@ -20,6 +20,7 @@ import { setLoadingProgress2 } from './components/LoadingScreen';
 import { setMainMode } from './slices/mainModeSlice';
 import './vendor/pako-jszip.min.js';
 import { useDispatch } from 'react-redux';
+import { showStats } from './components/Home';
 
 var loading = {
   recLength: 1,
@@ -1805,12 +1806,18 @@ function ja(a) {
     //console.log(a.g);
     b.bb(a.g)
   };
-  a.get('staty').onclick = function () {
+  a.get('staty').onclick = function (el) {
 
     // CHECKPOINT WAŻNY
     // const dispatch = useDispatch();
     // dispatch(setMainMode('stats'));
     // return;
+
+    // console.log('klik', el.target)
+
+    showStats(el.target);
+
+    return;
 
     var cod = new gxd(a);
     //console.log(cod);

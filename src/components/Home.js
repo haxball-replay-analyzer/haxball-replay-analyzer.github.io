@@ -3,8 +3,26 @@ import $ from 'jquery'
 // import "../game-original";
 import { handleFile } from "../game2.js";
 import LoadingScreen from "./LoadingScreen";
+import { useSelector, useDispatch } from "react-redux";
+import { setMainMode } from "../slices/mainModeSlice";
+import { setDivStyle } from "../slices/gameStatsSlice";
+import GameStats from "./game stats/GameStats";
+
+export function showStats() {
+}
 
 function Home() {
+
+  const dispatch = useDispatch();
+  const mainMode = useSelector((state) => state.mainMode.value)
+  var divStyle = {};
+
+  function showStatsExp(elStyle) {
+    dispatch(setDivStyle(elStyle));
+    dispatch(setMainMode('stats'));
+    divStyle = elStyle.clientWidth;
+  }
+  showStats = showStatsExp;
 
   function callbackFn(e) {
     handleFile(e);
@@ -44,6 +62,7 @@ function Home() {
         </div>
       </div>
       <LoadingScreen />
+      {mainMode === 'stats' && <GameStats divStyle={divStyle} />}
     </>
   );
 }

@@ -1,4 +1,8 @@
+import { useSelector } from "react-redux";
+
 function Header() {
+
+  const mainMode = useSelector((state) => state.mainMode.value);
 
   return (
     <div className="header">
@@ -8,6 +12,7 @@ function Header() {
       <a href="https://www.haxball.com/community" target="_blank" rel='noreferrer'>Community</a>
       <a href="https://www.discord.io/haxracing" target="_blank" rel='noreferrer'>HaxRacing</a>
       <a href="https://haxball-stadium-editor.github.io" target="_blank" rel='noreferrer'>Stadium Editor</a>
+      {mainMode === 'stats' && <div style={{ zIndex: 2, backgroundColor: 'rgba(115, 136, 92, 0.5)', position: 'absolute', top: 0, width: '100%', height: 35 }}></div>}
     </div >
   );
 }

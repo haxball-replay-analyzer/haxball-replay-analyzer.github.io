@@ -2039,6 +2039,17 @@ th {
   background-color: rgba(115, 136, 92, 0.5)
 }
 
+.flexRow>[data-hook="popups"] {
+  z-index: 2;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(115, 136, 92, 0.5)
+}
+
 .loader-view {
   position: absolute;
   width: 100%;
@@ -2499,7 +2510,7 @@ th {
 }
 
 .kick-player-view {
-  min-width: 300px
+  /* min-width: 300px */
 }
 
 .replayer .room-view>.container>.header-btns {

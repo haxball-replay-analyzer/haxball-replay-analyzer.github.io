@@ -6,7 +6,6 @@ import Replay from './components/Replay';
 import LoadingScreen from './components/LoadingScreen';
 import $ from 'jquery'
 import { useSelector } from 'react-redux'
-import GameStats from './components/game stats/GameStats';
 
 function App() {
 
@@ -21,7 +20,6 @@ function App() {
       <Header />
       <div className="flexRow flexGrow">
         <Home />
-        {mainMode === 'stats' && <GameStats />}
       </div>
     </div>
   );
