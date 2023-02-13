@@ -5,11 +5,11 @@ import { handleFile } from "../game2.js";
 import LoadingScreen from "./LoadingScreen";
 import { useSelector, useDispatch } from "react-redux";
 import { setMainMode } from "../slices/mainModeSlice";
-import { setDivStyle } from "../slices/gameStatsSlice";
+import { setDivStyle, setStats } from "../slices/gameStatsSlice";
 import GameStats from "./game stats/GameStats";
 
-export function showStats() {
-}
+export function showStats() { }
+export function setGameStats() { }
 
 function Home() {
 
@@ -22,7 +22,14 @@ function Home() {
     dispatch(setMainMode('stats'));
     divStyle = elStyle.clientWidth;
   }
+
+  function setGameStatsExp(stats) {
+    dispatch(setStats(stats));
+    console.log(stats)
+  }
+
   showStats = showStatsExp;
+  setGameStats = setGameStatsExp;
 
   function callbackFn(e) {
     handleFile(e);

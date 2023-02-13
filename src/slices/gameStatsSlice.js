@@ -4,15 +4,29 @@ export const gameStatsSlice = createSlice({
   name: 'gameStats',
   initialState: {
     divStyle: {},
+    matches: [],
+    selectedMatch: 0
   },
   reducers: {
     setDivStyle: (state, action) => {
       state.divStyle = action.payload
+    },
+    setStats: (state, action) => {
+      state.matches = action.payload
+    },
+    showNextMatch: (state) => {
+      state.selectedMatch++
+    },
+    showPreviousMatch: (state) => {
+      state.selectedMatch--;
+    },
+    selectMatch: (state, action) => {
+      state.selectedMatch = action.payload
     }
   },
 })
 
 // Action creators are generated for each case reducer function
-export const { setDivStyle } = gameStatsSlice.actions
+export const { setDivStyle, setStats, showNextMatch, showPreviousMatch, selectMatch } = gameStatsSlice.actions
 
 export default gameStatsSlice.reducer

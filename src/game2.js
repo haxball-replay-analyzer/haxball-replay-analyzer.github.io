@@ -20,7 +20,7 @@ import { setLoadingProgress2 } from './components/LoadingScreen';
 import { setMainMode } from './slices/mainModeSlice';
 import './vendor/pako-jszip.min.js';
 import { useDispatch } from 'react-redux';
-import { showStats } from './components/Home';
+import { showStats, setGameStats } from './components/Home';
 
 var loading = {
   recLength: 1,
@@ -1815,6 +1815,7 @@ function ja(a) {
 
     // console.log('klik', el.target)
 
+    setGameStats(match);
     showStats(el.target);
 
     return;
