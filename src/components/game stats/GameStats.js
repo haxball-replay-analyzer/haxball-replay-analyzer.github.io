@@ -1,6 +1,7 @@
 import { useSelector, useDispatch } from "react-redux";
 import { setMainMode } from "../../slices/mainModeSlice";
 import { useEffect, useState } from "react";
+import PlayerStats from "./PlayerStats";
 import $ from 'jquery'
 import { selectMatch, showNextMatch, showPreviousMatch } from "../../slices/gameStatsSlice";
 
@@ -75,6 +76,19 @@ function GameStats() {
     }
   }
 
+  function handleMouseOver(e) {
+    e.target.bgColor = '#244a67';
+    e.target.style.cursor = 'pointer'
+  }
+
+  function handleMouseOut(e) {
+    e.target.bgColor = ''
+  }
+
+  function watchGoal(e) {
+    console.log('będziem oglądać bramkie', $(e.target).attr('goalIndex'))
+  }
+
   useEffect(() => {
 
     $('#game-stats').animate({
@@ -93,7 +107,7 @@ function GameStats() {
 
   return (
     <>
-      <div id='game-stats' className="dialog kick-player-view" style={{ zIndex: 2, opacity: 0.5, overflowY: 'scroll', position: 'absolute', left: offset.left, top: offset.top, width: divStyle.clientWidth, height: divStyle.clientHeight }}>
+      <div id='game-stats' className="dialog kick-player-view" style={{ zIndex: 2, opacity: 0.5, overflowY: 'hidden', position: 'absolute', left: offset.left, top: offset.top, width: divStyle.clientWidth, height: divStyle.clientHeight }}>
         <h1 id="title" className="title">
           Match stats{match[mtc].spaceMode && ' (space mode)'}:
           <select onChange={showMatch}>
@@ -103,7 +117,6 @@ function GameStats() {
           </select>
           {match[mtc].stadium && <button onClick={downloadMap} style={{ margin: '0 10px 0 30px' }}>Download map</button>}
         </h1>
-        Tu będą se leganckie statystyki
         <button onClick={closeStats} style={{ position: 'absolute', right: 20 }} >Close ❌</button>
         <table><tbody>
           <tr>
@@ -129,12 +142,95 @@ function GameStats() {
                     <td></td>
                   </tr>
                   <tr style={{ height: 30, }}><td> </td></tr>
+                  <tr style={{ fontSize: '20px', textAlign: 'center' }}>
+                    <td style={{ width: 200 }}></td>
+                    <td style={{ width: 200 }}>GOALS</td>
+                    <td style={{ width: 200 }}></td>
+                  </tr>
+                  <tr style={{ height: 30 }}>
+                    <td> </td>
+                  </tr>
+                  {/* tu brameczki */}
 
+                  {match[mtc].goals.map((goal, index) => {
+                    return (
+                      <tr>
+                        <td onClick={watchGoal} goalIndex={index} onMouseOverCapture={handleMouseOver} onMouseOutCapture={handleMouseOut} style={{ textAlign: 'right' }}>
+                          {goal.for === 'Red' && goal.scorer + (goal.assist ? ' (' + goal.assist + ')' : '')}
+                        </td>
+                        <td style={{ textAlign: 'center', padding: 2 }}>
+                          {goal.aktualnyWynik[0] + ':' + goal.aktualnyWynik[1]}
+                        </td>
+                        <td onClick={watchGoal} goalIndex={index} onMouseOverCapture={handleMouseOver} onMouseOutCapture={handleMouseOut} style={{ textAlign: 'left' }}>
+                          {goal.for === 'Blue' && goal.scorer + (goal.assist ? ' (' + goal.assist + ')' : '')}
+                        </td>
+                      </tr>
+                    )
+                  })}
+
+                  <tr></tr>
+
+                  <tr style={{ fontSize: 20, textAlign: 'center' }}>
+                    <td style={{ width: 200 }}></td>
+                    <td style={{ width: 200 }}>STATS</td>
+                    <td style={{ width: 200 }}></td>
+                  </tr>
+                  <tr style={{ height: 10 }}>
+                    <td> </td>
+                  </tr>
+
+                  {/* tu staty */}
+
+                  <tr>
+                    <td className='redStats'>{(match[mtc].possRed / (match[mtc].possRed + match[mtc].possBlue) * 100).toFixed(1)}%</td>
+                    <td className="center">POSSESSION</td>
+                    <td className='blueStats'>{(match[mtc].possBlue / (match[mtc].possRed + match[mtc].possBlue) * 100).toFixed(1)}%</td>
+                  </tr>
+                  <tr>
+                    <td className="redStats">{match[mtc].kicksRed}</td>
+                    <td className="center">KICKS</td>
+                    <td className="blueStats">{match[mtc].kicksBlue}</td>
+                  </tr>
+                  <tr>
+                    <td className="redStats">{match[mtc].passesRed}</td>
+                    <td className="center">PASSES</td>
+                    <td className="blueStats">{match[mtc].passesBlue}</td>
+                  </tr>
+                  <tr>
+                    <td className="redStats">{match[mtc].shotsRed}</td>
+                    <td className="center">SHOTS ON GOAL</td>
+                    <td className="blueStats">{match[mtc].shotsBlue}</td>
+                  </tr>
+
+
+                  <tr style={{ height: 30 }}>
+                    <td> </td>
+                  </tr>
                 </tbody>
               </table>
+              <table id='div.tabela2'>
+                {/* <tr style={{ fontSize: 20, textAlign: 'center' }}>
+                  <td style={{ width: 200 }}></td>
+                  <td></td>
+                  <td style={{ width: 100 }}>PLAYERS</td>
+                  <td style={{ width: 100 }}></td>
+                </tr>
+                <tr style={{ height: 10 }}>
+                  <td> </td>
+                </tr> */}
+                <PlayerStats />
+              </table>
+            </td>
+            <td style={{ width: 10 }}></td>
+            <td>
+              <div id="thirdStats"></div>
+              <br />
+              <div id="heatmap"></div>
+              <div className="row" />
             </td>
           </tr>
-        </tbody></table>
+        </tbody>
+        </table>
       </div>
       <div id='greyer' onClick={closeStats} style={{ zIndex: 1, opacity: 0, backgroundColor: 'rgba(115, 136, 92)', position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh' }}></div>
     </>
@@ -143,19 +239,7 @@ function GameStats() {
 
 export default GameStats;
 
-//<tr style="font-size: 20px; text-align: center"><td style="width: 200px"></td><td style="width: 200px">GOALS</td><td style="width: 200px"></td></tr><tr style="height: 30px"><td> </td></tr><tr style="font-size: 20px; text-align: center"><td style="width: 200px"></td><td style="width: 200px">STATS</td><td style="width: 200px"></td></tr><tr style="height: 10px"><td> </td></tr><tr style="height: 30px"><td> </td></tr></table><table id=\'div.tabela2\'><tr style="font-size: 20px; text-align: center"><td style="width: 200px"></td><td></td><td style="width: 100px">PLAYERS</td><td style="width: 100px"></td></tr><tr style="height: 10px"><td> </td></tr></table></td><td style="width:10px"></td><td><div id="thirdStats"></div><br><div id="heatmap"></div><div class="row"></td></tr></table></div></div>';
-
-//       document.getElementById("div.wynik").innerHTML = "" + match[mtc].scoreRed + ":" + match[mtc].scoreBlue;
-//       //console.log(document.getElementById('displayedMatch'));
-//       //document.getElementById('dessert').[0]
 //       var tableRef = document.getElementById("div.tabela").getElementsByTagName('tbody')[0];
-//       /*if (mtc==0) document.getElementById("prevMatch").style="background-color: grey";
-//       else document.getElementById("prevMatch").style="";
-//       if (mtc==match.length-1) document.getElementById("nextMatch").style="background-color: grey";
-//       else document.getElementById("nextMatch").style="";*/
-//       document.getElementById("game-time").innerHTML = "Game time: " + parseCzas(match[mtc].gameTicks);
-//       //console.log(tableRef);
-//       //console.log(playerPos);
 //       var wiersz = 4;
 //       for (var j = 0; j < match[mtc].goals.length; j++) {
 //         var mar = document.getElementById("recGoal" + (match[mtc].goals[j].goalIndex + 1)).offsetLeft - 5;
@@ -180,78 +264,6 @@ export default GameStats;
 //         //console.log(newRow, newCell_1);
 //       }
 //       wiersz += 3;
-//       var newRow = tableRef.insertRow(wiersz);
-//       var newCell_3 = newRow.insertCell(0);
-//       var newCell_2 = newRow.insertCell(0);
-//       var newCell_1 = newRow.insertCell(0);
-//       newCell_1.style = "text-align: right; color:red";
-//       newCell_2.style = "text-align: center";
-//       newCell_3.style = "text-align: left; color: #5688e5";
-//       newCell_1.innerHTML = "" + (match[mtc].possRed / (match[mtc].possRed + match[mtc].possBlue) * 100).toFixed(1) + "%";
-//       newCell_2.innerHTML = "POSSESSION";
-//       newCell_3.innerHTML = "" + (match[mtc].possBlue / (match[mtc].possRed + match[mtc].possBlue) * 100).toFixed(1) + "%";
-//       wiersz++;
-
-//       newRow = tableRef.insertRow(wiersz);
-//       newCell_3 = newRow.insertCell(0);
-//       newCell_2 = newRow.insertCell(0);
-//       newCell_1 = newRow.insertCell(0);
-//       newCell_1.style = "text-align: right; color:red";
-//       newCell_2.style = "text-align: center";
-//       newCell_3.style = "text-align: left; color: #5688e5";
-//       newCell_1.innerHTML = "" + match[mtc].kicksRed;
-//       newCell_2.innerHTML = "KICKS";
-//       newCell_3.innerHTML = "" + match[mtc].kicksBlue;
-
-//       newRow = tableRef.insertRow(wiersz);
-//       newCell_1 = newRow.insertCell();
-//       newCell_1.innerHTML = "" + match[mtc].passesRed;
-//       newCell_1.style = "text-align: right; color:red";
-//       newCell_1 = newRow.insertCell();
-//       newCell_1.innerHTML = "PASSES";
-//       newCell_1.style = "text-align: center";
-//       newCell_1 = newRow.insertCell();
-//       newCell_1.innerHTML = "" + match[mtc].passesBlue;
-//       newCell_1.style = "text-align: left; color: #5688e5";
-
-//       newRow = tableRef.insertRow(wiersz);
-//       newCell_1 = newRow.insertCell();
-//       newCell_1.innerHTML = "" + match[mtc].shotsRed;
-//       newCell_1.style = "text-align: right; color:red";
-//       newCell_1 = newRow.insertCell();
-//       newCell_1.innerHTML = "SHOTS ON GOAL";
-//       newCell_1.style = "text-align: center";
-//       newCell_1 = newRow.insertCell();
-//       newCell_1.innerHTML = "" + match[mtc].shotsBlue;
-//       newCell_1.style = "text-align: left; color: #5688e5";
-
-//       document.getElementById("prevMatch").onclick = function () {
-//         if (mtc > 0) {
-//           mtc--;
-//           document.getElementById("button_close").click();
-//           document.getElementById("button_staty").click();
-//         }
-//       }
-//       document.getElementById("nextMatch").onclick = function () {
-//         if (mtc < match.length - 1) {
-//           mtc++;
-//           document.getElementById("button_close").click();
-//           document.getElementById("button_staty").click();
-//           exd('Incompatible replay version', 'The replay file is of a different version. You can open simple player, without stats', [
-//             'Open player',
-//             'Cancel'
-//           ]);
-//         }
-//       }
-//       document.getElementById("input_redTeam").onchange = function () {
-//         redName = document.getElementById("input_redTeam").value;
-//       }
-//       document.getElementById("input_redTeam").value = redName;
-//       document.getElementById("input_blueTeam").onchange = function () {
-//         blueName = document.getElementById("input_blueTeam").value;
-//       }
-//       document.getElementById("input_blueTeam").value = blueName;
-//       tableRef = document.getElementById("div.tabela2").getElementsByTagName('tbody')[0];
 
 //       var canvas = document.createElement("canvas");
 //       if (canvas.getContext) {

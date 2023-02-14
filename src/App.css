@@ -2050,6 +2050,29 @@ th {
   background-color: rgba(115, 136, 92, 0.5)
 }
 
+.redStats {
+  text-align: right;
+  color: red
+}
+
+.blueStats {
+  color: #5688e5;
+}
+
+.center {
+  text-align: center;
+}
+
+.leftStat {
+  text-align: left;
+  width: 100;
+}
+
+.centerStat {
+  text-align: center;
+  width: 100;
+}
+
 .loader-view {
   position: absolute;
   width: 100%;
