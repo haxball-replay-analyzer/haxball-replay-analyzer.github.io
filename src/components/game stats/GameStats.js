@@ -74,6 +74,14 @@ function GameStats() {
     } else if (x.target.id === 'blueTeam') {
       setBlueTeamName(x.target.value)
     }
+
+    var l = x.target.value.length
+    if (l > 6) {
+      console.log('spr', x.target);
+      var size = 50 - 2 * l;
+      if (size < 14) size = 14;
+      x.target.style['font-size'] = '' + size + 'px';
+    } else x.target.style['font-size'] = '40px';
   }
 
   function handleMouseOver(e) {
@@ -118,98 +126,100 @@ function GameStats() {
           {match[mtc].stadium && <button onClick={downloadMap} style={{ margin: '0 10px 0 30px' }}>Download map</button>}
         </h1>
         <button onClick={closeStats} style={{ position: 'absolute', right: 20 }} >Close ❌</button>
-        <table><tbody>
-          <tr>
-            <td style={{ verticalAlign: 'top' }}>
-              <table id='div.tabela' style={{ width: '100%' }}>
-                <tbody>
-                  <tr id='trosso' style={{ textAlign: 'center' }}>
-                    <td style={{ fontSize: 40, color: 'red', width: 200 }}>
-                      <input id='redTeam' type="text" value={redTeamName} onChange={handleInput} style={{ fontSize: 40, textAlign: 'right', color: 'red', borderStyle: 'hidden', backgroundColor: '#1a2125', width: 200 }} />
-                    </td>
-                    <td style={{ fontSize: 60 }}>
-                      {match[mtc].scoreRed + ':' + match[mtc].scoreBlue}
-                    </td>
-                    <td style={{ fontSize: 40, color: 'red', width: 200 }}>
-                      <input id='blueTeam' type="text" value={blueTeamName} onChange={handleInput} style={{ fontSize: 40, textAlign: 'right', color: 'red', borderStyle: 'hidden', backgroundColor: '#1a2125', width: 200 }} />
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
+        <div id='leftHalf' style={{ overflowY: 'scroll', width: '50%', display: 'inline-block' }}>
+          <table style={{ width: '100%' }}><tbody>
+            <tr id='trosso' style={{ textAlign: 'center' }}>
+              <td style={{ fontSize: 40, color: 'red', width: '40%' }}>
+                <input id='redTeam' type="text" value={redTeamName} onChange={handleInput} style={{ fontSize: 40, textAlign: 'right', color: 'red', borderStyle: 'hidden', backgroundColor: '#1a2125', width: 200 }} />
+              </td>
+              <td style={{ fontSize: 60, width: '20%' }}>
+                {match[mtc].scoreRed + ':' + match[mtc].scoreBlue}
+              </td>
+              <td style={{ fontSize: 40, color: 'red', width: '40%' }}>
+                <input id='blueTeam' type="text" value={blueTeamName} onChange={handleInput} style={{ fontSize: 40, textAlign: 'left', color: '#5688e5', borderStyle: 'hidden', backgroundColor: '#1a2125', width: 200 }} />
+              </td>
+            </tr>
+            <tr>
+              <td>
+              </td>
+              <td id='game-time' style={{ textAlign: 'center' }}>Game time: {parseTime(match[mtc].gameTicks)}</td>
+              <td></td>
+            </tr>
+            <tr style={{ height: 30 }}><td> </td></tr>
+            <tr style={{ fontSize: '20px', textAlign: 'center' }}>
+              <td></td>
+              <td>GOALS</td>
+              <td></td>
+            </tr>
+            <tr style={{ height: 30 }}>
+              <td> </td>
+            </tr>
+          </tbody></table>
+          {/* tu brameczki */}
 
-                    </td>
-                    <td id='game-time' style={{ textAlign: 'center' }}>Game time: {parseTime(match[mtc].gameTicks)}</td>
-                    <td></td>
-                  </tr>
-                  <tr style={{ height: 30, }}><td> </td></tr>
-                  <tr style={{ fontSize: '20px', textAlign: 'center' }}>
-                    <td style={{ width: 200 }}></td>
-                    <td style={{ width: 200 }}>GOALS</td>
-                    <td style={{ width: 200 }}></td>
-                  </tr>
-                  <tr style={{ height: 30 }}>
-                    <td> </td>
-                  </tr>
-                  {/* tu brameczki */}
+          <table style={{ width: '100%' }}><tbody>
 
-                  {match[mtc].goals.map((goal, index) => {
-                    return (
-                      <tr>
-                        <td onClick={watchGoal} goalIndex={index} onMouseOverCapture={handleMouseOver} onMouseOutCapture={handleMouseOut} style={{ textAlign: 'right' }}>
-                          {goal.for === 'Red' && goal.scorer + (goal.assist ? ' (' + goal.assist + ')' : '')}
-                        </td>
-                        <td style={{ textAlign: 'center', padding: 2 }}>
-                          {goal.aktualnyWynik[0] + ':' + goal.aktualnyWynik[1]}
-                        </td>
-                        <td onClick={watchGoal} goalIndex={index} onMouseOverCapture={handleMouseOver} onMouseOutCapture={handleMouseOut} style={{ textAlign: 'left' }}>
-                          {goal.for === 'Blue' && goal.scorer + (goal.assist ? ' (' + goal.assist + ')' : '')}
-                        </td>
-                      </tr>
-                    )
-                  })}
+            {match[mtc].goals.map((goal, index) => {
+              return (
+                <tr>
+                  <td onClick={watchGoal} goalIndex={index} onMouseOverCapture={handleMouseOver} onMouseOutCapture={handleMouseOut} style={{ width: '45%', textAlign: 'right' }}>
+                    {goal.for === 'Red' && goal.scorer + (goal.assist ? ' (' + goal.assist + ')' : '')}
+                  </td>
+                  <td style={{ width: '10%', textAlign: 'center', padding: 2 }}>
+                    {goal.aktualnyWynik[0] + ':' + goal.aktualnyWynik[1]}
+                  </td>
+                  <td onClick={watchGoal} goalIndex={index} onMouseOverCapture={handleMouseOver} onMouseOutCapture={handleMouseOut} style={{ width: '45%', textAlign: 'left' }}>
+                    {goal.for === 'Blue' && goal.scorer + (goal.assist ? ' (' + goal.assist + ')' : '')}
+                  </td>
+                </tr>
+              )
+            })}
 
-                  <tr></tr>
+          </tbody></table>
 
-                  <tr style={{ fontSize: 20, textAlign: 'center' }}>
-                    <td style={{ width: 200 }}></td>
-                    <td style={{ width: 200 }}>STATS</td>
-                    <td style={{ width: 200 }}></td>
-                  </tr>
-                  <tr style={{ height: 10 }}>
-                    <td> </td>
-                  </tr>
+          <table><tbody>
+            <tr></tr>
 
-                  {/* tu staty */}
+            <tr style={{ fontSize: 20, textAlign: 'center' }}>
+              <td style={{ width: 200 }}></td>
+              <td style={{ width: 200 }}>STATS</td>
+              <td style={{ width: 200 }}></td>
+            </tr>
+            <tr style={{ height: 10 }}>
+              <td> </td>
+            </tr>
 
-                  <tr>
-                    <td className='redStats'>{(match[mtc].possRed / (match[mtc].possRed + match[mtc].possBlue) * 100).toFixed(1)}%</td>
-                    <td className="center">POSSESSION</td>
-                    <td className='blueStats'>{(match[mtc].possBlue / (match[mtc].possRed + match[mtc].possBlue) * 100).toFixed(1)}%</td>
-                  </tr>
-                  <tr>
-                    <td className="redStats">{match[mtc].kicksRed}</td>
-                    <td className="center">KICKS</td>
-                    <td className="blueStats">{match[mtc].kicksBlue}</td>
-                  </tr>
-                  <tr>
-                    <td className="redStats">{match[mtc].passesRed}</td>
-                    <td className="center">PASSES</td>
-                    <td className="blueStats">{match[mtc].passesBlue}</td>
-                  </tr>
-                  <tr>
-                    <td className="redStats">{match[mtc].shotsRed}</td>
-                    <td className="center">SHOTS ON GOAL</td>
-                    <td className="blueStats">{match[mtc].shotsBlue}</td>
-                  </tr>
+            {/* tu staty */}
+
+            <tr>
+              <td className='redStats'>{(match[mtc].possRed / (match[mtc].possRed + match[mtc].possBlue) * 100).toFixed(1)}%</td>
+              <td className="center">POSSESSION</td>
+              <td className='blueStats'>{(match[mtc].possBlue / (match[mtc].possRed + match[mtc].possBlue) * 100).toFixed(1)}%</td>
+            </tr>
+            <tr>
+              <td className="redStats">{match[mtc].kicksRed}</td>
+              <td className="center">KICKS</td>
+              <td className="blueStats">{match[mtc].kicksBlue}</td>
+            </tr>
+            <tr>
+              <td className="redStats">{match[mtc].passesRed}</td>
+              <td className="center">PASSES</td>
+              <td className="blueStats">{match[mtc].passesBlue}</td>
+            </tr>
+            <tr>
+              <td className="redStats">{match[mtc].shotsRed}</td>
+              <td className="center">SHOTS ON GOAL</td>
+              <td className="blueStats">{match[mtc].shotsBlue}</td>
+            </tr>
 
 
-                  <tr style={{ height: 30 }}>
-                    <td> </td>
-                  </tr>
-                </tbody>
-              </table>
-              <table id='div.tabela2'>
-                {/* <tr style={{ fontSize: 20, textAlign: 'center' }}>
+            <tr style={{ height: 30 }}>
+              <td> </td>
+            </tr>
+          </tbody>
+          </table>
+          <table id='div.tabela2'>
+            {/* <tr style={{ fontSize: 20, textAlign: 'center' }}>
                   <td style={{ width: 200 }}></td>
                   <td></td>
                   <td style={{ width: 100 }}>PLAYERS</td>
@@ -218,19 +228,21 @@ function GameStats() {
                 <tr style={{ height: 10 }}>
                   <td> </td>
                 </tr> */}
-                <PlayerStats />
-              </table>
-            </td>
-            <td style={{ width: 10 }}></td>
-            <td>
-              <div id="thirdStats"></div>
-              <br />
-              <div id="heatmap"></div>
-              <div className="row" />
-            </td>
-          </tr>
-        </tbody>
-        </table>
+            <PlayerStats />
+          </table>
+          {/* </td>
+        <td style={{ width: 10 }}></td>
+        <td>
+          <div id="thirdStats"></div>
+          <br />
+          <div id="heatmap"></div>
+          <div className="row" />
+        </td>
+      </tr> */}
+        </div >
+      </div >
+      <div id='rightHalf' style={{ width: '50%', display: 'inline-block' }}>
+
       </div>
       <div id='greyer' onClick={closeStats} style={{ zIndex: 1, opacity: 0, backgroundColor: 'rgba(115, 136, 92)', position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh' }}></div>
     </>
