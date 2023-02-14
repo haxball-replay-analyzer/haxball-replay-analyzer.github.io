@@ -24,7 +24,7 @@ function PlayerStats() {
       tab.push([pr.nick, pr.nation, prGoals, prAssists, prKicks, prPasses, prShots, prBumps, prTouches]);
     } else tab.push([pr.nick, pr.nation, prGoals, prAssists, prKicks, prPasses, prShots]);
   }
-  if (par >= 0) {
+  if (par > 0) {
     var tab2 = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]];
     for (var i = 0; i < tab.length; i++) {
       for (var j = 0; j < tab2.length; j++) {
@@ -46,9 +46,18 @@ function PlayerStats() {
   }
 
   function handleClick(e) {
-    console.log(e.target.textContent);
-    const tab = ['', '', 'Goals', 'Assists', 'Kicks', 'Passes', 'Shots On Goal', 'Bumps', 'Touches'];
+    const tab = ['Players', '', 'Goals', 'Assists', 'Kicks', 'Passes', 'Shots On Goal', 'Bumps', 'Touches'];
     dispatch(selectStat(tab.indexOf(e.target.textContent)))
+  }
+
+  function handleMouseOver(e) {
+    // console.log('over', e.target)
+    e.target.style.cursor = 'pointer';
+    e.target.bgColor = '#244a67'
+  }
+
+  function handleMouseOut(e) {
+    e.target.bgColor = ''
   }
 
   return (
@@ -62,8 +71,8 @@ function PlayerStats() {
       <tr style={{ height: 10 }}>
         <td> </td>
       </tr>
-      <tr onClick={handleClick}>
-        <td className="leftStat">Players</td>
+      <tr onClick={handleClick} onMouseOver={handleMouseOver} onMouseOut={handleMouseOut}>
+        <td className="leftStat" style={{ width: '25%' }}>Players</td>
         <td className="centerStat">Goals</td>
         <td className="centerStat">Assists</td>
         <td className="centerStat">Kicks</td>
@@ -79,9 +88,10 @@ function PlayerStats() {
       {tab.map(stat => {
         return (
           <>
+            <tr style={{ height: 5 }}></tr>
             <tr style={{ backgroundColor: match[mtc].redTeam.includes(stat[0]) ? '#9c0603' : '#244a67' }}>
               <td className="leftStat">
-                <div className={"flagico f-" + stat[1]}> {stat[0]}</div>
+                <div className={"flagico f-" + stat[1]} /> {stat[0]}
               </td>
               <td className="centerStat">{stat[2]}</td>
               <td className="centerStat">{stat[3]}</td>
@@ -95,7 +105,6 @@ function PlayerStats() {
                 </>
               )}
             </tr>
-            <tr style={{ height: 5 }}></tr>
           </>
         )
       })}

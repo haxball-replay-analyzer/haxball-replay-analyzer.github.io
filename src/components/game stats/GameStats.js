@@ -145,13 +145,13 @@ function GameStats() {
               <td id='game-time' style={{ textAlign: 'center' }}>Game time: {parseTime(match[mtc].gameTicks)}</td>
               <td></td>
             </tr>
-            <tr style={{ height: 30 }}><td> </td></tr>
+            <tr style={{ height: 15 }}><td> </td></tr>
             <tr style={{ fontSize: '20px', textAlign: 'center' }}>
               <td></td>
               <td>GOALS</td>
               <td></td>
             </tr>
-            <tr style={{ height: 30 }}>
+            <tr style={{ height: 15 }}>
               <td> </td>
             </tr>
           </tbody></table>
@@ -177,13 +177,13 @@ function GameStats() {
 
           </tbody></table>
 
-          <table><tbody>
-            <tr></tr>
+          <table style={{ width: '100%' }}><tbody>
+            <tr style={{ height: 15 }}></tr>
 
             <tr style={{ fontSize: 20, textAlign: 'center' }}>
-              <td style={{ width: 200 }}></td>
-              <td style={{ width: 200 }}>STATS</td>
-              <td style={{ width: 200 }}></td>
+              <td style={{ width: '33%' }}></td>
+              <td style={{ width: '34%' }}>STATS</td>
+              <td style={{ width: '33%' }}></td>
             </tr>
             <tr style={{ height: 10 }}>
               <td> </td>
@@ -213,32 +213,14 @@ function GameStats() {
             </tr>
 
 
-            <tr style={{ height: 30 }}>
+            <tr style={{ height: 20 }}>
               <td> </td>
             </tr>
           </tbody>
           </table>
-          <table id='div.tabela2'>
-            {/* <tr style={{ fontSize: 20, textAlign: 'center' }}>
-                  <td style={{ width: 200 }}></td>
-                  <td></td>
-                  <td style={{ width: 100 }}>PLAYERS</td>
-                  <td style={{ width: 100 }}></td>
-                </tr>
-                <tr style={{ height: 10 }}>
-                  <td> </td>
-                </tr> */}
+          <table id='div.tabela2' style={{ width: '100%' }}>
             <PlayerStats />
           </table>
-          {/* </td>
-        <td style={{ width: 10 }}></td>
-        <td>
-          <div id="thirdStats"></div>
-          <br />
-          <div id="heatmap"></div>
-          <div className="row" />
-        </td>
-      </tr> */}
         </div >
       </div >
       <div id='rightHalf' style={{ width: '50%', display: 'inline-block' }}>
