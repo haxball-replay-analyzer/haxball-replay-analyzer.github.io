@@ -5193,7 +5193,7 @@ T.Rf = function (a) {
   return b
 };
 T.Fo = function () {
-  return M.tk(/*n.Ee + 'api/geo'*/"https://haxball-replay-analyzer.github.io/pliki/geo.json").then(function (a) {
+  return M.tk(/*n.Ee + 'api/geo'*/"https://kpias760.github.io/haxball-replay-analyzer.github.io/pliki/geo.json").then(function (a) {
     return T.Rf(a)
   })
   //return false;
@@ -5493,7 +5493,7 @@ u.oo = function () {
     g.I.push(k);
     var l = new Lb({
       iceServers: n.Vf,
-      ij: 'https://haxball-replay-analyzer.github.io/pliki/host.json',
+      ij: 'https://kpias760.github.io/haxball-replay-analyzer.github.io/pliki/host.json',
       //ij: "pliki/host.json",
       state: g,
       version: 9
@@ -5765,7 +5765,7 @@ x.fj = function (a) {
       return {
       }
     }) : b = Promise.resolve(null);
-    return Promise.all([M.L('https://haxball-replay-analyzer.github.io/pliki/res.dat', 'arraybuffer').then(function (a) {
+    return Promise.all([M.L('https://kpias760.github.io/haxball-replay-analyzer.github.io/pliki/res.dat', 'arraybuffer').then(function (a) {
       a = new JSZip(a);
       n.Na = new Ub(a);
       return Promise.all([n.Na.ro,
@@ -5929,7 +5929,7 @@ va.Hs = function (a, b) {
   }
 };
 va.get = function () {
-  return M.L(/*n.Ee + */'https://haxball-replay-analyzer.github.io/pliki/geo.json', 'arraybuffer').then(function (a) {
+  return M.L(/*n.Ee + */'https://kpias760.github.io/haxball-replay-analyzer.github.io/pliki/geo.json', 'arraybuffer').then(function (a) {
     return va.parse(new F(new DataView(a), !1))
   })
 };
@@ -10331,7 +10331,7 @@ $a.b = !0;
 $a.prototype = {
   Il: function () {
     var a = this;
-    M.tk(/*n.Ee + 'api/notice'*/"https://haxball-replay-analyzer.github.io/pliki/notice.json").then(function (b) {
+    M.tk(/*n.Ee + 'api/notice'*/"https://kpias760.github.io/haxball-replay-analyzer.github.io/pliki/notice.json").then(function (b) {
       var c = b.content;
       null != c && '' != c && $a.On != c && (a.$n.innerHTML = c, a.Xk.hidden = !1, a.nd.onclick = function () {
         $a.On = c;
@@ -11761,7 +11761,7 @@ R.kn = new Ib([0,
   1]);
 mb.N = '<div class=\'dialog change-location-view\'><h1>Change Location</h1><div class=\'splitter\'><div class=\'list\' data-hook=\'list\'></div><div class=\'buttons\'><button data-hook=\'change\'>Change</button><button data-hook=\'cancel\'>Cancel</button></div></div></div>';
 Da.N = '<div class=\'chatbox-view\'><div data-hook=\'log\' class=\'log\'><p>Controls:<br/>Move: WASD or Arrows<br/>Kick: X, Space, Ctrl, Shift, Numpad 0<br/>View: Numbers 1 to 4</p></div><div class=\'autocompletebox\' data-hook=\'autocompletebox\'></div><div class=\'input\'><input data-hook=\'input\' type=\'text\' /><button data-hook=\'send\'>Send</button></div></div>';
-kb.N = '<div class=\'choose-nickname-view\'><img src="https://haxball-replay-analyzer.github.io/images/falafcio.png" /><div class=\'dialog\'><h1>Haxball Replay Analyzer</h1><div style=\'display: none\' class=\'label-input\'><label>Nick:</label><input data-hook=\'input\' type=\'text\' /></div><button id=\'button_ok\' data-hook=\'ok\'>Start</button></div></div>';
+kb.N = '<div class=\'choose-nickname-view\'><img src="https://kpias760.github.io/haxball-replay-analyzer.github.io/images/falafcio.png" /><div class=\'dialog\'><h1>Haxball Replay Analyzer</h1><div style=\'display: none\' class=\'label-input\'><label>Nick:</label><input data-hook=\'input\' type=\'text\' /></div><button id=\'button_ok\' data-hook=\'ok\'>Start</button></div></div>';
 jb.N = '<div class=\'connecting-view\'><div class=\'dialog\'><h1>Connecting</h1><div class=\'connecting-view-log\' data-hook=\'log\'></div><button data-hook=\'cancel\'>Cancel</button></div></div>';
 ib.N = '<div class=\'create-room-view\'><div class=\'dialog\'><h1>Create room</h1><div class=\'label-input\'><label>Room name:</label><input data-hook=\'name\' required /></div><div class=\'label-input\'><label>Password:</label><input data-hook=\'pass\' /></div><div class=\'label-input\'><label>Max players:</label><select data-hook=\'max-pl\'></select></div><button data-hook=\'unlisted\'></button><div class=\'row\'><button data-hook=\'cancel\'>Cancel</button><button data-hook=\'create\'>Create</button></div></div></div>';
 Ka.N = '<div class=\'disconnected-view\'><div class=\'dialog basic-dialog\'><h1>Disconnected</h1><p data-hook=\'reason\'></p><div class=\'buttons\'><button data-hook=\'ok\'>Ok</button><button data-hook=\'replay\'>Save replay</button></div></div></div>';
