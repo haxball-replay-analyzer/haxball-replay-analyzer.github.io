@@ -1,5 +1,6 @@
 import { useSelector, useDispatch } from "react-redux";
 import { selectStat, selectPlayer } from "../../slices/gameStatsSlice";
+import React from "react";
 
 function PlayerStats() {
 
@@ -12,15 +13,15 @@ function PlayerStats() {
   for (var i = 0; i < match[mtc].player.length; i++) {
     var pr = match[mtc].player[i], prGoals = 0, prAssists = 0, prKicks = 0, prPasses = 0, prShots = 0, prBumps = 0, prTouches = 0;
     for (var j = 0; j < match[mtc].goals.length; j++) {
-      if (match[mtc].goals[j].scorer == pr.nick) prGoals++;
-      else if (match[mtc].goals[j].assist == pr.nick) prAssists++;
+      if (match[mtc].goals[j].scorer === pr.nick) prGoals++;
+      else if (match[mtc].goals[j].assist === pr.nick) prAssists++;
     }
-    for (var j = 0; j < match[mtc].kicks.length; j++) if (match[mtc].kicks[j] == pr.nick) prKicks++;
-    for (var j = 0; j < match[mtc].passes.length; j++) if (match[mtc].passes[j] == pr.nick) prPasses++;
-    for (var j = 0; j < match[mtc].shots.length; j++) if (match[mtc].shots[j] == pr.nick) prShots++;
+    for (var j = 0; j < match[mtc].kicks.length; j++) if (match[mtc].kicks[j] === pr.nick) prKicks++;
+    for (var j = 0; j < match[mtc].passes.length; j++) if (match[mtc].passes[j] === pr.nick) prPasses++;
+    for (var j = 0; j < match[mtc].shots.length; j++) if (match[mtc].shots[j] === pr.nick) prShots++;
     if (match[mtc].spaceMode) {
-      for (var j = 0; j < match[mtc].bumps.length; j++) if (match[mtc].bumps[j] == pr.nick) prBumps++;
-      for (var j = 0; j < match[mtc].touches.length; j++) if (match[mtc].touches[j] == pr.nick) prTouches++;
+      for (var j = 0; j < match[mtc].bumps.length; j++) if (match[mtc].bumps[j] === pr.nick) prBumps++;
+      for (var j = 0; j < match[mtc].touches.length; j++) if (match[mtc].touches[j] === pr.nick) prTouches++;
       tab.push([pr.nick, pr.nation, prGoals, prAssists, prKicks, prPasses, prShots, prBumps, prTouches]);
     } else tab.push([pr.nick, pr.nation, prGoals, prAssists, prKicks, prPasses, prShots]);
   }
@@ -64,7 +65,6 @@ function PlayerStats() {
   function showHeatMap(e) {
     e.target.style.cursor = 'pointer';
     if (e.target.className === 'leftStat') {
-      console.log(e.target.textContent)
       dispatch(selectPlayer(e.target.textContent.substring(1)))
     }
   }
@@ -88,9 +88,9 @@ function PlayerStats() {
           </>
         )}
       </tr>
-      {tab.map(stat => {
+      {tab.map((stat, index) => {
         return (
-          <>
+          <React.Fragment key={index}>
             <tr style={{ height: 5 }}></tr>
             <tr style={{ backgroundColor: match[mtc].redTeam.includes(stat[0]) ? '#9c0603' : '#244a67' }}>
               <td className="leftStat" onMouseOver={showHeatMap}>
@@ -108,7 +108,7 @@ function PlayerStats() {
                 </>
               )}
             </tr>
-          </>
+          </React.Fragment>
         )
       })}
     </tbody>

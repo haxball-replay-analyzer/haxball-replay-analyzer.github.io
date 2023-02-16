@@ -1,6 +1,7 @@
 import Changes from './Changes.js';
 import { useDispatch } from 'react-redux';
 import { setVersion } from '../../slices/mainModeSlice.js';
+import { useEffect } from 'react';
 
 const changelog = [
   {
@@ -158,7 +159,10 @@ const newChanges = changelog.map(change => <Changes key={change.version} change=
 function Changelog() {
 
   const dispatch = useDispatch();
-  dispatch(setVersion(changelog[0].version))
+
+  useEffect(() => {
+    dispatch(setVersion(changelog[0].version))
+  }, [])
 
   return (
     <div id="lista-zmian" style={{ fontFamily: 'roboto', fontSize: '110%', overflowY: 'scroll' }}>

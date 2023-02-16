@@ -1,70 +1,24 @@
-# Getting Started with Create React App
+# Haxball Replay Analyzer
+https://haxball-replay-analyzer.github.io
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A tool for analyzing haxball recordings (.hbr2). It decrypts Uint8Array files and allow you to check various statistics:  
+• scores, kicks, shots on goal, passes, ball possession  
+• info about percentage of time the ball was in each third  
+• heatmaps for all players  
 
-## Available Scripts
+Analyzer let you switch between all games in single recording, change teamnames (so you can easily create a Match Report), switch between different replay speed (from 0.1x to 10000x). You can find sample recordings [HERE](https://github.com/haxball-replay-analyzer/haxball-replay-analyzer.github.io/tree/master/sample%20recordings), on [THEHAX Replays](https://thehax.pl/forum/powtorki.php?action=ostatnio_dodane), or record by yourself on haxball room (click "Rec" button).
 
-In the project directory, you can run:
+1. ► Load replay (.hbr2 file)
+2. Click 'Game Stats'
+3. Enjoy! :)
 
-### `npm start`
+![start](https://user-images.githubusercontent.com/103112562/212660345-276bdce9-f989-43fb-8cc6-0957be54fe0a.png)
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+![stats](https://user-images.githubusercontent.com/103112562/212660394-22d68dc2-66a2-4322-844f-23c260792691.PNG)
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- 1 - Drop-down list of matches played in a loaded recording. Choose the one you want to see stats from...
+- 2 - ... or click on the buttons Previous match and Next match.
+- 3 - All teamstats. Score, goals, ball possession, shots on goal, passes, kicks. Note: if the game was played on a map with SpaceBounce physics, goalscorer is the last player to touch the ball (not the last kicker), same with assist. If you want to change teamnames, just click on them (Red/Blue) and type new ones.
+- 4 - Players' stats. All of them are sortable by clicking on the header. In SpaceBounce mode, they also include Bump counter and Ball Touches counter.
+- 5 - Take a look on where did the ball spend its time.
+- 6 - Players' heatmaps. Move your mouse over each players nick to see their movement.

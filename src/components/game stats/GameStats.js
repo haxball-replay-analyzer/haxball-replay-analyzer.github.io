@@ -20,7 +20,7 @@ function GameStats() {
 
   var offset = {
     left: divStyle.offsetLeft,
-    top: divStyle.offsetTop + divStyle.offsetParent.offsetTop
+    top: divStyle.offsetTop + divStyle.offsetParentTop
   }
 
   function closeStats(e, completeF = null) {
@@ -94,7 +94,7 @@ function GameStats() {
   }
 
   function handleMouseOver(e) {
-    if (e.target.className === match[mtc].goals[$(e.target).attr('goalIndex')].for) {
+    if (e.target.className === match[mtc].goals[$(e.target).attr('goalindex')].for) {
       e.target.bgColor = '#244a67'
       e.target.style.cursor = 'pointer'
     } else e.target.style.cursor = 'default'
@@ -105,12 +105,12 @@ function GameStats() {
   }
 
   function watchGoal_(e) {
-    if (e.target.className === match[mtc].goals[$(e.target).attr('goalIndex')].for) {
-      var goalIndex = Number($(e.target).attr('goalIndex'));
+    if (e.target.className === match[mtc].goals[$(e.target).attr('goalindex')].for) {
+      var goalindex = Number($(e.target).attr('goalindex'));
       for (var i = 0; i < mtc; i++) {
-        goalIndex = goalIndex + match[i].goals.length;
+        goalindex = goalindex + match[i].goals.length;
       }
-      closeStats(watchGoal(goalIndex))
+      closeStats(watchGoal(goalindex))
     }
   }
 
@@ -121,7 +121,6 @@ function GameStats() {
     const newLeft = $("#greyer").width() * 0.1 - 50;
     const newRight = $("#greyer").width() * 0.9 + 10;
     $('#prevMatch').animate({
-      // left: 'calc(10vw - 50px)'
       left: newLeft
     }, { duration: 1000, easing: 'swing', queue: false });
 
@@ -198,20 +197,19 @@ function GameStats() {
               <td> </td>
             </tr>
           </tbody></table>
-          {/* tu brameczki */}
 
           <table style={{ width: '100%' }}><tbody>
 
             {match[mtc].goals.map((goal, index) => {
               return (
-                <tr>
-                  <td className="Red" onClick={watchGoal_} goalIndex={index} onMouseOverCapture={handleMouseOver} onMouseOutCapture={handleMouseOut} style={{ width: '45%', textAlign: 'right' }}>
+                <tr key={index}>
+                  <td className="Red" onClick={watchGoal_} goalindex={index} onMouseOverCapture={handleMouseOver} onMouseOutCapture={handleMouseOut} style={{ width: '45%', textAlign: 'right' }}>
                     {goal.for === 'Red' && goal.scorer + (goal.assist ? ' (' + goal.assist + ')' : '')}
                   </td>
                   <td style={{ width: '10%', textAlign: 'center', padding: 2 }}>
-                    {goal.aktualnyWynik[0] + ':' + goal.aktualnyWynik[1]}
+                    {goal.currentScore[0] + ':' + goal.currentScore[1]}
                   </td>
-                  <td className="Blue" onClick={watchGoal_} goalIndex={index} onMouseOverCapture={handleMouseOver} onMouseOutCapture={handleMouseOut} style={{ width: '45%', textAlign: 'left' }}>
+                  <td className="Blue" onClick={watchGoal_} goalindex={index} onMouseOverCapture={handleMouseOver} onMouseOutCapture={handleMouseOut} style={{ width: '45%', textAlign: 'left' }}>
                     {goal.for === 'Blue' && goal.scorer + (goal.assist ? ' (' + goal.assist + ')' : '')}
                   </td>
                 </tr>
@@ -231,8 +229,6 @@ function GameStats() {
             <tr style={{ height: 10 }}>
               <td> </td>
             </tr>
-
-            {/* tu staty */}
 
             <tr>
               <td className='redStats'>{(match[mtc].possRed / (match[mtc].possRed + match[mtc].possBlue) * 100).toFixed(1)}%</td>
@@ -271,7 +267,6 @@ function GameStats() {
             <PlayerStats />
           </table>
         </div >
-        {/* <div id='rightHalf' style={{ position: 'absolute', left: '50%', width: '50%', backgroundColor: 'red', height: '100%', opacity: 0.5 }}> */}
         <div id='rightHalf' style={{ position: 'absolute', left: '50%', top: '10%', overflowY: 'hidden', width: '50%', height: '90%' }}>
           <div style={{ height: '50%', overflow: 'hidden' }}>
             <ThirdStats />

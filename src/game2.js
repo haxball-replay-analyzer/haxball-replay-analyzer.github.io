@@ -583,8 +583,6 @@ function downloadMap() {
 }
 
 export function watchGoal(par) {
-  // document.getElementById("button_close").click();
-  console.log(par, "recGoal" + (Number(par) + 1))
   const g = document.getElementById("recGoal" + (Number(par) + 1)).offsetLeft - 5;
   autoClick = true;
   autoClickValue = '' + g;
@@ -1896,12 +1894,12 @@ function ja(a) {
         newCell_1.style = "text-align: right";
         newCell_3.style = "text-align: left";
         if (match[mtc].goals[j].for == "Red") {
-          newCell_1.innerHTML = "" + match[mtc].goals[j].aktualnyWynik[0] + " : " + match[mtc].goals[j].aktualnyWynik[1] + " " + match[mtc].goals[j].scorer + (match[mtc].goals[j].assist == false ? "" : " (" + match[mtc].goals[j].assist + ")");
+          newCell_1.innerHTML = "" + match[mtc].goals[j].currentScore[0] + " : " + match[mtc].goals[j].currentScore[1] + " " + match[mtc].goals[j].scorer + (match[mtc].goals[j].assist == false ? "" : " (" + match[mtc].goals[j].assist + ")");
           newCell_1.setAttribute('onclick', 'watchGoal(' + mar + ');');
           newCell_1.setAttribute('onmouseover', 'this.style="cursor:pointer;background-color:#244a67;text-align: right;"');
           newCell_1.setAttribute('onmouseout', 'this.style="text-align: right;"');
         } else {
-          newCell_3.innerHTML = "" + match[mtc].goals[j].aktualnyWynik[0] + " : " + match[mtc].goals[j].aktualnyWynik[1] + " " + match[mtc].goals[j].scorer + (match[mtc].goals[j].assist == false ? "" : " (" + match[mtc].goals[j].assist + ")");
+          newCell_3.innerHTML = "" + match[mtc].goals[j].currentScore[0] + " : " + match[mtc].goals[j].currentScore[1] + " " + match[mtc].goals[j].scorer + (match[mtc].goals[j].assist == false ? "" : " (" + match[mtc].goals[j].assist + ")");
           newCell_3.setAttribute('onclick', 'watchGoal(' + mar + ');');
           newCell_3.setAttribute('onmouseover', 'this.style="cursor:pointer;background-color:#244a67;text-align: left;"');
           newCell_3.setAttribute('onmouseout', 'this.style="text-align: left;"');
@@ -5854,7 +5852,7 @@ Gb.prototype = {
         if (match[match.length - 1].spaceMode) {
           //eeee
           if (a.w == toucher.team) {
-            match[match.length - 1].goals.push({ scorer: toucher.name, aktualnyWynik: [match[match.length - 1].scoreRed, match[match.length - 1].scoreBlue] });
+            match[match.length - 1].goals.push({ scorer: toucher.name, currentScore: [match[match.length - 1].scoreRed, match[match.length - 1].scoreBlue] });
             match[match.length - 1].player[playerList.indexOf(toucher.name)].goals++;
             if (lastToucher.name != undefined && a.w == lastToucher.team) {
               match[match.length - 1].goals[match[match.length - 1].goals.length - 1].assist = lastToucher.name;
@@ -5863,11 +5861,11 @@ Gb.prototype = {
               match[match.length - 1].goals[match[match.length - 1].goals.length - 1].assist = false;
             }
           } else {
-            match[match.length - 1].goals.push({ scorer: toucher.name + " (own goal)", assist: false, aktualnyWynik: [match[match.length - 1].scoreRed, match[match.length - 1].scoreBlue] });
+            match[match.length - 1].goals.push({ scorer: toucher.name + " (own goal)", assist: false, currentScore: [match[match.length - 1].scoreRed, match[match.length - 1].scoreBlue] });
           }
         } else {
           if (a.w == kicker.team) {
-            match[match.length - 1].goals.push({ scorer: kicker.name, aktualnyWynik: [match[match.length - 1].scoreRed, match[match.length - 1].scoreBlue] });
+            match[match.length - 1].goals.push({ scorer: kicker.name, currentScore: [match[match.length - 1].scoreRed, match[match.length - 1].scoreBlue] });
             match[match.length - 1].player[playerList.indexOf(kicker.name)].goals++;
             if (lastKicker != undefined && a.w == lastKicker.team) {
               match[match.length - 1].goals[match[match.length - 1].goals.length - 1].assist = lastKicker.name;
@@ -5876,7 +5874,7 @@ Gb.prototype = {
               match[match.length - 1].goals[match[match.length - 1].goals.length - 1].assist = false;
             }
           } else {
-            match[match.length - 1].goals.push({ scorer: kicker.name + " (own goal)", assist: false, aktualnyWynik: [match[match.length - 1].scoreRed, match[match.length - 1].scoreBlue] });
+            match[match.length - 1].goals.push({ scorer: kicker.name + " (own goal)", assist: false, currentScore: [match[match.length - 1].scoreRed, match[match.length - 1].scoreBlue] });
           }
         }
         match[match.length - 1].goals[match[match.length - 1].goals.length - 1].for = a.w;

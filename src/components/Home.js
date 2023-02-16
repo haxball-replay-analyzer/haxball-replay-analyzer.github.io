@@ -1,6 +1,5 @@
 import Changelog from "./changelog/Changelog";
 import $ from 'jquery'
-// import "../game-original";
 import { handleFile } from "../game2.js";
 import LoadingScreen from "./LoadingScreen";
 import { useSelector, useDispatch } from "react-redux";
@@ -18,12 +17,12 @@ function Home() {
   const dispatch = useDispatch();
   const mainMode = useSelector((state) => state.mainMode.value);
   const version = useSelector((state) => state.mainMode.version);
-  var divStyle = {};
 
   function showStatsExp(elStyle) {
-    dispatch(setDivStyle(elStyle));
+    const { offsetLeft, offsetTop, clientWidth, clientHeight } = elStyle;
+    const offsetParentTop = elStyle.offsetParent.offsetTop;
+    dispatch(setDivStyle({ offsetLeft, offsetTop, offsetParentTop, clientWidth, clientHeight }));
     dispatch(setMainMode('stats'));
-    divStyle = elStyle.clientWidth;
   }
 
   function setGameStatsExp(stats) {
@@ -81,7 +80,7 @@ function Home() {
         </div>
       </div>
       <LoadingScreen />
-      {mainMode === 'stats' && <GameStats divStyle={divStyle} />}
+      {mainMode === 'stats' && <GameStats />}
     </>
   );
 }

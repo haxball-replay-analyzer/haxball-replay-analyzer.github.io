@@ -4,7 +4,7 @@ export const mainModeSlice = createSlice({
   name: 'mainMode',
   initialState: {
     value: 'home',
-    version: '1.17'
+    version: '2.0.0'
   },
   reducers: {
     setMainMode: (state, action) => {
