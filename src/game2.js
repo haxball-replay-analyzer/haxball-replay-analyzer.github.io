@@ -16,10 +16,7 @@
 /* eslint-disable no-unused-expressions */
 
 import $ from 'jquery';
-import { setLoadingProgress2 } from './components/LoadingScreen';
-import { setMainMode } from './slices/mainModeSlice';
 import './vendor/pako-jszip.min.js';
-import { useDispatch } from 'react-redux';
 import { showStats, setGameStats, dispatchPlayerList, dispatchPlayerPos } from './components/Home';
 
 var loading = {};
