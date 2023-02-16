@@ -21,8 +21,6 @@ function HeatMap() {
   const stadium = [match[mtc].stadium.width || match[mtc].stadium.bg.width, match[mtc].stadium.height || match[mtc].stadium.bg.height]
   const canvasRef = useRef(null);
 
-  // console.log(selectedPlayer);
-
   function draw(ctx2) {
 
     var par = selectedPlayer;

@@ -1,11 +1,11 @@
 import Changes from './Changes.js';
-import { useContext } from "react";
-import { AnalyzerContext } from "../../App";
+import { useDispatch } from 'react-redux';
+import { setVersion } from '../../slices/mainModeSlice.js';
 
 const changelog = [
   {
     version: '2.0.0',
-    date: 'XX.XX.2023',
+    date: '16.02.2023',
     changes: [
       'Whole code has been restructured and moved to React.js'
     ]
@@ -157,8 +157,11 @@ const newChanges = changelog.map(change => <Changes key={change.version} change=
 
 function Changelog() {
 
+  const dispatch = useDispatch();
+  dispatch(setVersion(changelog[0].version))
+
   return (
-    <div id="lista-zmian" style={{ fontFamily: 'roboto', fontSize: '110%', overflowY: 'scroll', maxWidth: '630px' }}>
+    <div id="lista-zmian" style={{ fontFamily: 'roboto', fontSize: '110%', overflowY: 'scroll' }}>
       {newChanges}
 
     </div >

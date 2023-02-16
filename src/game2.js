@@ -22,13 +22,18 @@ import './vendor/pako-jszip.min.js';
 import { useDispatch } from 'react-redux';
 import { showStats, setGameStats, dispatchPlayerList, dispatchPlayerPos } from './components/Home';
 
-var loading = {
-  recLength: 1,
-  progress: 0,
-  analyzed: 0,
-  changed: false,
-  done: false
+var loading = {};
+
+function newReplay() {
+  loading = {
+    recLength: 1,
+    progress: 0,
+    analyzed: 0,
+    changed: false,
+    done: false
+  }
 }
+newReplay();
 
 function bringReplayer() {
   $('.top-section').animate({
@@ -1519,11 +1524,34 @@ function ha(a) {
   };
   this.fp = d.get('leave');
   this.fp.onclick = function () {
-    A.i(c.de);
+    // A.i(c.de);
     aktualizuj = true;
     kicker, lastKicker, goals = [], match = [{ stadium: false, started: true, stopped: false, spaceMode: false, touches: [], thirds: [0, 0, 0], changes: [], gameTicks: -1, kicks: [], shots: [], redTeam: [], blueTeam: [], shotsRed: 0, shotsBlue: 0, passes: [], passesRed: 0, passesBlue: 0, kicksRed: 0, kicksBlue: 0, possRed: 0, possBlue: 0, scoreRed: 0, scoreBlue: 0, player: [], goals: [] }], player = [], players = [], playerList = [], czyAktualizowacGraczy = true;
     czasGry = 0, czasik = [], mtc = 0, playSounds = false, pileczka = [], aktualizuj = true, aktualizujStadion = true;
     redGoalCord = [], blueGoalCord = [], redName = "RED", blueName = "BLUE", goalParsed = 0, goalMarkers = [], playerPos = [];
+
+    newReplay();
+
+    $('.roomlist-view').animate({
+      left: 0,
+    }, { duration: 700, easing: 'swing', queue: false });
+
+    $('.top-section').animate({
+      left: '150%',
+    }, { duration: 700, easing: 'swing', queue: false });
+
+    $('.bottom-section').animate({
+      left: '150%',
+    }, { duration: 700, easing: 'swing', queue: false });
+
+    $('.replay-controls-view').animate({
+      left: '150%',
+    }, { duration: 700, easing: 'swing', queue: false });
+
+    $("#loading-screen").css('left', '150%')
+
+    // document.getElementsByClassName('replayer')[0].innerHTML = '';
+    // setMainMode('home');
   }
 }
 function Q(a) {

@@ -2,11 +2,11 @@ import { useSelector } from "react-redux";
 
 function Header() {
 
-  const mainMode = useSelector((state) => state.mainMode.value);
+  const version = useSelector((state) => state.mainMode.version);
 
   return (
     <div className="header">
-      <span className="title">Haxball Replay Analyzer</span>
+      <span className="title">Haxball Replay Analyzer v{version}</span>
       <a href="http://blog.haxball.com" target="_blank" rel='noreferrer'>News</a>
       <a href="https://www.haxball.com/play" className="active" target="_blank" rel='noreferrer'>Play</a>
       <a href="https://www.haxball.com/community" target="_blank" rel='noreferrer'>Community</a>

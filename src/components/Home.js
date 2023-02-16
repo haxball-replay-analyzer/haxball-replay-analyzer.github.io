@@ -16,7 +16,8 @@ export function dispatchPlayerPos() { }
 function Home() {
 
   const dispatch = useDispatch();
-  const mainMode = useSelector((state) => state.mainMode.value)
+  const mainMode = useSelector((state) => state.mainMode.value);
+  const version = useSelector((state) => state.mainMode.version);
   var divStyle = {};
 
   function showStatsExp(elStyle) {
@@ -64,9 +65,9 @@ function Home() {
 
   return (
     <>
-      <div className='roomlist-view'>
+      <div className='roomlist-view' style={{ zIndex: 5 }}>
         <div className='dialog'>
-          <h1>Haxball Replay Analyzer v2.0.0</h1>
+          <h1>Haxball Replay Analyzer v{version}</h1>
           <p>Contact: <br />Discord: Falafel#3895, you can find me at discord.io/haxracing<br />turbofalafel@gmail.com</p>
           <div className='file-btn'>
             <label htmlFor='replayfile'>

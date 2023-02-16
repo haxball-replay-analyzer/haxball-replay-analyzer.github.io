@@ -2595,8 +2595,9 @@ th {
 .roomlist-view {
   position: absolute;
   width: 100%;
-  height: calc(100% - 10px);
-  margin-top: 5px;
+  /* height: calc(100% - 10px); */
+  height: 100%;
+  /* margin-top: 5px; */
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -2628,12 +2629,16 @@ th {
 
 .roomlist-view>.dialog,
 .room-view.roomlist-view>.container {
-  position: relative;
+  /* position: relative;
   min-height: 0;
   max-width: 650px;
   max-height: 700px;
   height: 100%;
-  width: 100%
+  width: 100% */
+  position: absolute;
+  height: calc(94% - 35px);
+  width: 40%;
+  top: 3%
 }
 
 .roomlist-view>.dialog [data-hook="count"],

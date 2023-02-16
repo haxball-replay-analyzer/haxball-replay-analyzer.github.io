@@ -65,7 +65,6 @@ function GameStats() {
   }
 
   function showMatch(x) {
-    console.log('1', mtc)
     if (x === 'next') {
       dispatch(showNextMatch())
     } else if (x === 'prev') {
@@ -132,7 +131,6 @@ function GameStats() {
   }
 
   useEffect(() => {
-    console.log('efekt', mtc, match.length)
     $("#prevMatch").css('display', mtc === 0 ? 'none' : 'block')
     $("#nextMatch").css('display', mtc === match.length - 1 ? 'none' : 'block')
   }, [mtc])
@@ -279,7 +277,7 @@ function GameStats() {
             <ThirdStats />
           </div>
           <div style={{ height: '50%', overflow: 'hidden' }}>
-            <HeatMap />
+            {match[mtc].stadium ? <HeatMap /> : null}
           </div>
         </div >
       </div>

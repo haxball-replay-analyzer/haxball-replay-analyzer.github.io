@@ -16,7 +16,14 @@ export const gameStatsSlice = createSlice({
       state.divStyle = action.payload
     },
     setStats: (state, action) => {
-      state.matches = action.payload
+      var matches = action.payload;
+      for (var i = 0; i < matches.length; i++) {
+        if (matches[i].gameTicks < 0) matches.splice(i, 1);
+      }
+      state.matches = matches;
+      state.selectedMatch = 0;
+      state.selectedPlayer = -1;
+      state.selectedStat = -1;
     },
     showNextMatch: (state) => {
       state.selectedMatch++
@@ -34,7 +41,11 @@ export const gameStatsSlice = createSlice({
       state.selectedPlayer = action.payload
     },
     setPlayerPos: (state, action) => {
-      state.playerPos = action.payload
+      var x = action.payload;
+      for (var i = 0; i < x.length; i++) {
+        if (x[i].length === 0) x.splice(i, 1);
+      }
+      state.playerPos = x;
     },
     setPlayerList: (state, action) => {
       state.playerList = action.payload
