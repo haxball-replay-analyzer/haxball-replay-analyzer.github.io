@@ -8,7 +8,11 @@ const changelog = [
     version: '2.0.0',
     date: '16.02.2023',
     changes: [
-      'Whole code has been restructured and moved to React.js'
+      'Whole code has been restructured and moved to React.js',
+      'Bug fixed - user was unable to download map if match was played in Space Mode',
+      'Clicking outside the Match Stats will close them',
+      'Team names will shrink with the length of user input',
+      'Slightly changed appearance and added animations'
     ]
   },
   {
