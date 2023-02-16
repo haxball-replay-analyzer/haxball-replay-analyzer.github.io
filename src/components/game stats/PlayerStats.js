@@ -1,5 +1,5 @@
 import { useSelector, useDispatch } from "react-redux";
-import { selectStat } from "../../slices/gameStatsSlice";
+import { selectStat, selectPlayer } from "../../slices/gameStatsSlice";
 
 function PlayerStats() {
 
@@ -27,6 +27,7 @@ function PlayerStats() {
   if (par > 0) {
     var tab2 = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]];
     for (var i = 0; i < tab.length; i++) {
+      if (!match[mtc].redTeam.includes(tab[i][0]) && !match[mtc].blueTeam.includes(tab[i][0])) continue;
       for (var j = 0; j < tab2.length; j++) {
         if (tab[i][par] >= tab2[j][par]) {
           tab2.splice(j, 0, tab[i]);
@@ -40,7 +41,7 @@ function PlayerStats() {
     var tab2 = [];
     for (var i = 0; i < tab.length; i++) {
       if (match[mtc].redTeam.includes(tab[i][0])) tab2.splice(0, 0, tab[i]);
-      else tab2.push(tab[i])
+      else if (match[mtc].blueTeam.includes(tab[i][0])) tab2.push(tab[i])
     }
     tab = tab2;
   }
@@ -60,14 +61,16 @@ function PlayerStats() {
     e.target.bgColor = ''
   }
 
+  function showHeatMap(e) {
+    e.target.style.cursor = 'pointer';
+    if (e.target.className === 'leftStat') {
+      console.log(e.target.textContent)
+      dispatch(selectPlayer(e.target.textContent.substring(1)))
+    }
+  }
+
   return (
     <tbody>
-      <tr style={{ fontSize: 20, textAlign: 'center' }}>
-        <td style={{ width: 200 }}></td>
-        <td></td>
-        <td style={{ width: 100 }}>PLAYERS</td>
-        <td style={{ width: 100 }}></td>
-      </tr>
       <tr style={{ height: 10 }}>
         <td> </td>
       </tr>
@@ -90,7 +93,7 @@ function PlayerStats() {
           <>
             <tr style={{ height: 5 }}></tr>
             <tr style={{ backgroundColor: match[mtc].redTeam.includes(stat[0]) ? '#9c0603' : '#244a67' }}>
-              <td className="leftStat">
+              <td className="leftStat" onMouseOver={showHeatMap}>
                 <div className={"flagico f-" + stat[1]} /> {stat[0]}
               </td>
               <td className="centerStat">{stat[2]}</td>

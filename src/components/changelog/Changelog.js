@@ -11,6 +11,15 @@ const changelog = [
     ]
   },
   {
+    version: '1.17',
+    date: '24.01.2023',
+    changes: [
+      'Change the camera focus to a specific player - click [Settings] > [Video] > [Player To Follow]',
+      'Download map extracted from recording - button will appear on top of Game Stats tab only if author of the stadium didn\'t set the "canBeStored" property to false',
+      'Fixed Settings button bug and display of icons'
+    ]
+  },
+  {
     version: '1.16',
     date: '07.01.2023',
     changes: [

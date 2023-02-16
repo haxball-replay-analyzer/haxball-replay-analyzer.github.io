@@ -2,8 +2,11 @@ import { useSelector, useDispatch } from "react-redux";
 import { setMainMode } from "../../slices/mainModeSlice";
 import { useEffect, useState } from "react";
 import PlayerStats from "./PlayerStats";
+import ThirdStats from "./ThirdStats";
+import { watchGoal } from "../../game2";
 import $ from 'jquery'
 import { selectMatch, showNextMatch, showPreviousMatch } from "../../slices/gameStatsSlice";
+import HeatMap from "./HeatMap";
 
 function GameStats() {
 
@@ -20,7 +23,14 @@ function GameStats() {
     top: divStyle.offsetTop + divStyle.offsetParent.offsetTop
   }
 
-  function closeStats() {
+  function closeStats(e, completeF = null) {
+
+    function completeFunction() {
+      dispatch(setMainMode('home'))
+    }
+
+    $("#prevMatch").css('display', 'none')
+    $("#nextMatch").css('display', 'none')
 
     $('#game-stats').animate({
       left: offset.left,
@@ -32,7 +42,7 @@ function GameStats() {
 
     $('#greyer').animate({
       opacity: 0
-    }, { duration: 300, easing: 'swing', queue: false, complete: function () { dispatch(setMainMode('home')) } });
+    }, { duration: 300, easing: 'swing', queue: false, complete: function () { completeF ? completeF() : completeFunction() } });
 
   }
 
@@ -55,10 +65,10 @@ function GameStats() {
   }
 
   function showMatch(x) {
-    return console.log(x)
+    console.log('1', mtc)
     if (x === 'next') {
       dispatch(showNextMatch())
-    } else if (x === 'previous') {
+    } else if (x === 'prev') {
       dispatch(showPreviousMatch())
     } else {
       dispatch(selectMatch(x.target.value))
@@ -85,19 +95,52 @@ function GameStats() {
   }
 
   function handleMouseOver(e) {
-    e.target.bgColor = '#244a67';
-    e.target.style.cursor = 'pointer'
+    if (e.target.className === match[mtc].goals[$(e.target).attr('goalIndex')].for) {
+      e.target.bgColor = '#244a67'
+      e.target.style.cursor = 'pointer'
+    } else e.target.style.cursor = 'default'
   }
 
   function handleMouseOut(e) {
     e.target.bgColor = ''
   }
 
-  function watchGoal(e) {
-    console.log('będziem oglądać bramkie', $(e.target).attr('goalIndex'))
+  function watchGoal_(e) {
+    if (e.target.className === match[mtc].goals[$(e.target).attr('goalIndex')].for) {
+      var goalIndex = Number($(e.target).attr('goalIndex'));
+      for (var i = 0; i < mtc; i++) {
+        goalIndex = goalIndex + match[i].goals.length;
+      }
+      closeStats(watchGoal(goalIndex))
+    }
+  }
+
+  function showButtons() {
+    $('#prevMatch').css('display', mtc === 0 ? 'none' : 'block')
+    $('#nextMatch').css('display', mtc === match.length - 1 ? 'none' : 'block')
+
+    const newLeft = $("#greyer").width() * 0.1 - 50;
+    const newRight = $("#greyer").width() * 0.9 + 10;
+    $('#prevMatch').animate({
+      // left: 'calc(10vw - 50px)'
+      left: newLeft
+    }, { duration: 1000, easing: 'swing', queue: false });
+
+    $('#nextMatch').animate({
+      left: newRight
+    }, { duration: 1000, easing: 'swing', queue: false });
   }
 
   useEffect(() => {
+    console.log('efekt', mtc, match.length)
+    $("#prevMatch").css('display', mtc === 0 ? 'none' : 'block')
+    $("#nextMatch").css('display', mtc === match.length - 1 ? 'none' : 'block')
+  }, [mtc])
+
+  useEffect(() => {
+
+    $("#prevMatch").css('display', 'none')
+    $("#nextMatch").css('display', 'none')
 
     $('#game-stats').animate({
       left: '10vw',
@@ -105,7 +148,7 @@ function GameStats() {
       top: '5vh',
       width: '80vw',
       height: '90vh'
-    }, { duration: 300, easing: 'swing', queue: false });
+    }, { duration: 300, easing: 'swing', queue: false, complete: function () { showButtons() } });
 
     $('#greyer').animate({
       opacity: 0.5
@@ -115,18 +158,20 @@ function GameStats() {
 
   return (
     <>
+      <button id='prevMatch' onClick={prevMatch} style={{ display: 'none', zIndex: 2, fontSize: 25, position: 'fixed', width: 40, height: 40, padding: '0 0 0 0', top: 'calc(50% - 20px)', left: '10vw' }}>◄</button>
+      <button id='nextMatch' onClick={nextMatch} style={{ display: 'none', zIndex: 2, fontSize: 25, position: 'fixed', width: 40, height: 40, padding: '0 0 0 0', top: 'calc(50% - 20px)', left: 'calc(90vw - 40px)' }}>►</button>
       <div id='game-stats' className="dialog kick-player-view" style={{ zIndex: 2, opacity: 0.5, overflowY: 'hidden', position: 'absolute', left: offset.left, top: offset.top, width: divStyle.clientWidth, height: divStyle.clientHeight }}>
         <h1 id="title" className="title">
           Match stats{match[mtc].spaceMode && ' (space mode)'}:
-          <select onChange={showMatch}>
+          <select value={mtc} onChange={showMatch}>
             {match.map((m, index) => <option value={index} key={index} >
-              {index + ': Red ' + match[index].scoreRed + ':' + match[index].scoreBlue + ' Blue'}
+              {index + 1}: Red {match[index].scoreRed}:{match[index].scoreBlue} Blue
             </option>)}
           </select>
-          {match[mtc].stadium && <button onClick={downloadMap} style={{ margin: '0 10px 0 30px' }}>Download map</button>}
+          {match[mtc].stadium.canBeStored && <button onClick={downloadMap} style={{ margin: '0 10px 0 30px' }}>Download map</button>}
         </h1>
         <button onClick={closeStats} style={{ position: 'absolute', right: 20 }} >Close ❌</button>
-        <div id='leftHalf' style={{ overflowY: 'scroll', width: '50%', display: 'inline-block' }}>
+        <div id='leftHalf' style={{ overflowY: 'scroll', width: '50%', float: 'left', height: '100%' }}>
           <table style={{ width: '100%' }}><tbody>
             <tr id='trosso' style={{ textAlign: 'center' }}>
               <td style={{ fontSize: 40, color: 'red', width: '40%' }}>
@@ -162,13 +207,13 @@ function GameStats() {
             {match[mtc].goals.map((goal, index) => {
               return (
                 <tr>
-                  <td onClick={watchGoal} goalIndex={index} onMouseOverCapture={handleMouseOver} onMouseOutCapture={handleMouseOut} style={{ width: '45%', textAlign: 'right' }}>
+                  <td className="Red" onClick={watchGoal_} goalIndex={index} onMouseOverCapture={handleMouseOver} onMouseOutCapture={handleMouseOut} style={{ width: '45%', textAlign: 'right' }}>
                     {goal.for === 'Red' && goal.scorer + (goal.assist ? ' (' + goal.assist + ')' : '')}
                   </td>
                   <td style={{ width: '10%', textAlign: 'center', padding: 2 }}>
                     {goal.aktualnyWynik[0] + ':' + goal.aktualnyWynik[1]}
                   </td>
-                  <td onClick={watchGoal} goalIndex={index} onMouseOverCapture={handleMouseOver} onMouseOutCapture={handleMouseOut} style={{ width: '45%', textAlign: 'left' }}>
+                  <td className="Blue" onClick={watchGoal_} goalIndex={index} onMouseOverCapture={handleMouseOver} onMouseOutCapture={handleMouseOut} style={{ width: '45%', textAlign: 'left' }}>
                     {goal.for === 'Blue' && goal.scorer + (goal.assist ? ' (' + goal.assist + ')' : '')}
                   </td>
                 </tr>
@@ -216,15 +261,27 @@ function GameStats() {
             <tr style={{ height: 20 }}>
               <td> </td>
             </tr>
+
+            <tr style={{ fontSize: 20, textAlign: 'center' }}>
+              <td></td>
+              <td>PLAYERS</td>
+              <td></td>
+            </tr>
           </tbody>
           </table>
           <table id='div.tabela2' style={{ width: '100%' }}>
             <PlayerStats />
           </table>
         </div >
-      </div >
-      <div id='rightHalf' style={{ width: '50%', display: 'inline-block' }}>
-
+        {/* <div id='rightHalf' style={{ position: 'absolute', left: '50%', width: '50%', backgroundColor: 'red', height: '100%', opacity: 0.5 }}> */}
+        <div id='rightHalf' style={{ position: 'absolute', left: '50%', top: '10%', overflowY: 'hidden', width: '50%', height: '90%' }}>
+          <div style={{ height: '50%', overflow: 'hidden' }}>
+            <ThirdStats />
+          </div>
+          <div style={{ height: '50%', overflow: 'hidden' }}>
+            <HeatMap />
+          </div>
+        </div >
       </div>
       <div id='greyer' onClick={closeStats} style={{ zIndex: 1, opacity: 0, backgroundColor: 'rgba(115, 136, 92)', position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh' }}></div>
     </>
@@ -232,104 +289,3 @@ function GameStats() {
 }
 
 export default GameStats;
-
-//       var tableRef = document.getElementById("div.tabela").getElementsByTagName('tbody')[0];
-//       var wiersz = 4;
-//       for (var j = 0; j < match[mtc].goals.length; j++) {
-//         var mar = document.getElementById("recGoal" + (match[mtc].goals[j].goalIndex + 1)).offsetLeft - 5;
-//         var newRow = tableRef.insertRow(wiersz);
-//         wiersz++;
-//         var newCell_3 = newRow.insertCell(0);
-//         var newCell_2 = newRow.insertCell(0);
-//         var newCell_1 = newRow.insertCell(0);
-//         newCell_1.style = "text-align: right";
-//         newCell_3.style = "text-align: left";
-//         if (match[mtc].goals[j].for == "Red") {
-//           newCell_1.innerHTML = "" + match[mtc].goals[j].aktualnyWynik[0] + " : " + match[mtc].goals[j].aktualnyWynik[1] + " " + match[mtc].goals[j].scorer + (match[mtc].goals[j].assist == false ? "" : " (" + match[mtc].goals[j].assist + ")");
-//           newCell_1.setAttribute('onclick', 'watchGoal(' + mar + ');');
-//           newCell_1.setAttribute('onmouseover', 'this.style="cursor:pointer;background-color:#244a67;text-align: right;"');
-//           newCell_1.setAttribute('onmouseout', 'this.style="text-align: right;"');
-//         } else {
-//           newCell_3.innerHTML = "" + match[mtc].goals[j].aktualnyWynik[0] + " : " + match[mtc].goals[j].aktualnyWynik[1] + " " + match[mtc].goals[j].scorer + (match[mtc].goals[j].assist == false ? "" : " (" + match[mtc].goals[j].assist + ")");
-//           newCell_3.setAttribute('onclick', 'watchGoal(' + mar + ');');
-//           newCell_3.setAttribute('onmouseover', 'this.style="cursor:pointer;background-color:#244a67;text-align: left;"');
-//           newCell_3.setAttribute('onmouseout', 'this.style="text-align: left;"');
-//         }
-//         //console.log(newRow, newCell_1);
-//       }
-//       wiersz += 3;
-
-//       var canvas = document.createElement("canvas");
-//       if (canvas.getContext) {
-
-//         var ctx = canvas.getContext('2d');
-//         ctx.canvas.width = 500;
-//         ctx.canvas.height = 250;
-
-//         //Loading of the home test image - img1
-//         var img1 = new Image();
-
-//         //drawing of the test image - img1
-//         img1.onload = function () {
-//           //draw background image
-//           ctx.drawImage(img1, 0, 0);
-//           //draw a box over the top
-//           ctx.font = "45px Arial";
-//           ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
-//           ctx.fillRect(175, 0, 150, 250);
-//           ctx.fillStyle = "rgba(255, 255, 255, 1)";
-//           ctx.strokeStyle = "rgba(0, 0, 0, 1)";
-//           ctx.lineWidth = 8;
-//           //console.log(match[mtc].thirds);
-
-//           for (var i = 0; i < 3; i++) {
-//             ctx.strokeText("" + Math.round(100 * (match[mtc].thirds[i] / (match[mtc].thirds[0] + match[mtc].thirds[1] + match[mtc].thirds[2]))) + "%", 70 + 140 * i, 147);
-//             ctx.fillText("" + Math.round(100 * (match[mtc].thirds[i] / (match[mtc].thirds[0] + match[mtc].thirds[1] + match[mtc].thirds[2]))) + "%", 70 + 140 * i, 147);
-//           }
-//           document.getElementById("thirdStats").appendChild(canvas);
-
-//         };
-
-//         img1.src = 'https://haxball-replay-analyzer.github.io/images/haxpitch4.png';
-//       }
-//       var canvas2 = document.createElement("canvas");
-//       if (canvas2.getContext) {
-
-//         var ctx2 = canvas2.getContext('2d');
-//         ctx2.canvas.width = 500;
-//         ctx2.canvas.height = 250;
-
-//         //Loading of the home test image - img1
-//         var img2 = new Image();
-
-//         //drawing of the test image - img1
-//         img2.onload = function () {
-//           //draw background image
-//           ctx2.drawImage(img1, 0, 0);
-//           //draw a box over the top
-//           ctx2.fillStyle = "rgba(255, 0, 0, 0.006)";
-//           //console.log(redGoalCord);
-//           for (var i = 0; i < playerPos[0][1].length; i++) {
-//             ctx2.beginPath();
-//             //ctx2.arc((playerPos[0][2][i].x+606)*314/blueGoalCord[0],(playerPos[0][2][i].y+329)*1/2,7,0,2*Math.PI);
-//             ctx2.arc((playerPos[0][1][i].x + stadion[0]) * 433 / (2 * stadion[0]) + 33, (playerPos[0][1][i].y + stadion[1]) * 218 / (2 * stadion[1]) + 15, 7, 0, 2 * Math.PI);
-//             ctx2.fill();
-//           }
-//           ctx2.font = "20px Verdana";
-//           ctx2.textAlign = "center";
-//           ctx2.fillStyle = "rgba(0,0,0,1)";
-//           ctx2.fillText(playerList[1], 250, 15);
-//           /*ctx.fillRect(240, 0, 220, 350);
-//           ctx.fillStyle = "rgba(255, 255, 255, 1)";
-//           ctx.strokeStyle = "rgba(0, 0, 0, 1)";
-//           ctx.lineWidth = 8;*/
-//           //console.log(match[mtc].thirds);
-
-//           document.getElementById("heatmap").appendChild(canvas2);
-
-//         };
-//         img2.src = 'https://haxball-replay-analyzer.github.io/images/haxpitch4.png';
-//       }
-
-//       //console.log("e",sortTable);
-//       sortTable(-1);

@@ -20,7 +20,7 @@ import { setLoadingProgress2 } from './components/LoadingScreen';
 import { setMainMode } from './slices/mainModeSlice';
 import './vendor/pako-jszip.min.js';
 import { useDispatch } from 'react-redux';
-import { showStats, setGameStats } from './components/Home';
+import { showStats, setGameStats, dispatchPlayerList, dispatchPlayerPos } from './components/Home';
 
 var loading = {
   recLength: 1,
@@ -483,8 +483,8 @@ function playersToFollowList() {
   }
   return b;
 }
-
-function setPlayerToFollow() {
+// function setPlayerToFollow() {
+const setPlayerToFollow = function () {
   // console.log(document.getElementById('selectPlayerToFollow').value);
   playerToFollow = document.getElementById('selectPlayerToFollow').value;
 }
@@ -577,10 +577,13 @@ function downloadMap() {
   document.body.removeChild(a);
 }
 
-function watchGoal(par) {
-  document.getElementById("button_close").click();
+export function watchGoal(par) {
+  // document.getElementById("button_close").click();
+  console.log(par, "recGoal" + (Number(par) + 1))
+  const g = document.getElementById("recGoal" + (Number(par) + 1)).offsetLeft - 5;
   autoClick = true;
-  autoClickValue = par;
+  autoClickValue = '' + g;
+  // console.log(autoClickValue)
   //document.getElementById("recGoal1").click();
   document.getElementsByClassName("timebar")[0].click();
 }
@@ -1098,8 +1101,14 @@ function aa(a) {
       bh: l.get(a + 'sec')
     };
     t.push(b);
-    b.Jm.onclick = function () {
-      g(b)
+    b.Jm.onclick = function (el) {
+      g(b);
+      // console.log('chyba już można', el.target.id)
+      if (el.target.id === 'video_button') {
+        $("#selectPlayerToFollow")[0].onchange = function () {
+          setPlayerToFollow();
+        }
+      }
     }
   }
   function g(a) {
@@ -1115,9 +1124,11 @@ function aa(a) {
   }
   null == a && (a = !1);
   var k = this;
-  aa.N = '<div class=\'dialog settings-view\'><h1>Settings</h1><button data-hook=\'close\'>Close</button><div class=\'tabs\'><button data-hook=\'soundbtn\'>Sound</button><button data-hook=\'videobtn\'>Video</button><button data-hook=\'inputbtn\'>Input</button><button data-hook=\'miscbtn\'>Misc</button></div><div data-hook=\'presskey\' tabindex=\'-1\'><div>Press a key</div></div><div class=\'tabcontents\'><div class=\'section\' data-hook=\'miscsec\'><div class=\'loc\' data-hook=\'loc\'></div><div class=\'loc\' data-hook=\'loc-ovr\'></div><button data-hook=\'loc-ovr-btn\'></button></div><div class=\'section\' data-hook=\'soundsec\'><div data-hook="tsound-main">Sounds enabled</div><div data-hook="tsound-chat">Chat sound enabled</div><div data-hook="tsound-highlight">Nick highlight sound enabled</div><div data-hook="tsound-crowd">Crowd sound enabled</div></div><div class=\'section\' data-hook=\'inputsec\'></div><div class=\'section\' data-hook=\'videosec\'><div>Viewport Mode:<select data-hook=\'viewmode\'><option>Dynamic</option><option>Restricted 840x410</option><option>Full 1x Zoom</option><option>Full 1.25x Zoom</option><option>Full 1.5x Zoom</option><option>Full 1.75x Zoom</option><option>Full 2x Zoom</option><option>Full 2.25x Zoom</option><option>Full 2.5x Zoom</option></select></div><div>FPS Limit:<select data-hook=\'fps\'><option>None (Recommended)</option><option>30</option></select></div><div>Resolution Scaling:<select data-hook=\'resscale\'><option>100%</option><option>75%</option><option>50%</option><option>25%</option></select></div><div>Player To Follow:<select id="selectPlayerToFollow" onchange="setPlayerToFollow()">' + playersToFollowList() + '</select></div><div data-hook="tvideo-teamcol">Custom team colors enabled</div><div data-hook="tvideo-showindicators">Show chat indicators</div><div data-hook="tvideo-showavatars">Show player avatars</div></div></div></div>';
+  aa.N = '<div class=\'dialog settings-view\'><h1>Settings</h1><button data-hook=\'close\'>Close</button><div class=\'tabs\'><button data-hook=\'soundbtn\'>Sound</button><button id=\'video_button\' data-hook=\'videobtn\'>Video</button><button data-hook=\'inputbtn\'>Input</button><button data-hook=\'miscbtn\'>Misc</button></div><div data-hook=\'presskey\' tabindex=\'-1\'><div>Press a key</div></div><div class=\'tabcontents\'><div class=\'section\' data-hook=\'miscsec\'><div class=\'loc\' data-hook=\'loc\'></div><div class=\'loc\' data-hook=\'loc-ovr\'></div><button data-hook=\'loc-ovr-btn\'></button></div><div class=\'section\' data-hook=\'soundsec\'><div data-hook="tsound-main">Sounds enabled</div><div data-hook="tsound-chat">Chat sound enabled</div><div data-hook="tsound-highlight">Nick highlight sound enabled</div><div data-hook="tsound-crowd">Crowd sound enabled</div></div><div class=\'section\' data-hook=\'inputsec\'></div><div class=\'section\' data-hook=\'videosec\'><div>Viewport Mode:<select data-hook=\'viewmode\'><option>Dynamic</option><option>Restricted 840x410</option><option>Full 1x Zoom</option><option>Full 1.25x Zoom</option><option>Full 1.5x Zoom</option><option>Full 1.75x Zoom</option><option>Full 2x Zoom</option><option>Full 2.25x Zoom</option><option>Full 2.5x Zoom</option></select></div><div>FPS Limit:<select data-hook=\'fps\'><option>None (Recommended)</option><option>30</option></select></div><div>Resolution Scaling:<select data-hook=\'resscale\'><option>100%</option><option>75%</option><option>50%</option><option>25%</option></select></div><div>Player To Follow:<select id="selectPlayerToFollow" >' + playersToFollowList() + '</select></div><div data-hook="tvideo-teamcol">Custom team colors enabled</div><div data-hook="tvideo-showindicators">Show chat indicators</div><div data-hook="tvideo-showavatars">Show player avatars</div></div></div></div>';
   this.g = v.Ga(aa.N);
   var l = v.Ea(this.g);
+  // console.log(l, this.g)
+  // console.log('e', l.get('videosec'))
   this.nd = l.get('close');
   var t = [
   ];
@@ -1467,6 +1478,7 @@ function ha(a) {
   };
   this.Er = d.get('time');
   var l = d.get('timebar');
+  // console.log('wykrywam pasek', l)
   l.id = "pasek";
   this.Aq = d.get('progbar');
   //console.log(a.mf, ha.Wk(a.mf * a.mh));//checkpoint czas nagrania
@@ -1489,7 +1501,7 @@ function ha(a) {
   l.onclick = function (b) {
     //console.log(b);    TU DAĆ AUTOKLIKNIĘCIE
     if (autoClick) {
-      //console.log("autoklik",b,autoClickValue);
+      // console.log("autoklik", b, autoClickValue);
       a.er((autoClickValue) / l.clientWidth * a.mh * a.mf);
       c.Wf || (c.Wf = !0, c.Vp(), c.el());
       autoClick = false;
@@ -5304,6 +5316,9 @@ xa.prototype = C(V.prototype, {
       if (progress < loading.progress) {
         // console.log('koniec analizy');
         loading.done = true;
+        aktualizuj = false;
+        dispatchPlayerList(playerList);
+        dispatchPlayerPos(playerPos)
         bringReplayer();
       } else if (progress !== loading.progress) {
         loading.progress = progress;
@@ -7312,111 +7327,111 @@ O.prototype = {
             0 != (x & -2147483648) && b.push("c3");
             return b;
           }
-          if (st.Lf) {
-            match[match.length - 1].stadium = {
-              name: st.w,
-              height: st.qc,
-              width: st.$b,
-              maxViewWidth: st.Ye,
-              cameraFollow: (st.Ge == 1 ? 'player' : 'ball'),
-              spawnDistance: st.kc,
-              kickOffReset: (st.pf ? 'full' : 'partial'),
-              bg: {
-                type: (st.ld == 1 ? 'grass' : (st.ld == 2 ? 'hockey' : 'none')),
-                width: st.Td,
-                height: st.Sd,
-                kickOffRadius: st.kd,
-                cornerRadius: st.Uc,
-                color: getColor(st.jd),
-                goalLine: st.Fe
-              },
-              canBeStored: st.Lf,
-              redSpawnPoints: st.Dd.map((a) => ([a.x, a.y])),
-              blueSpawnPoints: st.md.map((a) => ([a.x, a.y])),
-              playerPhysics: {
-                bCoef: st.ge.m,
-                invMass: st.ge.aa,
-                damping: st.ge.Ca,
-                acceleration: st.ge.Ce,
-                kickingAcceleration: st.ge.Te,
-                kickingDamping: st.ge.Ue,
-                kickStrength: st.ge.Re,
-                cGroup: getCMask(st.ge.v),
-                gravity: [st.ge.oa.x, st.ge.oa.y],
-                radius: st.ge.Z,
-                kickback: st.ge.Se
-              },
-              segments: st.U.map((a) => ({
-                v0: a.W.ud,
-                v1: a.ca.ud,
-                bias: a.Cc,
-                bCoef: a.m,
-                curve: (0 != 0 * a.vb ? 0 : Math.abs(114.59155902616465 * Math.atan(1 / a.vb))),
-                vis: a.Za,
-                cMask: getCMask(a.h),
-                cGroup: getCMask(a.v),
-                color: getColor(a.R)
-              })),
-              vertexes: st.J.map((a) => ({
-                x: a.a.x,
-                y: a.a.y,
-                bCoef: a.m,
-                cMask: getCMask(a.h),
-                cGroup: getCMask(a.v)
-              })),
-              goals: st.tc.map((a) => ({
-                p0: [a.W.x, a.W.y],
-                p1: [a.ca.x, a.ca.y],
-                team: (a.qe == p.fa ? "red" : "blue")
-              })),
-              planes: st.qa.map((a) => ({
-                normal: [a.wa.x, a.wa.y],
-                dist: a.Ua,
-                bCoef: a.m,
-                cMask: getCMask(a.h),
-                cGroup: getCMask(a.v)
-              })),
-              discs: st.F.map((a) => ({
-                pos: [a.a.x, a.a.y],
-                speed: [a.D.x, a.D.y],
-                gravity: [a.oa.x, a.oa.y],
-                radius: a.Z,
-                bCoef: a.m,
-                invMass: a.aa,
-                damping: a.Ca,
-                color: getColor(a.R),
-                cMask: getCMask(a.h),
-                cGroup: getCMask(a.v)
-              })),
-              joints: st.pb.map((a) => ({
-                d0: a.Yd,
-                d1: a.Zd,
-                length: a.Hb >= a.ec ? a.Hb : [a.Hb, a.ec],
-                color: getColor(a.R),
-                strength: a.ne == Infinity ? 'rigid' : a.ne
-              }))
-            }
-
-            match[match.length - 1].stadium.ballPhysics = match[match.length - 1].stadium.discs.splice(0, 1)[0];
-            delete match[match.length - 1].stadium.ballPhysics.pos;
-            if (match[match.length - 1].stadium.bg.type != 'grass' && match[match.length - 1].stadium.bg.color == '718C5A') {
-              delete match[match.length - 1].stadium.bg.color;
-            }
-            var segments = match[match.length - 1].stadium.segments;
-            var trueSegments = st.U;
-            var vertexes = match[match.length - 1].stadium.vertexes;
-            for (var i = 0; i < segments.length; i++) {
-              // console.log('in', segments[i])
-              if (segments[i].v0 == 0 && segments[i].v1 == 0) {
-                for (var j = 0; j < vertexes.length; j++) {
-                  if (vertexes[j].x == trueSegments[i].W.a.x && vertexes[j].y == trueSegments[i].W.a.y) segments[i].v0 = j;
-                  else if (vertexes[j].x == trueSegments[i].ca.a.x && vertexes[j].y == trueSegments[i].ca.a.y) segments[i].v1 = j;
-                  if (segments[i].v0 != 0 && segments[i].v1 != 0) break;
-                }
-              }
-              // console.log('out', segments[i])
-            }
+          // if (st.Lf) {
+          match[match.length - 1].stadium = {
+            name: st.w,
+            height: st.qc,
+            width: st.$b,
+            maxViewWidth: st.Ye,
+            cameraFollow: (st.Ge == 1 ? 'player' : 'ball'),
+            spawnDistance: st.kc,
+            kickOffReset: (st.pf ? 'full' : 'partial'),
+            bg: {
+              type: (st.ld == 1 ? 'grass' : (st.ld == 2 ? 'hockey' : 'none')),
+              width: st.Td,
+              height: st.Sd,
+              kickOffRadius: st.kd,
+              cornerRadius: st.Uc,
+              color: getColor(st.jd),
+              goalLine: st.Fe
+            },
+            canBeStored: st.Lf,
+            redSpawnPoints: st.Dd.map((a) => ([a.x, a.y])),
+            blueSpawnPoints: st.md.map((a) => ([a.x, a.y])),
+            playerPhysics: {
+              bCoef: st.ge.m,
+              invMass: st.ge.aa,
+              damping: st.ge.Ca,
+              acceleration: st.ge.Ce,
+              kickingAcceleration: st.ge.Te,
+              kickingDamping: st.ge.Ue,
+              kickStrength: st.ge.Re,
+              cGroup: getCMask(st.ge.v),
+              gravity: [st.ge.oa.x, st.ge.oa.y],
+              radius: st.ge.Z,
+              kickback: st.ge.Se
+            },
+            segments: st.U.map((a) => ({
+              v0: a.W.ud,
+              v1: a.ca.ud,
+              bias: a.Cc,
+              bCoef: a.m,
+              curve: (0 != 0 * a.vb ? 0 : Math.abs(114.59155902616465 * Math.atan(1 / a.vb))),
+              vis: a.Za,
+              cMask: getCMask(a.h),
+              cGroup: getCMask(a.v),
+              color: getColor(a.R)
+            })),
+            vertexes: st.J.map((a) => ({
+              x: a.a.x,
+              y: a.a.y,
+              bCoef: a.m,
+              cMask: getCMask(a.h),
+              cGroup: getCMask(a.v)
+            })),
+            goals: st.tc.map((a) => ({
+              p0: [a.W.x, a.W.y],
+              p1: [a.ca.x, a.ca.y],
+              team: (a.qe == p.fa ? "red" : "blue")
+            })),
+            planes: st.qa.map((a) => ({
+              normal: [a.wa.x, a.wa.y],
+              dist: a.Ua,
+              bCoef: a.m,
+              cMask: getCMask(a.h),
+              cGroup: getCMask(a.v)
+            })),
+            discs: st.F.map((a) => ({
+              pos: [a.a.x, a.a.y],
+              speed: [a.D.x, a.D.y],
+              gravity: [a.oa.x, a.oa.y],
+              radius: a.Z,
+              bCoef: a.m,
+              invMass: a.aa,
+              damping: a.Ca,
+              color: getColor(a.R),
+              cMask: getCMask(a.h),
+              cGroup: getCMask(a.v)
+            })),
+            joints: st.pb.map((a) => ({
+              d0: a.Yd,
+              d1: a.Zd,
+              length: a.Hb >= a.ec ? a.Hb : [a.Hb, a.ec],
+              color: getColor(a.R),
+              strength: a.ne == Infinity ? 'rigid' : a.ne
+            }))
           }
+
+          match[match.length - 1].stadium.ballPhysics = match[match.length - 1].stadium.discs.splice(0, 1)[0];
+          delete match[match.length - 1].stadium.ballPhysics.pos;
+          if (match[match.length - 1].stadium.bg.type != 'grass' && match[match.length - 1].stadium.bg.color == '718C5A') {
+            delete match[match.length - 1].stadium.bg.color;
+          }
+          var segments = match[match.length - 1].stadium.segments;
+          var trueSegments = st.U;
+          var vertexes = match[match.length - 1].stadium.vertexes;
+          for (var i = 0; i < segments.length; i++) {
+            // console.log('in', segments[i])
+            if (segments[i].v0 == 0 && segments[i].v1 == 0) {
+              for (var j = 0; j < vertexes.length; j++) {
+                if (vertexes[j].x == trueSegments[i].W.a.x && vertexes[j].y == trueSegments[i].W.a.y) segments[i].v0 = j;
+                else if (vertexes[j].x == trueSegments[i].ca.a.x && vertexes[j].y == trueSegments[i].ca.a.y) segments[i].v1 = j;
+                if (segments[i].v0 != 0 && segments[i].v1 != 0) break;
+              }
+            }
+            // console.log('out', segments[i])
+          }
+          // }
           // console.log('segmenty', st.U)
           // console.log(segments, trueSegments)
           // console.log(match);
