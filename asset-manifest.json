@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/static/css/main.d7845bea.css",
+    "main.js": "/static/js/main.e3cba3aa.js",
+    "static/media/haxpitch4.png": "/static/media/haxpitch4.569e55d5ab5963c2b7d8.png",
+    "static/media/flags.png": "/static/media/flags.7d60a556e97ba9f4d3a9.png",
+    "index.html": "/index.html",
+    "main.d7845bea.css.map": "/static/css/main.d7845bea.css.map",
+    "main.e3cba3aa.js.map": "/static/js/main.e3cba3aa.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.d7845bea.css",
+    "static/js/main.e3cba3aa.js"
+  ]
+}
