@@ -325,13 +325,11 @@ function bringReplayer() {
   e.Modernizr = Modernizr
 }(window, document);
 
-var ListaZmian = 'aaaa';
-
 var kicker, lastKicker, goals = [], match = [{ stadium: false, started: true, stopped: false, spaceMode: false, touches: [], thirds: [0, 0, 0], changes: [], gameTicks: -1, kicks: [], shots: [], redTeam: [], blueTeam: [], shotsRed: 0, shotsBlue: 0, passes: [], passesRed: 0, passesBlue: 0, kicksRed: 0, kicksBlue: 0, possRed: 0, possBlue: 0, scoreRed: 0, scoreBlue: 0, player: [], goals: [] }], player = [], players = [], playerList = [], updatePlayers = true;
 var toucher = { name: "", team: "0" }, lastToucher = "", mtc = 0, playSounds = false, pileczka = [], keepUpdating = true, keepUpdatingStadium = true;
 var redGoalCord = [], blueGoalCord = [], checkTeams = true, autoClick = false, autoClickValue;
 var goalParsed = 0, playerPos = [], ballRadius = 10;
-var haxracing = false, playerToFollow = 0, mainCanvas, mousepos = { clientX: 0, clientY: 0 };
+var playerToFollow = 0, mainCanvas, mousepos = { clientX: 0, clientY: 0 };
 var globalPlayerHovered = false;
 
 function playersToFollowList() {
@@ -377,7 +375,7 @@ function parseTime(par) {
   return "" + mins + ":" + gt;
 }
 
-function odleglosc(a, b) {
+function distanceBetween(a, b) {
   return Math.sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y));
 }
 
@@ -387,328 +385,6 @@ export function watchGoal(par) {
   autoClickValue = '' + g;
   document.getElementsByClassName("timebar")[0].click();
 }
-
-function sortTable(par) {
-  var tab = [];
-  for (var i = 0; i < match[mtc].player.length; i++) {
-    var pr = match[mtc].player[i], prGoals = 0, prAssists = 0, prKicks = 0, prPasses = 0, prShots = 0, prBumps = 0, prTouches = 0;
-    for (var j = 0; j < match[mtc].goals.length; j++) {
-      //console.log(match[mtc].goals[j].scorer,match[mtc].goals[j].assist,pr.nick);
-      if (match[mtc].goals[j].scorer == pr.nick) prGoals++;
-      else if (match[mtc].goals[j].assist == pr.nick) prAssists++;
-    }
-    //console.log(pr, prGoals, prAssists, prKicks);
-    for (var j = 0; j < match[mtc].kicks.length; j++) if (match[mtc].kicks[j] == pr.nick) prKicks++;
-    for (var j = 0; j < match[mtc].passes.length; j++) if (match[mtc].passes[j] == pr.nick) prPasses++;
-    for (var j = 0; j < match[mtc].shots.length; j++) if (match[mtc].shots[j] == pr.nick) prShots++;
-    if (match[mtc].spaceMode) {
-      for (var j = 0; j < match[mtc].bumps.length; j++) if (match[mtc].bumps[j] == pr.nick) prBumps++;
-      for (var j = 0; j < match[mtc].touches.length; j++) if (match[mtc].touches[j] == pr.nick) prTouches++;
-      tab.push([pr.nick, pr.nation, prGoals, prAssists, prKicks, prPasses, prShots, prBumps, prTouches]);
-    } else tab.push([pr.nick, pr.nation, prGoals, prAssists, prKicks, prPasses, prShots]);
-  }
-  //console.log(tab);
-  // TU SORTOWANIE WSTAWIĆ
-  if (par >= 0) {
-    var tab2 = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]];
-    for (var i = 0; i < tab.length; i++) {
-      for (var j = 0; j < tab2.length; j++) {
-        if (tab[i][par] >= tab2[j][par]) {
-          //console.log(tab2);
-          tab2.splice(j, 0, tab[i]);
-          //console.log(tab2);
-          break;
-        }
-      }
-    }
-    tab2.splice(tab2.length - 1, 1);
-    tab = tab2;
-  }
-  var tableRef = document.getElementById("div.tabela2").getElementsByTagName('tbody')[0];
-  tableRef.innerHTML = '<tr style="font-size: 20px; text-align: center"><td style="width: 200px"></td><td></td><td style="width: 100px">PLAYERS</td><td style="width: 100px"></td></tr><tr style="height: 10px"><td> </td></tr>';
-  newRow = tableRef.insertRow();
-  newCell_1 = newRow.insertCell();
-  newCell_1.style = "text-align: left; width: 100px";
-  newCell_1.innerHTML = "Players";
-  /*newCell_1 = newRow.insertCell();
-  newCell_1.style="text-align: center; width: 50px";*/
-  newCell_2 = newRow.insertCell();
-  newCell_2.style = "text-align: center; width: 100px";
-  newCell_2.id = "cell1";
-  newCell_2.innerHTML = "Goals";
-  newCell_3 = newRow.insertCell();
-  newCell_3.style = "text-align: center; width: 100px";
-  newCell_3.id = "cell2";
-  newCell_3.innerHTML = "Assists";
-  newCell_3 = newRow.insertCell();
-  newCell_3.style = "text-align: center; width: 100px";
-  newCell_3.id = "cell3";
-  newCell_3.innerHTML = "Kicks";
-  newCell_3 = newRow.insertCell();
-  newCell_3.style = "text-align: center; width: 100px";
-  newCell_3.id = "cell4";
-  newCell_3.innerHTML = "Passes";
-  newCell_3 = newRow.insertCell();
-  newCell_3.style = "text-align: center; width: 100px";
-  newCell_3.id = "cell5";
-  newCell_3.innerHTML = 'Shots on Goal';
-
-  if (match[mtc].spaceMode) {
-    newCell_3 = newRow.insertCell();
-    newCell_3.style = "text-align: center; width: 100px";
-    newCell_3.id = "cell6";
-    newCell_3.innerHTML = 'Bumps';
-
-    newCell_3 = newRow.insertCell();
-    newCell_3.style = "text-align: center; width: 100px";
-    newCell_3.id = "cell7";
-    newCell_3.innerHTML = 'Touches';
-  }
-
-  newRow = tableRef.insertRow();
-  newRow.style = "height: 6px";
-  if (par > 0) {
-    for (var i = 0; i < tab.length; i++) {
-      if (match[mtc].redTeam.includes(tab[i][0])) {
-        var bgc = "9c0603";
-      } else if (match[mtc].blueTeam.includes(tab[i][0])) {
-        var bgc = "244a67";
-      } else continue;
-      newRow = tableRef.insertRow();
-      newCell_1 = newRow.insertCell();
-      newCell_1.style = "text-align: left; background-color: #" + bgc + "; width: 100px";
-      newCell_1.innerHTML = "<div class=\"flagico f-" + tab[i][1] + "\"></div> " + tab[i][0];
-      newCell_1.setAttribute('onmouseover', 'this.style.cursor= "pointer"; heatMap(this.innerHTML.split("</div> ")[1])')
-      /*
-      newCell_1 = newRow.insertCell();
-      newCell_1.style="text-align: center; width: 50px; color:green; background-color: #"+bgc;
-  */
-      newCell_2 = newRow.insertCell();
-      newCell_2.style = "text-align: center; background-color: #" + bgc + "; width: 100px";
-      newCell_2.innerHTML = "" + tab[i][2];
-      newCell_3 = newRow.insertCell();
-      newCell_3.style = "text-align: center; background-color: #" + bgc + "; width: 100px";
-      newCell_3.innerHTML = "" + tab[i][3];
-      var newCell_4 = newRow.insertCell();
-      newCell_4.style = "text-align: center; background-color: #" + bgc + "; width: 100px";
-      newCell_4.innerHTML = "" + tab[i][4];
-
-      newCell_4 = newRow.insertCell();
-      newCell_4.style = "text-align: center; background-color: #" + bgc + "; width: 100px";
-      newCell_4.innerHTML = "" + tab[i][5];
-
-      newCell_2 = newRow.insertCell();
-      newCell_2.style = "text-align: center; background-color: #" + bgc + "; width: 100px";
-      newCell_2.innerHTML = "" + tab[i][6];
-
-      if (match[mtc].spaceMode) {
-        newCell_2 = newRow.insertCell();
-        newCell_2.style = "text-align: center; background-color: #" + bgc + "; width: 100px";
-        newCell_2.innerHTML = "" + tab[i][7];
-
-        newCell_2 = newRow.insertCell();
-        newCell_2.style = "text-align: center; background-color: #" + bgc + "; width: 100px";
-        newCell_2.innerHTML = "" + tab[i][8];
-      }
-
-      newCell_3 = newRow.insertCell();
-      newCell_3.innerHTML = " ";
-      newCell_3 = newRow.insertCell();
-      newCell_3.innerHTML = " ";
-
-      newRow = tableRef.insertRow();
-      newRow.style = "height: 10px";
-      newCell_4 = newRow.insertCell();
-      newCell_4.innerHTML = "";
-      newCell_4 = newRow.insertCell();
-      newCell_4.innerHTML = "";
-    }
-
-  } else {
-
-    for (var i = 0; i < tab.length; i++) {
-      if (match[mtc].redTeam.includes(tab[i][0])) {
-        var bgc = "#9c0603";
-      } else continue;
-      newRow = tableRef.insertRow();
-      newCell_1 = newRow.insertCell();
-      newCell_1.style = "text-align: left; background-color: #9c0603; width: 100px";
-      newCell_1.innerHTML = "<div class=\"flagico f-" + tab[i][1] + "\"></div> " + tab[i][0];
-      newCell_1.setAttribute('onmouseover', 'this.style.cursor= "pointer"; heatMap(this.innerHTML.split("</div> ")[1])')
-
-      /*newCell_1 = newRow.insertCell();
-      newCell_1.style="text-align: center; width: 50px; color:green; background-color: #9c0603";
-      for (var j=0; j<match[mtc].changes.length; j++) {
-        let chn = match[mtc].changes[j];
-        if (chn[0]==tab[i][0]) {
-          if (chn[1]=="Spectators") {
-            newCell_1.style = "text-align: center; width: 50px; color:green; background-color: #9c0603";
-            newCell_1.innerHTML="⬈ "+chn[2];
-          } else {
-            newCell_1.style = "text-align: center; width: 50px; background-color: #9c0603; color: #610600";
-            newCell_1.innerHTML="⬊ "+chn[2];
-          }
-        }
-      }*/
-      newCell_2 = newRow.insertCell();
-      newCell_2.style = "text-align: center; background-color: #9c0603; width: 100px";
-      newCell_2.innerHTML = "" + tab[i][2];
-      newCell_3 = newRow.insertCell();
-      newCell_3.style = "text-align: center; background-color: #9c0603; width: 100px";
-      newCell_3.innerHTML = "" + tab[i][3];
-      var newCell_4 = newRow.insertCell();
-      newCell_4.style = "text-align: center; background-color: #9c0603; width: 100px";
-      newCell_4.innerHTML = "" + tab[i][4];
-
-      newCell_4 = newRow.insertCell();
-      newCell_4.style = "text-align: center; background-color: #9c0603; width: 100px";
-      newCell_4.innerHTML = "" + tab[i][5];
-
-      newCell_2 = newRow.insertCell();
-      newCell_2.style = "text-align: center; background-color: #9c0603; width: 100px";
-      newCell_2.innerHTML = "" + tab[i][6];
-
-      if (match[mtc].spaceMode) {
-        newCell_2 = newRow.insertCell();
-        newCell_2.style = "text-align: center; background-color: #9c0603; width: 100px";
-        newCell_2.innerHTML = "" + tab[i][7];
-
-        newCell_2 = newRow.insertCell();
-        newCell_2.style = "text-align: center; background-color: #9c0603; width: 100px";
-        newCell_2.innerHTML = "" + tab[i][8];
-      }
-
-      newCell_3 = newRow.insertCell();
-      newCell_3.innerHTML = " ";
-      newCell_3 = newRow.insertCell();
-      newCell_3.innerHTML = " ";
-
-      newRow = tableRef.insertRow();
-      newRow.style = "height: 10px";
-      newCell_4 = newRow.insertCell();
-      newCell_4.innerHTML = "";
-      newCell_4 = newRow.insertCell();
-      newCell_4.innerHTML = "";
-
-    };
-    for (var i = 0; i < tab.length; i++) {
-      if (!match[mtc].blueTeam.includes(tab[i][0])) continue;
-      newRow = tableRef.insertRow();
-      newCell_1 = newRow.insertCell();
-      newCell_1.style = "text-align: left; background-color: #244a67; width: 100px";
-      newCell_1.innerHTML = "<div class=\"flagico f-" + tab[i][1] + "\"></div> " + tab[i][0];
-      newCell_1.setAttribute('onmouseover', 'this.style.cursor= "pointer"; heatMap(this.innerHTML.split("</div> ")[1])')
-      /* 
-       newCell_1 = newRow.insertCell();
-       newCell_1.style="text-align: center; width: 30px; color:green; background-color: #244a67";
-       newCell_1.innerHTML = "";
-       */
-      newCell_2 = newRow.insertCell();
-      newCell_2.style = "text-align: center; background-color: #244a67; width: 100px";
-      newCell_2.innerHTML = "" + tab[i][2];
-      newCell_3 = newRow.insertCell();
-      newCell_3.style = "text-align: center; background-color: #244a67; width: 100px";
-      newCell_3.innerHTML = "" + tab[i][3];
-      var newCell_4 = newRow.insertCell();
-      newCell_4.style = "text-align: center; background-color: #244a67; width: 100px";
-      newCell_4.innerHTML = "" + tab[i][4];
-
-      newCell_4 = newRow.insertCell();
-      newCell_4.style = "text-align: center; background-color: #244a67; width: 100px";
-      newCell_4.innerHTML = "" + tab[i][5];
-
-      newCell_2 = newRow.insertCell();
-      newCell_2.style = "text-align: center; background-color: #244a67; width: 100px";
-      newCell_2.innerHTML = "" + tab[i][6];
-
-      if (match[mtc].spaceMode) {
-        newCell_2 = newRow.insertCell();
-        newCell_2.style = "text-align: center; background-color: #244a67; width: 100px";
-        newCell_2.innerHTML = "" + tab[i][7];
-
-        newCell_2 = newRow.insertCell();
-        newCell_2.style = "text-align: center; background-color: #244a67; width: 100px";
-        newCell_2.innerHTML = "" + tab[i][8];
-      }
-
-      newCell_3 = newRow.insertCell();
-      newCell_3.innerHTML = " ";
-      newCell_3 = newRow.insertCell();
-      newCell_3.innerHTML = " ";
-
-      newRow = tableRef.insertRow();
-      newRow.style = "height: 10px";
-      newCell_4 = newRow.insertCell();
-      newCell_4.innerHTML = "";
-      newCell_4 = newRow.insertCell();
-      newCell_4.innerHTML = "";
-
-    };
-  }
-  document.getElementById("cell1").setAttribute('onclick', 'sortTable(2);');
-  document.getElementById("cell1").setAttribute('onmouseover', 'this.style="cursor:pointer;background-color:#244a67;text-align: center;"');
-  document.getElementById("cell1").setAttribute('onmouseout', 'this.style="text-align: center;"');
-
-  document.getElementById("cell2").setAttribute('onclick', 'sortTable(3);');
-  document.getElementById("cell2").setAttribute('onmouseover', 'this.style="cursor:pointer;background-color:#244a67;text-align: center;"');
-  document.getElementById("cell2").setAttribute('onmouseout', 'this.style="text-align: center;"');
-
-  document.getElementById("cell3").setAttribute('onclick', 'sortTable(4);');
-  document.getElementById("cell3").setAttribute('onmouseover', 'this.style="cursor:pointer;background-color:#244a67;text-align: center;"');
-  document.getElementById("cell3").setAttribute('onmouseout', 'this.style="text-align: center;"');
-
-  document.getElementById("cell4").setAttribute('onclick', 'sortTable(5);');
-  document.getElementById("cell4").setAttribute('onmouseover', 'this.style="cursor:pointer;background-color:#244a67;text-align: center;"');
-  document.getElementById("cell4").setAttribute('onmouseout', 'this.style="text-align: center;"');
-
-  document.getElementById("cell5").setAttribute('onclick', 'sortTable(6);');
-  document.getElementById("cell5").setAttribute('onmouseover', 'this.style="cursor:pointer;background-color:#244a67;text-align: center;"');
-  document.getElementById("cell5").setAttribute('onmouseout', 'this.style="text-align: center;"');
-
-  if (match[mtc].spaceMode) {
-    document.getElementById("cell6").setAttribute('onclick', 'sortTable(7);');
-    document.getElementById("cell6").setAttribute('onmouseover', 'this.style="cursor:pointer;background-color:#244a67;text-align: center;"');
-    document.getElementById("cell6").setAttribute('onmouseout', 'this.style="text-align: center;"');
-
-    document.getElementById("cell7").setAttribute('onclick', 'sortTable(8);');
-    document.getElementById("cell7").setAttribute('onmouseover', 'this.style="cursor:pointer;background-color:#244a67;text-align: center;"');
-    document.getElementById("cell7").setAttribute('onmouseout', 'this.style="text-align: center;"');
-  }
-
-  var im = document.getElementsByClassName("dialog kick-player-view")[0];
-  //console.log(im.scrollTopMax, window.innerHeight);
-  if (/*im.scrollTopMax>50 && */window.innerHeight > 780) document.getElementsByClassName("dialog kick-player-view")[0].style = "overflow-y: scroll; position:fixed; top:10px; height: 750px";
-  if (/*im.scrollTopMax>100 && */window.innerHeight > 830) document.getElementsByClassName("dialog kick-player-view")[0].style = "overflow-y: scroll; position:fixed; top:10px; height: 800px";
-  if (/*im.scrollTopMax>150 && */window.innerHeight > 880) document.getElementsByClassName("dialog kick-player-view")[0].style = "overflow-y: scroll; position:fixed; top:10px; height: 850px";
-  if (/*im.scrollTopMax>200 && */window.innerHeight > 930) document.getElementsByClassName("dialog kick-player-view")[0].style = "overflow-y: scroll; position:fixed; top:10px; height: 900px";
-
-  var imx = (im.clientWidth / 2) + im.offsetWidth - 120;
-  var imxx = "width: 100px;position:relative;top:-55px;left:1070px";
-  document.getElementById("button_close").style = imxx;
-  document.getElementById('prevMatch').style = 'position:relative;top:-25px';
-  document.getElementById('nextMatch').style = 'position:relative;top:-25px';
-  if (mtc == match.length - 1) document.getElementById("nextMatch").style = "background-color: grey;position:relative;top:-25px";
-  if (mtc == 0) document.getElementById("prevMatch").style = "background-color: grey;position:relative;top:-25px";
-  keepUpdating = false;
-  /*document.getElementById("button_leave").onclick = function() {
-    keepUpdating = true;
-    A.i(c.de);
-  };*/
-
-  /*	  
-    
-    var tableRef = document.getElementById('myTable').getElementsByTagName('tbody')[0];
- 
-// Insert a row in the table at the last row
-var newRow   = tableRef.insertRow();
- 
-// Insert a cell in the row at index 0
-var newCell  = newRow.insertCell(0);
- 
-// Append a text node to the cell
-var newText  = document.createTextNode('New row');
-newCell.appendChild(newText);*/
-};
 
 function hc() {
 }
@@ -6954,7 +6630,7 @@ O.prototype = {
           if (match[match.length - 1].spaceMode) {
             for (var i = 0; i < b.length; i++) {
               if (b[i].H == null) continue;
-              if (odleglosc(b[i].H.a, d[0].a) < (15 + ballRadius + 0.0001)) {
+              if (distanceBetween(b[i].H.a, d[0].a) < (15 + ballRadius + 0.0001)) {
                 //console.log("touch",b[i]);// checkpoint teraz
                 if (toucher.name != b[i].w) {
                   lastToucher = toucher;
@@ -6964,9 +6640,9 @@ O.prototype = {
               }
               for (var j = i + 1; j < b.length; j++) {
                 if (b[j].H == null) continue;
-                //if (Math.random()<0.01) console.log(odleglosc(b[i].H.a,b[j].H.a));
-                if (odleglosc(b[i].H.a, b[j].H.a) < 30.0001) match[match.length - 1].bumps.push(b[i].w, b[j].w);
-                //if (odleglosc(b[i].H.a,b[j].H.a) < 30.0001) console.log("bump ",b[i].w, b[j].w, odleglosc(b[i].H.a,b[j].H.a));
+                //if (Math.random()<0.01) console.log(distanceBetween(b[i].H.a,b[j].H.a));
+                if (distanceBetween(b[i].H.a, b[j].H.a) < 30.0001) match[match.length - 1].bumps.push(b[i].w, b[j].w);
+                //if (distanceBetween(b[i].H.a,b[j].H.a) < 30.0001) console.log("bump ",b[i].w, b[j].w, distanceBetween(b[i].H.a,b[j].H.a));
               }
             }
           }
@@ -12102,7 +11778,7 @@ za.N = '<div class=\'player-list-view\'><div class=\'buttons\'><button data-hook
 ha.N = '<div class=\'replay-controls-view\'><button id=\'reset_button\' data-hook=\'reset\'>⏮</button><button id=\'play_button\' data-hook=\'play\'><i data-hook=\'playicon\'></i></button><div data-hook=\'spd\'>1x</div><button id=\'spddown\' data-hook=\'spddn\'>-</button><button data-hook=\'spdup\'>+</button><div data-hook=\'time\'>00:00</div><div class=\'timebar\' data-hook=\'timebar\'><div class=\'barbg\'><div class=\'bar\' data-hook=\'progbar\'></div></div><div class=\'timetooltip\' data-hook=\'timetooltip\'></div></div><button id=\'button_leave\' data-hook=\'leave\'>Leave</button></div>';
 bb.N = '<div class=\'dialog basic-dialog room-link-view\'><h1>Room link</h1><p>Use this url to link others directly into this room.</p><input data-hook=\'link\' readonly></input><div class=\'buttons\'><button data-hook=\'close\'>Close</button><button data-hook=\'copy\'>Copy to clipboard</button></div></div>';
 ab.tj = '<tr><td><span data-hook=\'tag\'></span><span data-hook=\'name\'></span></td><td data-hook=\'players\'></td><td data-hook=\'pass\'></td><td><div data-hook=\'flag\' class=\'flagico\'></div><span data-hook=\'distance\'></span></td></tr>';
-Aa.tj = '<div class=\'roomlist-view\'><div class=\'notice\' data-hook=\'notice\' hidden><div data-hook=\'notice-contents\'>Testing the notice.</div><div data-hook=\'notice-close\'><i class=\'icon-cancel\'></i></div></div><div class=\'dialog\'><h1>Haxball Replay Analyzer v1.17</h1><p>Contact: <br>Discord: Falafel#3895, you can find me at discord.io/haxracing<br>turbofalafel@gmail.com</p><br><br><div class=\'splitter\'><div style=\'display: none\' class=\'list\'><table class=\'header\'><colgroup><col><col><col><col></colgroup><thead><tr><td>Name</td><td>Players</td><td>Pass</td><td>Distance</td></tr></thead></table><div class=\'separator\'></div><div class=\'content\' data-hook=\'listscroll\'><table><colgroup><col><col><col><col></colgroup><tbody data-hook=\'list\'></tbody></table></div><div class=\'filters\'><span class=\'bool\' data-hook=\'fil-pass\'>Show locked <i></i></span><span class=\'bool\' data-hook=\'fil-full\'>Show full <i></i></span></div></div><div class=\'buttons\'><button style=\'display: none\' data-hook=\'refresh\'><i class=\'icon-cw\'></i><div>Refresh</div></button><button style=\'display: none\' data-hook=\'join\'><i class=\'icon-login\'></i><div>Join Room</div></button><button style=\'display: none\' data-hook=\'create\'><i class=\'icon-plus\'></i><div>Create Room</div></button><div style=\'display: none\' class=\'spacer\'></div><div class=\'file-btn\'><label for=\'replayfile\'>►<div>Load replay</div></label><input id=\'replayfile\' type=\'file\' accept=\'.hbr2\' data-hook=\'replayfile\'/></div><button style=\'display: none\' data-hook=\'settings\'><i class=\'icon-cog\'></i><div>Settings</div></button><button style=\'display: none\' data-hook=\'changenick\'><i class=\'icon-cw\'></i><div>Change Nick</div></button><br><br>' + ListaZmian + '</div></div></div></div>';
+Aa.tj = '<div class=\'roomlist-view\'><div class=\'notice\' data-hook=\'notice\' hidden><div data-hook=\'notice-contents\'>Testing the notice.</div><div data-hook=\'notice-close\'><i class=\'icon-cancel\'></i></div></div><div class=\'dialog\'><h1>Haxball Replay Analyzer v1.17</h1><p>Contact: <br>Discord: Falafel#3895, you can find me at discord.io/haxracing<br>turbofalafel@gmail.com</p><br><br><div class=\'splitter\'><div style=\'display: none\' class=\'list\'><table class=\'header\'><colgroup><col><col><col><col></colgroup><thead><tr><td>Name</td><td>Players</td><td>Pass</td><td>Distance</td></tr></thead></table><div class=\'separator\'></div><div class=\'content\' data-hook=\'listscroll\'><table><colgroup><col><col><col><col></colgroup><tbody data-hook=\'list\'></tbody></table></div><div class=\'filters\'><span class=\'bool\' data-hook=\'fil-pass\'>Show locked <i></i></span><span class=\'bool\' data-hook=\'fil-full\'>Show full <i></i></span></div></div><div class=\'buttons\'><button style=\'display: none\' data-hook=\'refresh\'><i class=\'icon-cw\'></i><div>Refresh</div></button><button style=\'display: none\' data-hook=\'join\'><i class=\'icon-login\'></i><div>Join Room</div></button><button style=\'display: none\' data-hook=\'create\'><i class=\'icon-plus\'></i><div>Create Room</div></button><div style=\'display: none\' class=\'spacer\'></div><div class=\'file-btn\'><label for=\'replayfile\'>►<div>Load replay</div></label><input id=\'replayfile\' type=\'file\' accept=\'.hbr2\' data-hook=\'replayfile\'/></div><button style=\'display: none\' data-hook=\'settings\'><i class=\'icon-cog\'></i><div>Settings</div></button><button style=\'display: none\' data-hook=\'changenick\'><i class=\'icon-cw\'></i><div>Change Nick</div></button><br><br></div></div></div></div>';
 Za.N = '<div class=\'room-password-view\'><div class=\'dialog\'><h1>Password required</h1><div class=\'label-input\'><label>Password:</label><input data-hook=\'input\' /></div><div class=\'buttons\'><button data-hook=\'cancel\'>Cancel</button><button data-hook=\'ok\'>Ok</button></div></div></div>';
 Ya.N = '<div id=\'room-view\' class=\'room-view\'><div class=\'container\'><h1 data-hook=\'room-name\'></h1><div class=\'header-btns\'><button data-hook=\'rec-btn\'><i class=\'icon-circle\'></i>Rec</button><button data-hook=\'link-btn\'><i class=\'icon-link\'></i>Link</button><button data-hook=\'leave-btn\'><i class=\'icon-logout\'></i>Leave</button></div><div class=\'teams\'><div class=\'tools admin-only\'><button data-hook=\'auto-btn\'>Auto</button><button data-hook=\'rand-btn\'>Rand</button><button data-hook=\'lock-btn\'>Lock</button><button data-hook=\'reset-all-btn\'>Reset</button></div><div data-hook=\'red-list\'></div><div data-hook=\'spec-list\'></div><div data-hook=\'blue-list\'></div><div class=\'spacer admin-only\'></div></div><div class=\'settings\'><div><label class=\'lbl\'>Time limit</label><select data-hook=\'time-limit-sel\'></select></div><div><label class=\'lbl\'>Score limit</label><select data-hook=\'score-limit-sel\'></select></div><div><label class=\'lbl\'>Stadium</label><label class=\'val\' data-hook=\'stadium-name\'>testing the stadium name</label><button class=\'admin-only\' data-hook=\'stadium-pick\'>Pick</button></div></div><div class=\'controls admin-only\'><button data-hook=\'start-btn\'><i class=\'icon-play\'></i>Start game</button><button data-hook=\'stop-btn\'><i class=\'icon-stop\'></i>Stop game</button><button data-hook=\'pause-btn\'><i class=\'icon-pause\'></i>Pause</button></div></div></div>';
 aa.N = '<div class=\'dialog settings-view\'><h1>Settings</h1><button data-hook=\'close\'>Close</button><div class=\'tabs\'><button data-hook=\'soundbtn\'>Sound</button><button data-hook=\'videobtn\'>Video</button><button data-hook=\'inputbtn\'>Input</button><button data-hook=\'miscbtn\'>Misc</button></div><div data-hook=\'presskey\' tabindex=\'-1\'><div>Press a key</div></div><div class=\'tabcontents\'><div class=\'section\' data-hook=\'miscsec\'><div class=\'loc\' data-hook=\'loc\'></div><div class=\'loc\' data-hook=\'loc-ovr\'></div><button data-hook=\'loc-ovr-btn\'></button></div><div class=\'section\' data-hook=\'soundsec\'><div data-hook="tsound-main">Sounds enabled</div><div data-hook="tsound-chat">Chat sound enabled</div><div data-hook="tsound-highlight">Nick highlight sound enabled</div><div data-hook="tsound-crowd">Crowd sound enabled</div></div><div class=\'section\' data-hook=\'inputsec\'></div><div class=\'section\' data-hook=\'videosec\'><div>Viewport Mode:<select data-hook=\'viewmode\'><option>Dynamic</option><option>Restricted 840x410</option><option>Full 1x Zoom</option><option>Full 1.25x Zoom</option><option>Full 1.5x Zoom</option><option>Full 1.75x Zoom</option><option>Full 2x Zoom</option><option>Full 2.25x Zoom</option><option>Full 2.5x Zoom</option></select></div><div>FPS Limit:<select data-hook=\'fps\'><option>None (Recommended)</option><option>30</option></select></div><div>Resolution Scaling:<select data-hook=\'resscale\'><option>100%</option><option>75%</option><option>50%</option><option>25%</option></select></div><div>Player To Follow:<select data-hook=\'follow\'>' + playersToFollowList() + '</select></div><div data-hook="tvideo-teamcol">Custom team colors enabled</div><div data-hook="tvideo-showindicators">Show chat indicators</div><div data-hook="tvideo-showavatars">Show player avatars</div></div></div></div>';
