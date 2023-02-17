@@ -5,6 +5,13 @@ import { useEffect } from 'react';
 
 const changelog = [
   {
+    version: '2.0.1',
+    date: '17.02.2023',
+    changes: [
+      'Small bugfixes'
+    ]
+  },
+  {
     version: '2.0.0',
     date: '16.02.2023',
     changes: [
