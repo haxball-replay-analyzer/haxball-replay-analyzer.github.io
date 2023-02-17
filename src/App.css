@@ -2202,7 +2202,7 @@ th {
   background-color: #1A2125;
   padding: 5px;
   border-radius: 0 0 5px 5px;
-  font: 900 20px Arial Black, Arial Bold, sans-serif
+  font: 900 20px Arial, sans-serif
 }
 
 .game-state-view .bar>.scoreboard {
