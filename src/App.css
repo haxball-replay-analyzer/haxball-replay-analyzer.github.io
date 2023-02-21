@@ -99,16 +99,6 @@ body {
   line-height: 1
 }
 
-form {
-  margin: 0
-}
-
-fieldset {
-  margin: 0;
-  padding: 0;
-  border: 0
-}
-
 button,
 input,
 select,
@@ -194,16 +184,6 @@ small {
   font-size: 100%
 }
 
-q {
-  quotes: none
-}
-
-q:before,
-q:after {
-  content: '';
-  content: none
-}
-
 a {
   font-weight: inherit;
   color: inherit;
@@ -217,21 +197,6 @@ a:active {
 
 a img {
   border: none
-}
-
-sub,
-sup {
-  font-size: 75%;
-  line-height: 0;
-  position: relative
-}
-
-sup {
-  top: -0.5em
-}
-
-sub {
-  bottom: -0.25em
 }
 
 article,
@@ -255,104 +220,6 @@ table {
 
 th {
   font-weight: inherit
-}
-
-.ps {
-  overflow: hidden !important;
-  overflow-anchor: none;
-  -ms-overflow-style: none;
-  touch-action: auto;
-  -ms-touch-action: auto
-}
-
-.ps__rail-x {
-  display: none;
-  opacity: 0;
-  transition: background-color .2s linear, opacity .2s linear;
-  -webkit-transition: background-color .2s linear, opacity .2s linear;
-  height: 15px;
-  bottom: 0px;
-  position: absolute
-}
-
-.ps__rail-y {
-  display: none;
-  opacity: 0;
-  transition: background-color .2s linear, opacity .2s linear;
-  -webkit-transition: background-color .2s linear, opacity .2s linear;
-  width: 15px;
-  right: 0;
-  position: absolute
-}
-
-.ps--active-x>.ps__rail-x,
-.ps--active-y>.ps__rail-y {
-  display: block;
-  background-color: transparent
-}
-
-.ps:hover>.ps__rail-x,
-.ps:hover>.ps__rail-y,
-.ps--focus>.ps__rail-x,
-.ps--focus>.ps__rail-y,
-.ps--scrolling-x>.ps__rail-x,
-.ps--scrolling-y>.ps__rail-y {
-  opacity: 1
-}
-
-.ps__rail-x:hover,
-.ps__rail-y:hover,
-.ps__rail-x:focus,
-.ps__rail-y:focus {
-  background-color: transparent;
-  opacity: 1
-}
-
-.ps__thumb-x {
-  background-color: #aaa;
-  border-radius: 6px;
-  transition: background-color .2s linear, height .2s ease-in-out;
-  -webkit-transition: background-color .2s linear, height .2s ease-in-out;
-  height: 6px;
-  bottom: 2px;
-  position: absolute
-}
-
-.ps__thumb-y {
-  background-color: #445661;
-  border-radius: 6px;
-  transition: background-color .2s linear, width .2s ease-in-out;
-  -webkit-transition: background-color .2s linear, width .2s ease-in-out;
-  width: 6px;
-  right: 2px;
-  position: absolute
-}
-
-.ps__thumb-y:hover {
-  background-color: #59717f
-}
-
-.ps__rail-x:hover>.ps__thumb-x,
-.ps__rail-x:focus>.ps__thumb-x {
-  height: 11px
-}
-
-.ps__rail-y:hover>.ps__thumb-y,
-.ps__rail-y:focus>.ps__thumb-y {
-  width: 11px
-}
-
-@supports (-ms-overflow-style: none) {
-  .ps {
-    overflow: auto !important
-  }
-}
-
-@media screen and (-ms-high-contrast: active),
-(-ms-high-contrast: none) {
-  .ps {
-    overflow: auto !important
-  }
 }
 
 #lista-zmian {
@@ -448,38 +315,6 @@ th {
   opacity: 1;
   transition: opacity .5s;
   transition-delay: 1s
-}
-
-.connecting-view button {
-  background-color: #DB2A2A
-}
-
-.connecting-view button:hover {
-  background-color: #e14d4d
-}
-
-.connecting-view button:active {
-  background-color: #bc2020
-}
-
-.connecting-view button:disabled {
-  background-color: #3e3e3e
-}
-
-.disconnected-view button {
-  background-color: #44D
-}
-
-.disconnected-view button:hover {
-  background-color: #6767e3
-}
-
-.disconnected-view button:active {
-  background-color: #2626d2
-}
-
-.disconnected-view button:disabled {
-  background-color: #3e3e3e
 }
 
 .dialog input,
@@ -651,39 +486,6 @@ th {
   border-color: #244967
 }
 
-.basic-dialog .buttons {
-  margin-top: 10px;
-  display: flex
-}
-
-.basic-dialog .buttons>:not(:last-child) {
-  margin-right: 6px
-}
-
-.basic-dialog .buttons>* {
-  flex: 1;
-  white-space: nowrap
-}
-
-.basic-dialog p {
-  line-height: 1.4em
-}
-
-.simple-dialog-view {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  flex-direction: column;
-  align-items: center
-}
-
-.simple-dialog-view>.dialog,
-.room-view.simple-dialog-view>.container {
-  min-width: 300px
-}
-
 .view-wrapper {
   position: absolute;
   width: 100%;
@@ -692,51 +494,6 @@ th {
   display: flex;
   justify-content: center;
   align-items: center
-}
-
-.spinner {
-  margin: 20px auto;
-  width: 50px;
-  height: 40px;
-  display: flex;
-  justify-content: center
-}
-
-.spinner>div {
-  background-color: white;
-  height: 100%;
-  width: 6px;
-  margin: 2px 2px;
-  animation: sk-stretchdelay 1.2s infinite ease-in-out
-}
-
-.spinner .rect2 {
-  animation-delay: -1.1s
-}
-
-.spinner .rect3 {
-  animation-delay: -1.0s
-}
-
-.spinner .rect4 {
-  animation-delay: -0.9s
-}
-
-.spinner .rect5 {
-  animation-delay: -0.8s
-}
-
-@keyframes sk-stretchdelay {
-
-  0%,
-  40%,
-  100% {
-    transform: scaleY(0.4)
-  }
-
-  20% {
-    transform: scaleY(1)
-  }
 }
 
 .flagico {
@@ -1842,58 +1599,6 @@ th {
   display: none
 }
 
-.connecting-view {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center
-}
-
-.connecting-view .dialog,
-.connecting-view .room-view>.container {
-  height: 300px;
-  width: 300px
-}
-
-.connecting-view button {
-  width: auto;
-  align-self: flex-end
-}
-
-.connecting-view-log {
-  flex: 1
-}
-
-.connecting-view-log p {
-  margin: 3px 0
-}
-
-.disconnected-view {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center
-}
-
-.disconnected-view .dialog,
-.disconnected-view .room-view>.container {
-  width: 300px
-}
-
-.disconnected-view .dialog>p,
-.disconnected-view .room-view>.container>p {
-  margin-bottom: 20px
-}
-
-.disconnected-view button {
-  width: auto;
-  align-self: flex-end
-}
-
 .game-view {
   position: absolute;
   /* left: 50%; */
@@ -2041,34 +1746,6 @@ th {
   image-rendering: -o-crisp-edges;
   image-rendering: pixelated;
   -ms-interpolation-mode: nearest-neighbor
-}
-
-.choose-nickname-view {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  flex-direction: column;
-  align-items: center
-}
-
-.choose-nickname-view>img {
-  flex: 0 0 auto;
-  position: relative;
-  left: 20px;
-  margin-bottom: 20px
-}
-
-.choose-nickname-view>.dialog,
-.room-view.choose-nickname-view>.container {
-  width: 300px
-}
-
-.choose-nickname-view>.dialog>[data-hook=ok],
-.room-view.choose-nickname-view>.container>[data-hook=ok] {
-  align-self: center;
-  width: 100px
 }
 
 .game-timer-view {
@@ -2471,58 +2148,6 @@ th {
   display: none
 }
 
-.create-room-view {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center
-}
-
-.create-room-view>.dialog,
-.room-view.create-room-view>.container {
-  position: relative;
-  min-height: 0;
-  max-width: 350px;
-  width: 100%
-}
-
-.create-room-view>.dialog>.label-input>label,
-.room-view.create-room-view>.container>.label-input>label {
-  flex: 0 0 100px
-}
-
-.room-password-view {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center
-}
-
-.room-password-view>.dialog,
-.room-view.room-password-view>.container {
-  width: 300px
-}
-
-.room-password-view>.dialog .buttons,
-.room-view.room-password-view>.container .buttons {
-  display: flex
-}
-
-.room-password-view>.dialog .buttons>:not(:last-child),
-.room-view.room-password-view>.container .buttons>:not(:last-child) {
-  margin-right: 6px
-}
-
-.room-password-view>.dialog .buttons>*,
-.room-view.room-password-view>.container .buttons>* {
-  flex: 1;
-  white-space: nowrap
-}
-
 .roomlist-view {
   position: absolute;
   width: 100%;
@@ -2769,64 +2394,6 @@ th {
 .roomlist-view>.dialog>.splitter>.list .simplebar-scrollbar,
 .room-view.roomlist-view>.container>.splitter>.list .simplebar-scrollbar {
   background-color: #708b9b
-}
-
-.pick-stadium-view {
-  width: 400px;
-  height: 100%;
-  max-height: 400px;
-  white-space: nowrap
-}
-
-.pick-stadium-view .splitter {
-  display: flex;
-  flex-direction: row;
-  flex: 1;
-  min-height: 0px
-}
-
-.pick-stadium-view .list {
-  -webkit-user-select: none;
-  user-select: none;
-  flex: 1;
-  position: relative;
-  overflow: hidden
-}
-
-.pick-stadium-view .list>.elem {
-  line-height: 22px;
-  margin-right: 12px;
-  padding-left: 6px;
-  text-overflow: ellipsis;
-  overflow: hidden
-}
-
-.pick-stadium-view .list>.elem:hover {
-  background-color: #2f3c43
-}
-
-.pick-stadium-view .list>.elem.selected {
-  background-color: #3a4952
-}
-
-.pick-stadium-view .list>.elem.custom {
-  color: #ffdb72
-}
-
-.pick-stadium-view .buttons {
-  display: flex;
-  flex-direction: column;
-  margin-left: 6px;
-  flex: 0 0 100px
-}
-
-.pick-stadium-view .buttons>:not(:last-child) {
-  margin-bottom: 6px
-}
-
-.pick-stadium-view .buttons .spacer {
-  flex: 1;
-  margin: 0
 }
 
 .unsupported-browser-view {
@@ -3315,17 +2882,6 @@ a:hover {
   font-weight: normal;
   font-style: normal;
 }
-
-/* Chrome hack: SVG is rendered more smooth in Windozze. 100% magic, uncomment if you need it. */
-/* Note, that will break hinting! In other OS-es font will be not as sharp as it could be */
-/*
-@media screen and (-webkit-min-device-pixel-ratio:0) {
-  @font-face {
-    font-family: 'fontello';
-    src: url('../font/fontello.svg?16506682#fontello') format('svg');
-  }
-}
-*/
 
 [class^="icon-"]:before,
 [class*=" icon-"]:before {
