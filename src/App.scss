@@ -1,0 +1,1488 @@
+@import './styles/flags.scss';
+@import './styles/icons.scss';
+
+.basic-style {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline
+}
+
+div,
+span,
+applet,
+object,
+iframe,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+pre,
+a,
+abbr,
+acronym,
+address,
+big,
+cite,
+code,
+del,
+dfn,
+em,
+img,
+ins,
+kbd,
+q,
+s,
+samp,
+small,
+strike,
+strong,
+sub,
+sup,
+tt,
+var,
+b,
+u,
+i,
+center,
+dl,
+dt,
+dd,
+ol,
+ul,
+li,
+fieldset,
+form,
+label,
+legend,
+table,
+caption,
+tbody,
+tfoot,
+thead,
+tr,
+th,
+td,
+article,
+aside,
+canvas,
+details,
+embed,
+figure,
+figcaption,
+footer,
+header,
+hgroup,
+menu,
+nav,
+output,
+ruby,
+section,
+summary,
+time,
+mark,
+audio,
+video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline
+}
+
+html {
+  @extend .basic-style;
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  text-size-adjust: 100%
+}
+
+body {
+  @extend .basic-style;
+  line-height: 1
+}
+
+.basic-element {
+  font-size: 100%;
+  font-family: inherit;
+  margin: 0;
+  padding: 0;
+  vertical-align: baseline;
+  *vertical-align: middle
+}
+
+select {
+  @extend .basic-element;
+}
+
+button,
+input {
+  @extend .basic-element;
+  line-height: normal;
+  overflow: visible
+}
+
+textarea {
+  @extend .basic-element;
+  overflow: auto;
+  vertical-align: top;
+  padding: 0
+}
+
+:focus {
+  outline: none
+}
+
+
+img {
+  -ms-interpolation-mode: bicubic;
+  display: block
+}
+
+li {
+  display: block;
+  padding: 0;
+  margin: 0;
+  list-style: none
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: inherit;
+  line-height: inherit;
+  font-size: inherit;
+  margin: 0
+}
+
+b,
+strong {
+  font-weight: inherit
+}
+
+em {
+  font-style: inherit
+}
+
+small {
+  font-size: 100%
+}
+
+a {
+  font-weight: inherit;
+  color: inherit;
+  text-decoration: none;
+
+  &:hover,
+  &:active {
+    outline: none
+  }
+
+  img {
+    border: none
+  }
+}
+
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+menu,
+nav,
+section {
+  display: block
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0
+}
+
+th {
+  font-weight: inherit
+}
+
+#lista-zmian {
+  overflow: auto;
+  height: 500px;
+  clear: right;
+
+  h4 {
+    font-size: 100%;
+    font-weight: bold;
+    color: #f57878
+  }
+
+  ul {
+    font-size: 90%;
+    margin-left: 10px;
+  }
+
+  div {
+    padding: 0 0 10px;
+  }
+}
+
+.dialog button,
+.room-view>.container button,
+.dialog .file-btn label,
+.room-view>.container .file-btn label,
+.chatbox-view>.input button,
+.game-view>.bottom-section button,
+.room-view button,
+.replay-controls-view button {
+  position: relative;
+  padding: 5px 15px;
+  border: 0;
+  border-radius: 5px;
+  color: white;
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 100%;
+
+  &:focus {
+    outline: none
+  }
+
+  .tooltip {
+    visibility: hidden;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    text-align: center;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-weight: 500;
+    position: absolute;
+    z-index: 1;
+    bottom: 130%;
+    right: 0%;
+    opacity: 0;
+    transition: opacity 0s
+  }
+
+  &:hover {
+    .tooltip {
+      visibility: visible;
+      opacity: 1;
+      transition: opacity .5s;
+      transition-delay: 1s
+    }
+  }
+}
+
+.dialog input:focus,
+.room-view>.container input:focus {
+  border-color: #244967
+}
+
+.dialog,
+.room-view>.container {
+  background-color: #1A2125;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 10px;
+  overflow: hidden;
+  box-sizing: border-box;
+  border-radius: 5px;
+
+  input {
+    color: white;
+    background-color: #111619;
+    border: none;
+    border-radius: 5px;
+    padding: 0 10px;
+    box-sizing: border-box;
+    border: 1px solid #111619
+  }
+}
+
+.loading {
+  background-color: #1A2125;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  height: 15vh;
+  width: 30vw;
+  padding: 10px;
+  overflow: hidden;
+  box-sizing: border-box;
+  border-radius: 5px;
+  position: absolute;
+  top: calc(50% - 7.5vh);
+  left: 100%;
+}
+
+.dialog>h1,
+.loading>h1,
+.room-view>.container>h1 {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 20px !important;
+  padding-top: 6px;
+  padding-bottom: 5px;
+  border-bottom: 3px;
+  border-bottom-color: #c13535;
+  border-bottom-style: solid
+}
+
+.dialog>:not(:last-child),
+.room-view>.container>:not(:last-child) {
+  margin-bottom: 6px
+}
+
+.dialog .row,
+.room-view>.container .row {
+  display: flex
+}
+
+.dialog .row>:not(:last-child),
+.room-view>.container .row>:not(:last-child) {
+  margin-right: 6px
+}
+
+.dialog .row>*,
+.room-view>.container .row>* {
+  flex: 1
+}
+
+.dialog button,
+.room-view>.container button {
+  background-color: #244967
+}
+
+.dialog button:hover,
+.room-view>.container button:hover {
+  background-color: #2f5e85
+}
+
+.dialog button:active,
+.room-view>.container button:active {
+  background-color: #193449
+}
+
+.dialog button:disabled,
+.room-view>.container button:disabled {
+  background-color: #3e3e3e
+}
+
+.dialog input,
+.room-view>.container input {
+  min-width: 10px
+}
+
+.dialog .label-input,
+.room-view>.container .label-input {
+  display: flex;
+  background-color: #244967;
+  align-items: baseline;
+  border-radius: 5px;
+  padding: 3px 3px 3px 5px
+}
+
+.dialog .label-input>*,
+.room-view>.container .label-input>* {
+  flex: 1
+}
+
+.dialog .label-input label,
+.room-view>.container .label-input label {
+  flex: 0 0 auto;
+  margin-right: 10px
+}
+
+.dialog .file-btn input[type="file"],
+.room-view>.container .file-btn input[type="file"] {
+  display: none
+}
+
+.dialog .file-btn label,
+.room-view>.container .file-btn label {
+  box-sizing: border-box;
+  width: 100%;
+  text-align: center;
+  background-color: #244967;
+  display: inline-block;
+  cursor: pointer
+}
+
+.dialog .file-btn label:hover,
+.room-view>.container .file-btn label:hover {
+  background-color: #2f5e85
+}
+
+.dialog .file-btn label:active,
+.room-view>.container .file-btn label:active {
+  background-color: #193449
+}
+
+.dialog .file-btn label:disabled,
+.room-view>.container .file-btn label:disabled {
+  background-color: #3e3e3e
+}
+
+.dialog select,
+.room-view>.container select {
+  border: 1px solid #111619;
+  background-color: #111619;
+  border-radius: 5px;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  color: white;
+  padding: 0px 5px
+}
+
+.dialog select:hover:not(:disabled),
+.room-view>.container select:hover:not(:disabled) {
+  border-color: #244967
+}
+
+.view-wrapper {
+  position: absolute;
+  width: 100%;
+  height: calc(100% - 10px);
+  margin-top: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center
+}
+
+.chatbox-view {
+  display: flex;
+  flex-direction: column;
+  height: 150px;
+  width: 800px;
+  min-width: 300px;
+  padding: 5px;
+  position: relative
+}
+
+@media (max-height: 700px) {
+  .chatbox-view {
+    height: 130px
+  }
+}
+
+.chatbox-view>:not(:first-child) {
+  margin-top: 5px
+}
+
+.chatbox-view>.log {
+  position: relative;
+  flex-grow: 1;
+  overflow: hidden;
+  line-height: 1.3
+}
+
+.chatbox-view>.log>p:not(:last-child) {
+  margin-bottom: 3px
+}
+
+.chatbox-view>.log p {
+  overflow: hidden
+}
+
+.chatbox-view>.log p.notice {
+  color: #8ed2ab
+}
+
+.chatbox-view>.log p.highlight {
+  font-weight: bold
+}
+
+.chatbox-view>.log p.announcement {
+  border-left: 3px solid #c13535;
+  padding-left: 5px;
+  min-height: 12px;
+  white-space: pre-wrap
+}
+
+.chatbox-view>.autocompletebox {
+  position: absolute;
+  background-color: white;
+  line-height: 25px;
+  color: black;
+  bottom: 30px;
+  left: 5px;
+  border: solid black 1px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: 200px
+}
+
+.chatbox-view>.autocompletebox>div {
+  padding: 0px 30px 0px 5px;
+  white-space: nowrap
+}
+
+.chatbox-view>.autocompletebox>div:hover {
+  background-color: #d1e2fe
+}
+
+.chatbox-view>.autocompletebox>div.selected {
+  background-color: #b3c6ff
+}
+
+.chatbox-view>.input {
+  display: flex;
+  flex-direction: row;
+  flex-shrink: 0
+}
+
+.chatbox-view>.input input[type="text"] {
+  color: white;
+  background-color: #111619;
+  border: none;
+  border-radius: 5px;
+  padding: 0 10px;
+  margin-right: 4px;
+  flex-grow: 1;
+  align-self: stretch;
+  box-sizing: border-box
+}
+
+.chatbox-view>.input input[type="text"]:focus {
+  border: 1px solid #244967;
+  padding: 0 7px
+}
+
+.chatbox-view>.input button {
+  background-color: #244967
+}
+
+.chatbox-view>.input button:hover {
+  background-color: #2f5e85
+}
+
+.chatbox-view>.input button:active {
+  background-color: #193449
+}
+
+.chatbox-view>.input button:disabled {
+  background-color: #3e3e3e
+}
+
+.replayer .chatbox-view {
+  height: 130px
+}
+
+.replayer .chatbox-view>.input {
+  display: none
+}
+
+.game-view {
+  position: absolute;
+  /* left: 50%; */
+  top: 35px;
+  width: 100vw;
+  height: calc(100vh - 35px);
+  overflow: hidden;
+  display: flex;
+  /* display: none; */
+  flex-direction: column;
+  align-items: stretch
+}
+
+.game-view>.top-section {
+  position: relative;
+  flex-grow: 1;
+  left: 100%;
+  min-height: 0
+}
+
+.game-view>.bottom-section {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  background-color: #1A2125;
+  position: relative;
+  left: 100%
+}
+
+.game-view>.bottom-section>.buttons {
+  padding: 6px;
+  white-space: nowrap;
+  margin-right: auto;
+  display: flex;
+  flex-direction: column
+}
+
+.game-view>.bottom-section>.buttons>:not(:last-child) {
+  margin-bottom: 6px
+}
+
+.game-view>.bottom-section button {
+  background-color: #244967
+}
+
+.game-view>.bottom-section button:hover {
+  background-color: #2f5e85
+}
+
+.game-view>.bottom-section button:active {
+  background-color: #193449
+}
+
+.game-view>.bottom-section button:disabled {
+  background-color: #3e3e3e
+}
+
+.game-view>.bottom-section .stats-view {
+  margin-right: auto
+}
+
+.game-view.replayer>.bottom-section {
+  padding-bottom: 40px
+}
+
+.game-view>[data-hook="popups"] {
+  z-index: 2;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(115, 136, 92, 0.5)
+}
+
+.flexRow>[data-hook="popups"] {
+  z-index: 2;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(115, 136, 92, 0.5)
+}
+
+.redStats {
+  text-align: right;
+  color: red
+}
+
+.blueStats {
+  color: #5688e5;
+}
+
+.center {
+  text-align: center;
+}
+
+.leftStat {
+  text-align: left;
+  width: 100;
+}
+
+.centerStat {
+  text-align: center;
+  width: 100;
+}
+
+.loader-view {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center
+}
+
+.loader-view .dialog,
+.loader-view .room-view>.container {
+  width: 300px
+}
+
+.stats-view {
+  background-color: #1A2125;
+  padding: 5px;
+  margin: 0 5px;
+  white-space: nowrap;
+  flex: 0 0 100px;
+  overflow: hidden;
+  line-height: 1.5em
+}
+
+.stats-view .graph {
+  width: 100%
+}
+
+.stats-view .graph canvas {
+  width: 100%;
+  height: 64px;
+  image-rendering: optimizeSpeed;
+  image-rendering: crisp-edges;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: -o-crisp-edges;
+  image-rendering: pixelated;
+  -ms-interpolation-mode: nearest-neighbor
+}
+
+.game-timer-view {
+  display: flex;
+  align-items: center
+}
+
+.game-timer-view>.overtime {
+  margin-right: 20px;
+  visibility: hidden
+}
+
+.game-timer-view>.overtime.on {
+  visibility: visible;
+  animation: 0.4s linear overtime-appear
+}
+
+.game-timer-view>.digit {
+  width: 15px;
+  text-align: center
+}
+
+.game-timer-view.time-warn {
+  animation: 0.3s infinite alternate linear time-warn
+}
+
+@keyframes time-warn {
+  from {
+    color: white
+  }
+
+  to {
+    color: #ff8080
+  }
+}
+
+@keyframes overtime-appear {
+  from {
+    opacity: 0;
+    transform: translateY(-25px)
+  }
+}
+
+.game-state-view {
+  position: absolute;
+  width: 100%;
+  height: 100%
+}
+
+.game-state-view .bar-container {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  z-index: 1
+}
+
+.game-state-view .bar {
+  display: flex;
+  justify-content: center;
+  background-color: #1A2125;
+  padding: 5px;
+  border-radius: 0 0 5px 5px;
+  font: 900 20px Arial, sans-serif
+}
+
+.game-state-view .bar>.scoreboard {
+  display: flex;
+  align-items: center;
+  margin-right: 100px
+}
+
+.game-state-view .bar>.scoreboard .score {
+  width: 35px;
+  overflow: hidden;
+  text-align: center
+}
+
+.game-state-view .bar>.scoreboard .teamicon {
+  width: 23px;
+  height: 23px;
+  border-radius: 5px
+}
+
+.game-state-view .bar>.scoreboard .teamicon.blue {
+  background-color: #5689E5
+}
+
+.game-state-view .bar>.scoreboard .teamicon.red {
+  background-color: #E56E56
+}
+
+.game-state-view canvas {
+  width: 100%;
+  height: 100%;
+  image-rendering: optimizeSpeed;
+  image-rendering: crisp-edges;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: -o-crisp-edges;
+  image-rendering: pixelated;
+  -ms-interpolation-mode: nearest-neighbor
+}
+
+.game-state-view.restricted {
+  background-color: #2e343c;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center
+}
+
+.game-state-view.restricted .bar-container {
+  position: relative;
+  height: 35px
+}
+
+.game-state-view.restricted .bar {
+  background: none
+}
+
+.game-state-view.restricted canvas {
+  width: 100%;
+  height: calc(100% - 35px);
+  max-width: 840px;
+  max-height: 410px
+}
+
+.room-view {
+  position: absolute;
+  width: 100%;
+  height: calc(100% - 10px);
+  margin-top: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-user-select: none;
+  user-select: none
+}
+
+.room-view>.container {
+  position: relative;
+  min-height: 0;
+  max-width: 900px;
+  max-height: 550px;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  padding-bottom: 30px;
+  z-index: 0
+}
+
+.room-view>.container>:not(:last-child) {
+  margin-bottom: 15px
+}
+
+.room-view>.container>.header-btns {
+  position: absolute;
+  z-index: 1;
+  top: 10px;
+  right: 10px
+}
+
+.room-view>.container>.header-btns>:not(:last-child) {
+  margin-right: 6px
+}
+
+.room-view>.container>.header-btns [data-hook="rec-btn"] i {
+  font-size: 75%;
+  color: #888;
+  margin-right: 4px
+}
+
+.room-view>.container>.header-btns [data-hook="rec-btn"].active i {
+  color: #D33
+}
+
+.room-view>.container>.teams {
+  margin-left: -3px;
+  margin-right: -3px;
+  display: flex;
+  flex: 1;
+  justify-content: center;
+  min-height: 60px
+}
+
+.room-view>.container>.teams>* {
+  margin-left: 3px;
+  margin-right: 3px
+}
+
+.room-view>.container>.teams>.tools {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 80px
+}
+
+.room-view>.container>.teams>.tools>:not(:last-child) {
+  margin-bottom: 6px
+}
+
+.room-view>.container>.teams>.spacer {
+  flex: 1 1 0;
+  max-width: 83px;
+  margin: 0 0
+}
+
+.room-view>.container>.teams .player-list-view {
+  min-width: 20px;
+  width: 220px;
+  display: flex;
+  flex-flow: column
+}
+
+.room-view>.container>.teams .player-list-view>:not(:last-child) {
+  margin-bottom: 6px
+}
+
+.room-view>.container>.teams .player-list-view .buttons {
+  display: flex;
+  justify-content: center;
+  flex-flow: row nowrap
+}
+
+.room-view>.container>.teams .player-list-view .buttons button[data-hook="join-btn"] {
+  min-width: 100px
+}
+
+.room-view>.container>.teams .player-list-view .list {
+  flex: 1;
+  background-color: #111619;
+  overflow-x: hidden;
+  overflow-y: auto
+}
+
+.room-view>.container>.teams .player-list-view.t-red button[data-hook="join-btn"] {
+  color: #ff8686
+}
+
+.room-view>.container>.teams .player-list-view.t-red button[data-hook="reset-btn"] {
+  margin-left: 6px
+}
+
+.room-view>.container>.teams .player-list-view.t-red button[data-hook="reset-btn"]:after {
+  content: "\25b6"
+}
+
+.room-view>.container>.teams .player-list-view.t-blue .buttons {
+  flex-direction: row-reverse
+}
+
+.room-view>.container>.teams .player-list-view.t-blue button[data-hook="join-btn"] {
+  color: #b7b7ff
+}
+
+.room-view>.container>.teams .player-list-view.t-blue button[data-hook="reset-btn"] {
+  margin-right: 6px
+}
+
+.room-view>.container>.teams .player-list-view.t-blue button[data-hook="reset-btn"]:after {
+  content: "\25c0"
+}
+
+.room-view>.container>.settings {
+  width: 300px;
+  align-self: center;
+  white-space: nowrap
+}
+
+.room-view>.container>.settings>div {
+  line-height: 22px;
+  margin-bottom: 5px;
+  display: flex;
+  width: 100%;
+  align-items: center
+}
+
+.room-view>.container>.settings>div>.lbl {
+  flex: 0 0 90px
+}
+
+.room-view>.container>.settings>div>.val {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis
+}
+
+.room-view>.container>.settings>div>select {
+  width: 100px
+}
+
+.room-view>.container>.settings [data-hook="stadium-name"].custom {
+  color: #ffdb72
+}
+
+.room-view>.container>.controls {
+  display: flex;
+  align-self: center
+}
+
+.room-view>.container>.controls>* {
+  margin: 0 3px
+}
+
+.room-view .player-list-item {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  line-height: 20px;
+  vertical-align: middle;
+  padding: 4px;
+  margin: 2px;
+  font-size: 15px;
+  white-space: nowrap
+}
+
+.room-view .player-list-item.admin [data-hook="name"] {
+  color: #ffdb72
+}
+
+.room-view .player-list-item .flagico {
+  margin-right: 3px;
+  position: relative;
+  top: 1px
+}
+
+.room-view .player-list-item [data-hook="name"] {
+  min-width: 10px;
+  overflow: hidden;
+  flex: 1
+}
+
+.room-view .player-list-item [data-hook="ping"] {
+  min-width: 30px;
+  text-align: right
+}
+
+.room-view .player-list-item:hover {
+  background-color: #1b2328
+}
+
+.room-view button {
+  background-color: #244967
+}
+
+.room-view button:hover {
+  background-color: #2f5e85
+}
+
+.room-view button:active {
+  background-color: #193449
+}
+
+.room-view button:disabled {
+  background-color: #3e3e3e
+}
+
+.room-view:not(.admin) .admin-only {
+  display: none !important
+}
+
+.replayer .room-view>.container>.header-btns {
+  display: none
+}
+
+.roomlist-view {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  .dialog {
+    position: absolute;
+    height: calc(94% - 35px);
+    width: 40%;
+    top: 3%
+  }
+}
+
+.settings-view {
+  width: 400px;
+  height: 100%;
+  max-height: 400px;
+  position: relative;
+
+  [data-hook="close"] {
+    position: absolute;
+    top: 12px;
+    right: 10px
+  }
+
+  .tabcontents {
+    overflow-y: auto
+  }
+
+  [data-hook="presskey"] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.7);
+    font-weight: bold;
+    z-index: 1;
+
+    .show {
+      display: flex
+    }
+  }
+
+  .tabs {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+
+    button {
+      border-radius: 0px
+    }
+
+    button:not(:last-child) {
+      margin-right: 2px
+    }
+
+    button:first-child {
+      border-radius: 5px 0 0 5px
+    }
+
+    button:last-child {
+      border-radius: 0 5px 5px 0
+    }
+
+    .selected {
+      background-color: #2f5e85
+    }
+  }
+
+  .section {
+    display: none;
+    flex-direction: column;
+
+    .toggle {
+      line-height: 25px;
+      cursor: default;
+
+      i {
+        margin-right: 5px
+      }
+    }
+
+    .toggle:hover {
+      background-color: #2f3c43
+    }
+
+    select {
+      height: 25px;
+      border: none;
+      background-color: #244967;
+      margin-left: 10px;
+
+      option {
+        background-color: #1A2125
+      }
+    }
+
+    select:hover {
+      background-color: #2f5e85
+    }
+
+    .loc {
+      line-height: 25px
+    }
+
+    [data-hook="loc-ovr-btn"] {
+      align-self: left
+    }
+
+    .inputrow {
+      line-height: 25px;
+      margin-bottom: 0;
+      padding: 6px
+    }
+
+    .inputrow:nth-child(odd) {
+      background-color: #222c31
+    }
+
+    .inputrow>:first-child {
+      display: inline-block;
+      width: 50px;
+      font-weight: bold
+    }
+
+    .inputrow>:not(:first-child) {
+      background-color: #2f3c43;
+      border-radius: 7px;
+      margin: 2px 2px;
+      padding: 0px 5px;
+      display: inline-block
+    }
+
+    .inputrow>:not(:first-child):hover {
+      background-color: #3a4952
+    }
+
+    .inputrow>:not(:first-child):hover .icon-cancel {
+      opacity: 1
+    }
+
+    .inputrow :last-child {
+      cursor: pointer
+    }
+
+    .inputrow .icon-cancel {
+      cursor: pointer;
+      opacity: 0.6
+    }
+  }
+
+  .section>:not(:last-child) {
+    margin-bottom: 6px
+  }
+
+  .section.selected {
+    display: flex
+  }
+
+  [data-hook="close"] {
+    margin-top: auto
+  }
+}
+
+.replay-controls-view {
+  -webkit-user-select: none;
+  user-select: none;
+  position: absolute;
+  bottom: 0;
+  height: 40px;
+  width: 100%;
+  left: 100%;
+  background-color: black;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding-left: 6px;
+  padding-right: 6px;
+  box-sizing: border-box;
+
+  >:not(:last-child) {
+    margin-right: 6px
+  }
+
+  button {
+    background-color: #244967;
+
+    &:hover {
+      background-color: #2f5e85
+    }
+
+    &:active {
+      background-color: #193449
+    }
+
+    &:disabled {
+      background-color: #3e3e3e
+    }
+  }
+
+  [data-hook="spd"] {
+    text-align: center;
+    min-width: 40px
+  }
+
+  [data-hook="time"] {
+    text-align: center;
+    min-width: 50px
+  }
+
+  .timebar {
+    background-color: transparent;
+    flex-grow: 1;
+    position: relative;
+    height: 40px;
+    cursor: pointer;
+
+    .barbg {
+      position: absolute;
+      height: 6px;
+      width: 100%;
+      margin: auto;
+      background-color: #393737;
+      top: 0;
+      bottom: 0
+    }
+
+    .bar {
+      background-color: #5c5c5c;
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0
+    }
+
+    .timetooltip {
+      position: absolute;
+      width: 60px;
+      background-color: black;
+      top: -20px;
+      text-align: center;
+      line-height: 30px;
+      display: none
+    }
+
+    &:hover {
+      .timetooltip {
+        display: block
+      }
+    }
+
+    .marker {
+      width: 2px;
+      height: 6px;
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      margin: auto;
+      background-color: #cecece
+    }
+
+    .marker.k1 {
+      background-color: #5689e5
+    }
+
+    .marker.k2 {
+      background-color: #e56e56
+    }
+
+    html {
+      overflow: auto
+    }
+  }
+}
+
+body {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 14px;
+  color: white;
+  background-color: #73885c;
+  background: #939e7f url("images/bg.png") fixed
+}
+
+a {
+  color: #ffe7cc;
+
+  &:hover {
+    text-decoration: underline;
+    cursor: pointer
+  }
+}
+
+.header {
+  width: 100%;
+  height: 35px;
+  line-height: 35px;
+  background-color: black;
+  color: white;
+  font-family: 'Noto Sans CJK KR Bold', '맑은 고딕 Bold', '나눔고딕 Bold', 'Nobile', arial, sans-serif;
+  font-size: 15px;
+  overflow: hidden;
+
+  .title {
+    display: inline-block;
+    height: 35px;
+    background-color: #244967;
+    padding: 0 25px;
+    color: #fff;
+    font-family: 'Noto Sans CJK KR Bold', '맑은 고딕 Bold', '나눔고딕 Bold', 'Nobile', arial, sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  * {
+    margin-right: 15px;
+  }
+}
+
+.header-logo {
+  height: 12px;
+  width: 12px;
+}
+
+.header-logoHax {
+  height: 12px;
+  width: 24px;
+}
+
+.container {
+  overflow: hidden;
+  position: absolute;
+  top: 0px;
+  bottom: 0px;
+  width: 100%
+}
+
+.flexCol {
+  display: flex;
+  flex-direction: column
+}
+
+.flexRow {
+  display: flex;
+  flex-direction: row
+}
+
+.flexGrow {
+  flex-grow: 1
+}
+
+.material-icons {
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  /* Preferred icon size */
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+
+  /* Support for all WebKit browsers. */
+  -webkit-font-smoothing: antialiased;
+
+  /* Support for Safari and Chrome. */
+  text-rendering: optimizeLegibility;
+
+  /* Support for Firefox. */
+  -moz-osx-font-smoothing: grayscale;
+
+  /* Support for IE. */
+  font-feature-settings: 'liga';
+}

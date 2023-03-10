@@ -86,7 +86,6 @@ function GameStats() {
 
     var l = x.target.value.length
     if (l > 6) {
-      console.log('spr', x.target);
       var size = 50 - 2 * l;
       if (size < 14) size = 14;
       x.target.style['font-size'] = '' + size + 'px';
