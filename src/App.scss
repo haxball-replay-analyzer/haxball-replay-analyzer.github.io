@@ -237,6 +237,33 @@ th {
   }
 }
 
+.loading {
+  background-color: #1A2125;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  height: 15vh;
+  width: 30vw;
+  padding: 10px;
+  overflow: hidden;
+  box-sizing: border-box;
+  border-radius: 5px;
+  position: absolute;
+  top: calc(50% - 7.5vh);
+  left: 100%;
+
+  &>h1 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 20px !important;
+    padding-top: 6px;
+    padding-bottom: 5px;
+    border-bottom: 3px;
+    border-bottom-color: #c13535;
+    border-bottom-style: solid
+  }
+}
+
 .dialog button,
 .room-view>.container button,
 .dialog .file-btn label,
@@ -285,11 +312,6 @@ th {
   }
 }
 
-.dialog input:focus,
-.room-view>.container input:focus {
-  border-color: #244967
-}
-
 .dialog,
 .room-view>.container {
   background-color: #1A2125;
@@ -308,149 +330,115 @@ th {
     border-radius: 5px;
     padding: 0 10px;
     box-sizing: border-box;
-    border: 1px solid #111619
+    border: 1px solid #111619;
+    min-width: 10px;
+
+    &:focus {
+      border-color: #244967
+    }
   }
-}
 
-.loading {
-  background-color: #1A2125;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  height: 15vh;
-  width: 30vw;
-  padding: 10px;
-  overflow: hidden;
-  box-sizing: border-box;
-  border-radius: 5px;
-  position: absolute;
-  top: calc(50% - 7.5vh);
-  left: 100%;
-}
+  &>h1 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 20px !important;
+    padding-top: 6px;
+    padding-bottom: 5px;
+    border-bottom: 3px;
+    border-bottom-color: #c13535;
+    border-bottom-style: solid
+  }
 
-.dialog>h1,
-.loading>h1,
-.room-view>.container>h1 {
-  font-size: 20px;
-  font-weight: 600;
-  margin-bottom: 20px !important;
-  padding-top: 6px;
-  padding-bottom: 5px;
-  border-bottom: 3px;
-  border-bottom-color: #c13535;
-  border-bottom-style: solid
-}
+  &>:not(:last-child) {
+    margin-bottom: 6px
+  }
 
-.dialog>:not(:last-child),
-.room-view>.container>:not(:last-child) {
-  margin-bottom: 6px
-}
+  .row {
+    display: flex;
 
-.dialog .row,
-.room-view>.container .row {
-  display: flex
-}
+    &>:not(:last-child) {
+      margin-right: 6px
+    }
 
-.dialog .row>:not(:last-child),
-.room-view>.container .row>:not(:last-child) {
-  margin-right: 6px
-}
+    &>* {
+      flex: 1
+    }
+  }
 
-.dialog .row>*,
-.room-view>.container .row>* {
-  flex: 1
-}
+  button {
+    background-color: #244967;
 
-.dialog button,
-.room-view>.container button {
-  background-color: #244967
-}
+    &:hover {
+      background-color: #2f5e85
+    }
 
-.dialog button:hover,
-.room-view>.container button:hover {
-  background-color: #2f5e85
-}
+    &:active {
+      background-color: #193449
+    }
 
-.dialog button:active,
-.room-view>.container button:active {
-  background-color: #193449
-}
+    &:disabled {
+      background-color: #3e3e3e
+    }
+  }
 
-.dialog button:disabled,
-.room-view>.container button:disabled {
-  background-color: #3e3e3e
-}
+  .label-input {
+    display: flex;
+    background-color: #244967;
+    align-items: baseline;
+    border-radius: 5px;
+    padding: 3px 3px 3px 5px;
 
-.dialog input,
-.room-view>.container input {
-  min-width: 10px
-}
+    &>* {
+      flex: 1
+    }
 
-.dialog .label-input,
-.room-view>.container .label-input {
-  display: flex;
-  background-color: #244967;
-  align-items: baseline;
-  border-radius: 5px;
-  padding: 3px 3px 3px 5px
-}
+    label {
+      flex: 0 0 auto;
+      margin-right: 10px
+    }
+  }
 
-.dialog .label-input>*,
-.room-view>.container .label-input>* {
-  flex: 1
-}
+  .file-btn {
+    input[type="file"] {
+      display: none
+    }
 
-.dialog .label-input label,
-.room-view>.container .label-input label {
-  flex: 0 0 auto;
-  margin-right: 10px
-}
+    label {
+      box-sizing: border-box;
+      width: 100%;
+      text-align: center;
+      background-color: #244967;
+      display: inline-block;
+      cursor: pointer;
 
-.dialog .file-btn input[type="file"],
-.room-view>.container .file-btn input[type="file"] {
-  display: none
-}
+      &:hover {
+        background-color: #2f5e85
+      }
 
-.dialog .file-btn label,
-.room-view>.container .file-btn label {
-  box-sizing: border-box;
-  width: 100%;
-  text-align: center;
-  background-color: #244967;
-  display: inline-block;
-  cursor: pointer
-}
+      &:active {
+        background-color: #193449
+      }
 
-.dialog .file-btn label:hover,
-.room-view>.container .file-btn label:hover {
-  background-color: #2f5e85
-}
+      &:disabled {
+        background-color: #3e3e3e
+      }
+    }
+  }
 
-.dialog .file-btn label:active,
-.room-view>.container .file-btn label:active {
-  background-color: #193449
-}
+  select {
+    border: 1px solid #111619;
+    background-color: #111619;
+    border-radius: 5px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    color: white;
+    padding: 0px 5px;
 
-.dialog .file-btn label:disabled,
-.room-view>.container .file-btn label:disabled {
-  background-color: #3e3e3e
-}
-
-.dialog select,
-.room-view>.container select {
-  border: 1px solid #111619;
-  background-color: #111619;
-  border-radius: 5px;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  color: white;
-  padding: 0px 5px
-}
-
-.dialog select:hover:not(:disabled),
-.room-view>.container select:hover:not(:disabled) {
-  border-color: #244967
+    &:hover:not(:disabled) {
+      border-color: #244967
+    }
+  }
 }
 
 .view-wrapper {
@@ -463,214 +451,158 @@ th {
   align-items: center
 }
 
-.chatbox-view {
-  display: flex;
-  flex-direction: column;
-  height: 150px;
-  width: 800px;
-  min-width: 300px;
-  padding: 5px;
-  position: relative
-}
-
 @media (max-height: 700px) {
   .chatbox-view {
     height: 130px
   }
 }
 
-.chatbox-view>:not(:first-child) {
-  margin-top: 5px
-}
-
-.chatbox-view>.log {
-  position: relative;
-  flex-grow: 1;
-  overflow: hidden;
-  line-height: 1.3
-}
-
-.chatbox-view>.log>p:not(:last-child) {
-  margin-bottom: 3px
-}
-
-.chatbox-view>.log p {
-  overflow: hidden
-}
-
-.chatbox-view>.log p.notice {
-  color: #8ed2ab
-}
-
-.chatbox-view>.log p.highlight {
-  font-weight: bold
-}
-
-.chatbox-view>.log p.announcement {
-  border-left: 3px solid #c13535;
-  padding-left: 5px;
-  min-height: 12px;
-  white-space: pre-wrap
-}
-
-.chatbox-view>.autocompletebox {
-  position: absolute;
-  background-color: white;
-  line-height: 25px;
-  color: black;
-  bottom: 30px;
-  left: 5px;
-  border: solid black 1px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  max-height: 200px
-}
-
-.chatbox-view>.autocompletebox>div {
-  padding: 0px 30px 0px 5px;
-  white-space: nowrap
-}
-
-.chatbox-view>.autocompletebox>div:hover {
-  background-color: #d1e2fe
-}
-
-.chatbox-view>.autocompletebox>div.selected {
-  background-color: #b3c6ff
-}
-
-.chatbox-view>.input {
+.chatbox-view {
   display: flex;
-  flex-direction: row;
-  flex-shrink: 0
-}
+  flex-direction: column;
+  width: 800px;
+  min-width: 300px;
+  padding: 5px;
+  position: relative;
+  height: 130px;
 
-.chatbox-view>.input input[type="text"] {
-  color: white;
-  background-color: #111619;
-  border: none;
-  border-radius: 5px;
-  padding: 0 10px;
-  margin-right: 4px;
-  flex-grow: 1;
-  align-self: stretch;
-  box-sizing: border-box
-}
+  &>:not(:first-child) {
+    margin-top: 5px
+  }
 
-.chatbox-view>.input input[type="text"]:focus {
-  border: 1px solid #244967;
-  padding: 0 7px
-}
+  &>.log {
+    position: relative;
+    flex-grow: 1;
+    overflow: hidden;
+    line-height: 1.3;
 
-.chatbox-view>.input button {
-  background-color: #244967
-}
+    p {
+      overflow: hidden;
 
-.chatbox-view>.input button:hover {
-  background-color: #2f5e85
-}
+      &:not(:last-child) {
+        margin-bottom: 3px
+      }
 
-.chatbox-view>.input button:active {
-  background-color: #193449
-}
+      &.notice {
+        color: #8ed2ab
+      }
 
-.chatbox-view>.input button:disabled {
-  background-color: #3e3e3e
-}
+      &.highlight {
+        font-weight: bold
+      }
 
-.replayer .chatbox-view {
-  height: 130px
-}
+      &.announcement {
+        border-left: 3px solid #c13535;
+        padding-left: 5px;
+        min-height: 12px;
+        white-space: pre-wrap
+      }
+    }
+  }
 
-.replayer .chatbox-view>.input {
-  display: none
+  &>.autocompletebox {
+    position: absolute;
+    background-color: white;
+    line-height: 25px;
+    color: black;
+    bottom: 30px;
+    left: 5px;
+    border: solid black 1px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    max-height: 200px;
+
+    &>div {
+      padding: 0px 30px 0px 5px;
+      white-space: nowrap;
+
+      &:hover {
+        background-color: #d1e2fe
+      }
+
+      &.selected {
+        background-color: #b3c6ff
+      }
+    }
+  }
+
+  &>.input {
+    display: flex;
+    flex-direction: row;
+    flex-shrink: 0;
+    display: none
+  }
 }
 
 .game-view {
   position: absolute;
-  /* left: 50%; */
   top: 35px;
   width: 100vw;
   height: calc(100vh - 35px);
   overflow: hidden;
   display: flex;
-  /* display: none; */
   flex-direction: column;
-  align-items: stretch
-}
+  align-items: stretch;
 
-.game-view>.top-section {
-  position: relative;
-  flex-grow: 1;
-  left: 100%;
-  min-height: 0
-}
+  &>.top-section {
+    position: relative;
+    flex-grow: 1;
+    left: 100%;
+    min-height: 0
+  }
 
-.game-view>.bottom-section {
-  flex-shrink: 0;
-  display: flex;
-  justify-content: center;
-  background-color: #1A2125;
-  position: relative;
-  left: 100%
-}
+  &>.bottom-section {
+    flex-shrink: 0;
+    display: flex;
+    justify-content: center;
+    background-color: #1A2125;
+    position: relative;
+    left: 100%;
+    padding-bottom: 40px;
 
-.game-view>.bottom-section>.buttons {
-  padding: 6px;
-  white-space: nowrap;
-  margin-right: auto;
-  display: flex;
-  flex-direction: column
-}
+    &>.buttons {
+      padding: 6px;
+      white-space: nowrap;
+      margin-right: auto;
+      display: flex;
+      flex-direction: column;
 
-.game-view>.bottom-section>.buttons>:not(:last-child) {
-  margin-bottom: 6px
-}
+      &>:not(:last-child) {
+        margin-bottom: 6px
+      }
+    }
 
-.game-view>.bottom-section button {
-  background-color: #244967
-}
+    button {
+      background-color: #244967;
 
-.game-view>.bottom-section button:hover {
-  background-color: #2f5e85
-}
+      &:hover {
+        background-color: #2f5e85
+      }
 
-.game-view>.bottom-section button:active {
-  background-color: #193449
-}
+      &:active {
+        background-color: #193449
+      }
 
-.game-view>.bottom-section button:disabled {
-  background-color: #3e3e3e
-}
+      &:disabled {
+        background-color: #3e3e3e
+      }
+    }
 
-.game-view>.bottom-section .stats-view {
-  margin-right: auto
-}
+    .stats-view {
+      margin-right: auto
+    }
+  }
 
-.game-view.replayer>.bottom-section {
-  padding-bottom: 40px
-}
-
-.game-view>[data-hook="popups"] {
-  z-index: 2;
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: rgba(115, 136, 92, 0.5)
-}
-
-.flexRow>[data-hook="popups"] {
-  z-index: 2;
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: rgba(115, 136, 92, 0.5)
+  &>[data-hook="popups"] {
+    z-index: 2;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(115, 136, 92, 0.5)
+  }
 }
 
 .redStats {
@@ -717,46 +649,46 @@ th {
   white-space: nowrap;
   flex: 0 0 100px;
   overflow: hidden;
-  line-height: 1.5em
-}
+  line-height: 1.5em;
 
-.stats-view .graph {
-  width: 100%
-}
+  .graph {
+    width: 100%;
 
-.stats-view .graph canvas {
-  width: 100%;
-  height: 64px;
-  image-rendering: optimizeSpeed;
-  image-rendering: crisp-edges;
-  image-rendering: -moz-crisp-edges;
-  image-rendering: -o-crisp-edges;
-  image-rendering: pixelated;
-  -ms-interpolation-mode: nearest-neighbor
+    canvas {
+      width: 100%;
+      height: 64px;
+      image-rendering: optimizeSpeed;
+      image-rendering: crisp-edges;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: -o-crisp-edges;
+      image-rendering: pixelated;
+      -ms-interpolation-mode: nearest-neighbor
+    }
+  }
 }
 
 .game-timer-view {
   display: flex;
-  align-items: center
-}
+  align-items: center;
 
-.game-timer-view>.overtime {
-  margin-right: 20px;
-  visibility: hidden
-}
+  &>.overtime {
+    margin-right: 20px;
+    visibility: hidden;
 
-.game-timer-view>.overtime.on {
-  visibility: visible;
-  animation: 0.4s linear overtime-appear
-}
+    &.on {
+      visibility: visible;
+      animation: 0.4s linear overtime-appear
+    }
+  }
 
-.game-timer-view>.digit {
-  width: 15px;
-  text-align: center
-}
+  &>.digit {
+    width: 15px;
+    text-align: center
+  }
 
-.game-timer-view.time-warn {
-  animation: 0.3s infinite alternate linear time-warn
+  &.time-warn {
+    animation: 0.3s infinite alternate linear time-warn
+  }
 }
 
 @keyframes time-warn {
@@ -779,86 +711,86 @@ th {
 .game-state-view {
   position: absolute;
   width: 100%;
-  height: 100%
-}
-
-.game-state-view .bar-container {
-  position: absolute;
-  top: 0;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  z-index: 1
-}
-
-.game-state-view .bar {
-  display: flex;
-  justify-content: center;
-  background-color: #1A2125;
-  padding: 5px;
-  border-radius: 0 0 5px 5px;
-  font: 900 20px Arial, sans-serif
-}
-
-.game-state-view .bar>.scoreboard {
-  display: flex;
-  align-items: center;
-  margin-right: 100px
-}
-
-.game-state-view .bar>.scoreboard .score {
-  width: 35px;
-  overflow: hidden;
-  text-align: center
-}
-
-.game-state-view .bar>.scoreboard .teamicon {
-  width: 23px;
-  height: 23px;
-  border-radius: 5px
-}
-
-.game-state-view .bar>.scoreboard .teamicon.blue {
-  background-color: #5689E5
-}
-
-.game-state-view .bar>.scoreboard .teamicon.red {
-  background-color: #E56E56
-}
-
-.game-state-view canvas {
-  width: 100%;
   height: 100%;
-  image-rendering: optimizeSpeed;
-  image-rendering: crisp-edges;
-  image-rendering: -moz-crisp-edges;
-  image-rendering: -o-crisp-edges;
-  image-rendering: pixelated;
-  -ms-interpolation-mode: nearest-neighbor
-}
 
-.game-state-view.restricted {
-  background-color: #2e343c;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center
-}
+  .bar-container {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    z-index: 1
+  }
 
-.game-state-view.restricted .bar-container {
-  position: relative;
-  height: 35px
-}
+  .bar {
+    display: flex;
+    justify-content: center;
+    background-color: #1A2125;
+    padding: 5px;
+    border-radius: 0 0 5px 5px;
+    font: 900 20px Arial, sans-serif;
 
-.game-state-view.restricted .bar {
-  background: none
-}
+    &>.scoreboard {
+      display: flex;
+      align-items: center;
+      margin-right: 100px;
 
-.game-state-view.restricted canvas {
-  width: 100%;
-  height: calc(100% - 35px);
-  max-width: 840px;
-  max-height: 410px
+      .score {
+        width: 35px;
+        overflow: hidden;
+        text-align: center
+      }
+
+      .teamicon {
+        width: 23px;
+        height: 23px;
+        border-radius: 5px;
+
+        &.blue {
+          background-color: #5689E5
+        }
+
+        &.red {
+          background-color: #E56E56
+        }
+      }
+    }
+  }
+
+  canvas {
+    width: 100%;
+    height: 100%;
+    image-rendering: optimizeSpeed;
+    image-rendering: crisp-edges;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: -o-crisp-edges;
+    image-rendering: pixelated;
+    -ms-interpolation-mode: nearest-neighbor
+  }
+
+  &.restricted {
+    background-color: #2e343c;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    .bar-container {
+      position: relative;
+      height: 35px
+    }
+
+    .bar {
+      background: none
+    }
+
+    canvas {
+      width: 100%;
+      height: calc(100% - 35px);
+      max-width: 840px;
+      max-height: 410px
+    }
+  }
 }
 
 .room-view {
@@ -870,233 +802,184 @@ th {
   align-items: center;
   justify-content: center;
   -webkit-user-select: none;
-  user-select: none
-}
+  user-select: none;
 
-.room-view>.container {
-  position: relative;
-  min-height: 0;
-  max-width: 900px;
-  max-height: 550px;
-  width: 100%;
-  height: 100%;
-  box-sizing: border-box;
-  padding-bottom: 30px;
-  z-index: 0
-}
+  &>.container {
+    position: relative;
+    min-height: 0;
+    max-width: 900px;
+    max-height: 550px;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    padding-bottom: 30px;
+    z-index: 0;
 
-.room-view>.container>:not(:last-child) {
-  margin-bottom: 15px
-}
+    &>:not(:last-child) {
+      margin-bottom: 15px
+    }
 
-.room-view>.container>.header-btns {
-  position: absolute;
-  z-index: 1;
-  top: 10px;
-  right: 10px
-}
+    &>.header-btns {
+      display: none
+    }
 
-.room-view>.container>.header-btns>:not(:last-child) {
-  margin-right: 6px
-}
+    &>.teams {
+      margin-left: -3px;
+      margin-right: -3px;
+      display: flex;
+      flex: 1;
+      justify-content: center;
+      min-height: 60px;
 
-.room-view>.container>.header-btns [data-hook="rec-btn"] i {
-  font-size: 75%;
-  color: #888;
-  margin-right: 4px
-}
+      &>* {
+        margin-left: 3px;
+        margin-right: 3px
+      }
 
-.room-view>.container>.header-btns [data-hook="rec-btn"].active i {
-  color: #D33
-}
+      &>.tools {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        width: 80px;
 
-.room-view>.container>.teams {
-  margin-left: -3px;
-  margin-right: -3px;
-  display: flex;
-  flex: 1;
-  justify-content: center;
-  min-height: 60px
-}
+        &>:not(:last-child) {
+          margin-bottom: 6px
+        }
+      }
 
-.room-view>.container>.teams>* {
-  margin-left: 3px;
-  margin-right: 3px
-}
+      &>.spacer {
+        flex: 1 1 0;
+        max-width: 83px;
+        margin: 0 0
+      }
 
-.room-view>.container>.teams>.tools {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  width: 80px
-}
+      .player-list-view {
+        min-width: 20px;
+        width: 220px;
+        display: flex;
+        flex-flow: column;
 
-.room-view>.container>.teams>.tools>:not(:last-child) {
-  margin-bottom: 6px
-}
+        &>:not(:last-child) {
+          margin-bottom: 6px
+        }
 
-.room-view>.container>.teams>.spacer {
-  flex: 1 1 0;
-  max-width: 83px;
-  margin: 0 0
-}
+        .buttons {
+          display: flex;
+          justify-content: center;
+          flex-flow: row nowrap;
 
-.room-view>.container>.teams .player-list-view {
-  min-width: 20px;
-  width: 220px;
-  display: flex;
-  flex-flow: column
-}
+          button[data-hook="join-btn"] {
+            min-width: 100px
+          }
+        }
 
-.room-view>.container>.teams .player-list-view>:not(:last-child) {
-  margin-bottom: 6px
-}
+        .list {
+          flex: 1;
+          background-color: #111619;
+          overflow-x: hidden;
+          overflow-y: auto
+        }
+      }
+    }
 
-.room-view>.container>.teams .player-list-view .buttons {
-  display: flex;
-  justify-content: center;
-  flex-flow: row nowrap
-}
+    &>.settings {
+      width: 300px;
+      align-self: center;
+      white-space: nowrap;
 
-.room-view>.container>.teams .player-list-view .buttons button[data-hook="join-btn"] {
-  min-width: 100px
-}
+      &>div {
+        line-height: 22px;
+        margin-bottom: 5px;
+        display: flex;
+        width: 100%;
+        align-items: center;
 
-.room-view>.container>.teams .player-list-view .list {
-  flex: 1;
-  background-color: #111619;
-  overflow-x: hidden;
-  overflow-y: auto
-}
+        &>.lbl {
+          flex: 0 0 90px
+        }
 
-.room-view>.container>.teams .player-list-view.t-red button[data-hook="join-btn"] {
-  color: #ff8686
-}
+        &>.val {
+          flex: 1;
+          overflow: hidden;
+          text-overflow: ellipsis
+        }
 
-.room-view>.container>.teams .player-list-view.t-red button[data-hook="reset-btn"] {
-  margin-left: 6px
-}
+        &>select {
+          width: 100px
+        }
+      }
 
-.room-view>.container>.teams .player-list-view.t-red button[data-hook="reset-btn"]:after {
-  content: "\25b6"
-}
+      [data-hook="stadium-name"].custom {
+        color: #ffdb72
+      }
+    }
 
-.room-view>.container>.teams .player-list-view.t-blue .buttons {
-  flex-direction: row-reverse
-}
+    &>.controls {
+      display: flex;
+      align-self: center;
 
-.room-view>.container>.teams .player-list-view.t-blue button[data-hook="join-btn"] {
-  color: #b7b7ff
-}
+      &>* {
+        margin: 0 3px
+      }
+    }
+  }
 
-.room-view>.container>.teams .player-list-view.t-blue button[data-hook="reset-btn"] {
-  margin-right: 6px
-}
+  .player-list-item {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    line-height: 20px;
+    vertical-align: middle;
+    padding: 4px;
+    margin: 2px;
+    font-size: 15px;
+    white-space: nowrap;
 
-.room-view>.container>.teams .player-list-view.t-blue button[data-hook="reset-btn"]:after {
-  content: "\25c0"
-}
+    &.admin [data-hook="name"] {
+      color: #ffdb72
+    }
 
-.room-view>.container>.settings {
-  width: 300px;
-  align-self: center;
-  white-space: nowrap
-}
+    .flagico {
+      margin-right: 3px;
+      position: relative;
+      top: 1px
+    }
 
-.room-view>.container>.settings>div {
-  line-height: 22px;
-  margin-bottom: 5px;
-  display: flex;
-  width: 100%;
-  align-items: center
-}
+    [data-hook="name"] {
+      min-width: 10px;
+      overflow: hidden;
+      flex: 1
+    }
 
-.room-view>.container>.settings>div>.lbl {
-  flex: 0 0 90px
-}
+    [data-hook="ping"] {
+      min-width: 30px;
+      text-align: right
+    }
 
-.room-view>.container>.settings>div>.val {
-  flex: 1;
-  overflow: hidden;
-  text-overflow: ellipsis
-}
+    &:hover {
+      background-color: #1b2328
+    }
+  }
 
-.room-view>.container>.settings>div>select {
-  width: 100px
-}
+  button {
+    background-color: #244967;
 
-.room-view>.container>.settings [data-hook="stadium-name"].custom {
-  color: #ffdb72
-}
+    &:hover {
+      background-color: #2f5e85
+    }
 
-.room-view>.container>.controls {
-  display: flex;
-  align-self: center
-}
+    &:active {
+      background-color: #193449
+    }
 
-.room-view>.container>.controls>* {
-  margin: 0 3px
-}
+    &:disabled {
+      background-color: #3e3e3e
+    }
+  }
 
-.room-view .player-list-item {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  line-height: 20px;
-  vertical-align: middle;
-  padding: 4px;
-  margin: 2px;
-  font-size: 15px;
-  white-space: nowrap
-}
-
-.room-view .player-list-item.admin [data-hook="name"] {
-  color: #ffdb72
-}
-
-.room-view .player-list-item .flagico {
-  margin-right: 3px;
-  position: relative;
-  top: 1px
-}
-
-.room-view .player-list-item [data-hook="name"] {
-  min-width: 10px;
-  overflow: hidden;
-  flex: 1
-}
-
-.room-view .player-list-item [data-hook="ping"] {
-  min-width: 30px;
-  text-align: right
-}
-
-.room-view .player-list-item:hover {
-  background-color: #1b2328
-}
-
-.room-view button {
-  background-color: #244967
-}
-
-.room-view button:hover {
-  background-color: #2f5e85
-}
-
-.room-view button:active {
-  background-color: #193449
-}
-
-.room-view button:disabled {
-  background-color: #3e3e3e
-}
-
-.room-view:not(.admin) .admin-only {
-  display: none !important
-}
-
-.replayer .room-view>.container>.header-btns {
-  display: none
+  &:not(.admin) .admin-only {
+    display: none !important
+  }
 }
 
 .roomlist-view {
@@ -1451,7 +1334,18 @@ a {
 
 .flexRow {
   display: flex;
-  flex-direction: row
+  flex-direction: row;
+
+  &>[data-hook="popups"] {
+    z-index: 2;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(115, 136, 92, 0.5)
+  }
 }
 
 .flexGrow {
