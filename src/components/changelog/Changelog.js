@@ -176,7 +176,7 @@ function Changelog() {
   }, [])
 
   return (
-    <div id="lista-zmian" style={{ fontFamily: 'roboto', fontSize: '110%', overflowY: 'scroll' }}>
+    <div id="changelist" style={{ fontFamily: 'roboto', fontSize: '110%', overflowY: 'scroll' }}>
       {newChanges}
 
     </div >
