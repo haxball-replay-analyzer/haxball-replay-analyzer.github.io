@@ -1,0 +1,296 @@
+@import './styles/flags.scss';
+@import './styles/icons.scss';
+@import './styles/haxball.scss';
+
+@mixin basic-style {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline
+}
+
+div,
+span,
+p,
+b,
+u,
+i,
+center,
+ul,
+tbody,
+tfoot,
+thead,
+tr,
+th,
+td,
+time {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline
+}
+
+html {
+  @include basic-style;
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  text-size-adjust: 100%
+}
+
+body {
+  @include basic-style;
+  line-height: 1;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 14px;
+  color: white;
+  background-color: #73885c;
+  background: #939e7f url("images/bg.png") fixed
+}
+
+@mixin basic-element {
+  font-size: 100%;
+  font-family: inherit;
+  margin: 0;
+  padding: 0;
+  vertical-align: baseline;
+  *vertical-align: middle
+}
+
+select {
+  @include basic-element;
+}
+
+button,
+input {
+  @include basic-element;
+  line-height: normal;
+  overflow: visible
+}
+
+textarea {
+  @include basic-element;
+  overflow: auto;
+  vertical-align: top;
+  padding: 0
+}
+
+:focus {
+  outline: none
+}
+
+
+img {
+  -ms-interpolation-mode: bicubic;
+  display: block
+}
+
+li {
+  @include basic-style;
+  display: block;
+  list-style: none
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: inherit;
+  line-height: inherit;
+  font-size: inherit;
+  margin: 0
+}
+
+b,
+strong {
+  font-weight: inherit
+}
+
+em {
+  font-style: inherit
+}
+
+small {
+  font-size: 100%
+}
+
+a {
+  font-weight: inherit;
+  color: #ffe7cc;
+  text-decoration: none;
+
+  &:hover,
+  &:active {
+    outline: none
+  }
+
+  &:hover {
+    text-decoration: underline;
+    cursor: pointer
+  }
+}
+
+
+section {
+  display: block
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0
+}
+
+#changelist {
+  overflow: auto;
+  height: 500px;
+  clear: right;
+
+  h4 {
+    font-size: 100%;
+    font-weight: bold;
+    color: #f57878
+  }
+
+  ul {
+    font-size: 90%;
+    margin-left: 10px;
+  }
+
+  div {
+    padding: 0 0 10px;
+  }
+}
+
+.loading {
+  background-color: #1A2125;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  height: 15vh;
+  width: 30vw;
+  padding: 10px;
+  overflow: hidden;
+  box-sizing: border-box;
+  border-radius: 5px;
+  position: absolute;
+  top: calc(50% - 7.5vh);
+  left: 100%;
+
+  &>h1 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 20px !important;
+    padding-top: 6px;
+    padding-bottom: 5px;
+    border-bottom: 3px;
+    border-bottom-color: #c13535;
+    border-bottom-style: solid
+  }
+}
+
+.view-wrapper {
+  position: absolute;
+  width: 100%;
+  height: calc(100% - 10px);
+  margin-top: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center
+}
+
+.redStats {
+  text-align: right;
+  color: red
+}
+
+.blueStats {
+  color: #5688e5;
+}
+
+.center {
+  text-align: center;
+}
+
+.leftStat {
+  text-align: left;
+  width: 100;
+}
+
+.centerStat {
+  text-align: center;
+  width: 100;
+}
+
+.header {
+  width: 100%;
+  height: 35px;
+  line-height: 35px;
+  background-color: black;
+  color: white;
+  font-family: 'Noto Sans CJK KR Bold', '맑은 고딕 Bold', '나눔고딕 Bold', 'Nobile', arial, sans-serif;
+  font-size: 15px;
+  overflow: hidden;
+
+  .title {
+    display: inline-block;
+    height: 35px;
+    background-color: #244967;
+    padding: 0 25px;
+    color: #fff;
+    font-family: 'Noto Sans CJK KR Bold', '맑은 고딕 Bold', '나눔고딕 Bold', 'Nobile', arial, sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  * {
+    margin-right: 15px;
+  }
+}
+
+.header-logo {
+  height: 12px;
+  width: 12px;
+}
+
+.header-logoHax {
+  height: 12px;
+  width: 24px;
+}
+
+.container {
+  overflow: hidden;
+  position: absolute;
+  top: 0px;
+  bottom: 0px;
+  width: 100%
+}
+
+.flexCol {
+  display: flex;
+  flex-direction: column
+}
+
+.flexRow {
+  display: flex;
+  flex-direction: row;
+
+  &>[data-hook="popups"] {
+    z-index: 2;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(115, 136, 92, 0.5)
+  }
+}
+
+.flexGrow {
+  flex-grow: 1
+}
