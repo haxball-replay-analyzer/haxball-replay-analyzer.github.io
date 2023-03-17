@@ -1,25 +1,19 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import img from '../../images/haxpitch4.png'
 import { useSelector } from 'react-redux';
 import { useRef, useEffect } from 'react';
-
-var img1;
-
-var tile = new Image(128, 128);
-tile.onload = function () {
-  img1 = tile;
-};
-tile.src = img;
+import { drawStadium } from './HeatMap';
 
 function ThirdStats() {
 
   const match = useSelector(state => state.gameStats.matches);
   const mtc = useSelector(state => state.gameStats.selectedMatch)
+  const stadium = match[mtc].stadium
   const canvasRef = useRef(null);
 
   function draw(ctx) {
 
-    ctx.drawImage(img1, 0, 0);
+    drawStadium(ctx, stadium);
+    ctx.setTransform(1, 0, 0, 1, 0, 0)
     ctx.font = "45px Arial";
     ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
     ctx.fillRect(175, 0, 150, 250);
