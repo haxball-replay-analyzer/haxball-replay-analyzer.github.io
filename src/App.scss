@@ -227,6 +227,11 @@ table {
   width: 100;
 }
 
+#nextMatch,
+#prevMatch {
+  @include haxball-button;
+}
+
 .header {
   width: 100%;
   height: 35px;
