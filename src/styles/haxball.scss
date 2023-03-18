@@ -21,7 +21,7 @@
       visibility: visible;
       opacity: 1;
       transition: opacity .5s;
-      transition-delay: .5s
+      transition-delay: .3s
     }
   }
 
@@ -42,11 +42,17 @@
     border-radius: 6px;
     font-weight: 500;
     position: absolute;
-    z-index: 1;
+    z-index: 11;
     bottom: 130%;
-    right: 0%;
+    left: 0%;
     opacity: 0;
     transition: opacity 0s
+  }
+
+  .tooltip-left {
+    @extend .tooltip;
+    left: auto;
+    right: 0%;
   }
 }
 

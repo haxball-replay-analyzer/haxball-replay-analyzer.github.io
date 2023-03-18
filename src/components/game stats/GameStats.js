@@ -12,7 +12,8 @@ function GameStats() {
 
   const divStyle = useSelector((state) => state.gameStats.divStyle);
   const match = useSelector((state) => state.gameStats.matches)
-  const mtc = useSelector((state) => state.gameStats.selectedMatch)
+  const mtc = useSelector((state) => state.gameStats.selectedMatch);
+  const selectedPlayer = useSelector(state => state.gameStats.selectedPlayer)
   const dispatch = useDispatch();
 
   const [redTeamName, setRedTeamName] = useState('RED');
@@ -154,8 +155,12 @@ function GameStats() {
 
   return (
     <>
-      <button id='prevMatch' onClick={prevMatch} style={{ display: 'none', zIndex: 2, fontSize: 25, position: 'fixed', width: 40, height: 40, padding: '0 0 0 0', top: 'calc(50% - 20px)', left: '10vw' }}>◄</button>
-      <button id='nextMatch' onClick={nextMatch} style={{ display: 'none', zIndex: 2, fontSize: 25, position: 'fixed', width: 40, height: 40, padding: '0 0 0 0', top: 'calc(50% - 20px)', left: 'calc(90vw - 40px)' }}>►</button>
+      <button id='prevMatch' onClick={prevMatch} style={{ display: 'none', zIndex: 2, fontSize: 25, position: 'fixed', width: 40, height: 40, padding: '0 0 0 0', top: 'calc(50% - 20px)', left: '10vw' }}>◄
+        <span className="tooltip-left">Previous match</span>
+      </button>
+      <button id='nextMatch' onClick={nextMatch} style={{ display: 'none', zIndex: 2, fontSize: 25, position: 'fixed', width: 40, height: 40, padding: '0 0 0 0', top: 'calc(50% - 20px)', left: 'calc(90vw - 40px)' }}>►
+        <span className="tooltip">Next match</span>
+      </button>
       <div id='game-stats' className="dialog kick-player-view" style={{ zIndex: 2, opacity: 0.5, overflowY: 'hidden', position: 'absolute', left: offset.left, top: offset.top, width: divStyle.clientWidth, height: divStyle.clientHeight }}>
         <h1 id="title" className="title">
           Match stats{match[mtc].spaceMode && ' (space mode)'}:
@@ -271,6 +276,7 @@ function GameStats() {
             <ThirdStats />
           </div>
           <div style={{ height: '50%', overflow: 'hidden' }}>
+            <p style={{ textAlign: 'center', fontSize: 18 }}>Heatmap of {selectedPlayer}:</p>
             {match[mtc].stadium ? <HeatMap /> : null}
           </div>
         </div >
