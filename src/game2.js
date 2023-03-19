@@ -50,6 +50,33 @@ function bringReplayer() {
   }, { duration: 700, easing: 'swing', queue: false });
 }
 
+function leaveReplayer() {
+  keepUpdating = true;
+  kicker, lastKicker, goals = [], match = [{ stadium: false, started: true, stopped: false, spaceMode: false, touches: [], thirds: [0, 0, 0], changes: [], gameTicks: -1, kicks: [], shots: [], redTeam: [], blueTeam: [], shotsRed: 0, shotsBlue: 0, passes: [], passesRed: 0, passesBlue: 0, kicksRed: 0, kicksBlue: 0, possRed: 0, possBlue: 0, scoreRed: 0, scoreBlue: 0, player: [], goals: [] }], player = [], players = [], playerList = [], updatePlayers = true;
+  mtc = 0, playSounds = false, pileczka = [], keepUpdating = true, keepUpdatingStadium = true;
+  redGoalCord = [], blueGoalCord = [], goalParsed = 0, playerPos = [];
+
+  newReplay();
+
+  $('.roomlist-view').animate({
+    left: 0,
+  }, { duration: 700, easing: 'swing', queue: false });
+
+  $('.top-section').animate({
+    left: '150%',
+  }, { duration: 700, easing: 'swing', queue: false });
+
+  $('.bottom-section').animate({
+    left: '150%',
+  }, { duration: 700, easing: 'swing', queue: false });
+
+  $('.replay-controls-view').animate({
+    left: '150%',
+  }, { duration: 700, easing: 'swing', queue: false });
+
+  $("#loading-screen").css('left', '150%')
+}
+
 !function (e, n, t) {
   function r(e, n) {
     return typeof e === n
@@ -934,31 +961,7 @@ function ha(a) {
   this.fp = d.get('leave');
   this.fp.onclick = function () {
     // A.i(c.de);
-    keepUpdating = true;
-    kicker, lastKicker, goals = [], match = [{ stadium: false, started: true, stopped: false, spaceMode: false, touches: [], thirds: [0, 0, 0], changes: [], gameTicks: -1, kicks: [], shots: [], redTeam: [], blueTeam: [], shotsRed: 0, shotsBlue: 0, passes: [], passesRed: 0, passesBlue: 0, kicksRed: 0, kicksBlue: 0, possRed: 0, possBlue: 0, scoreRed: 0, scoreBlue: 0, player: [], goals: [] }], player = [], players = [], playerList = [], updatePlayers = true;
-    mtc = 0, playSounds = false, pileczka = [], keepUpdating = true, keepUpdatingStadium = true;
-    redGoalCord = [], blueGoalCord = [], goalParsed = 0, playerPos = [];
-
-    newReplay();
-
-    $('.roomlist-view').animate({
-      left: 0,
-    }, { duration: 700, easing: 'swing', queue: false });
-
-    $('.top-section').animate({
-      left: '150%',
-    }, { duration: 700, easing: 'swing', queue: false });
-
-    $('.bottom-section').animate({
-      left: '150%',
-    }, { duration: 700, easing: 'swing', queue: false });
-
-    $('.replay-controls-view').animate({
-      left: '150%',
-    }, { duration: 700, easing: 'swing', queue: false });
-
-    $("#loading-screen").css('left', '150%')
-
+    leaveReplayer();
   }
 }
 function Q(a) {
@@ -5609,7 +5612,11 @@ u.po = function (a) {
       x.La(d.g);
       d.Va = function () {
         d.Va = null;
-        u.xb()
+        // u.xb()
+        $('.simple-dialog-view').animate({
+          left: '150%',
+        }, { duration: 700, easing: 'swing', queue: false });
+        leaveReplayer();
       }
     }
   }

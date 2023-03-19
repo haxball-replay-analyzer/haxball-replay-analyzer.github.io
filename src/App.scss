@@ -311,3 +311,10 @@ table {
 .flexGrow {
   flex-grow: 1
 }
+
+.simple-dialog-view {
+  position: fixed;
+  top: calc(50% - 7.5vh);
+  left: calc(50% - 15vw);
+  width: 30vw;
+}
