@@ -380,7 +380,7 @@ function distanceBetween(a, b) {
 }
 
 export function watchGoal(par) {
-  const g = document.getElementById("recGoal" + (Number(par) + 1)).offsetLeft - 5;
+  const g = document.getElementById("recGoal" + (Number(par) + 1)).offsetLeft;
   autoClick = true;
   autoClickValue = '' + g;
   document.getElementsByClassName("timebar")[0].click();
@@ -913,13 +913,15 @@ function ha(a) {
   };
   //console.log(document.getElementsByClassName("recGoal1")[0]);
   l.onclick = function (b) {
+    // console.log(l, b, a.mh, a.mf)
     if (autoClick) {
-      a.er((autoClickValue) / l.clientWidth * a.mh * a.mf);
+      var toClick = (autoClickValue) / l.clientWidth * a.mh * a.mf - 5000;
+      if (toClick < 0) toClick = 0;
+      a.er(toClick);
       c.Wf || (c.Wf = !0, c.Vp(), c.el());
       autoClick = false;
       return;
     }
-    //console.log(b);
     a.er((b.pageX - l.offsetLeft) / l.clientWidth * a.mh * a.mf);
     c.Wf || (c.Wf = !0, c.Vp(), c.el())
   };
@@ -4555,7 +4557,9 @@ xa.prototype = C(V.prototype, {
   },
   er: function (a) {
     this.Fd = a;
-    a < this.Qb && this.ui()
+    a < this.Qb && this.ui();
+    // console.log('e', this.ui.toString());
+    // console.log(this.Lc);
   },
   ui: function () {
     this.hg = 0;
