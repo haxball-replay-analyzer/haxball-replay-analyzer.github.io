@@ -77,6 +77,51 @@ function leaveReplayer() {
   $("#loading-screen").css('left', '150%')
 }
 
+function bringSettings() {
+  $("#popups").click(function (e) {
+    if (e.target.id == 'popups') {
+      leaveSettings();
+    }
+  })
+
+  const parent = $("#settings_button")[0];
+
+  $('.settings-view').css({
+    'position': 'fixed',
+    'left': parent.offsetLeft + 'px',
+    'top': parent.offsetTop + parent.offsetParent.offsetTop + 35 + 'px',
+    'width': parent.clientWidth + 'px',
+    'height': parent.clientHeight + 'px'
+  })
+  $('.settings-view').css('visibility', 'visible');
+  $('.settings-view').animate({
+    visibility: 'visible',
+    opacity: 1,
+    width: '25vw',
+    height: '50vh',
+    maxHeight: '400px',
+    top: '25vh',
+    left: '37.5vw'
+  }, { duration: 300, easing: 'swing', queue: false });
+}
+
+function leaveSettings() {
+  const parent = $("#settings_button")[0];
+
+  $('.settings-view').animate({
+    left: parent.offsetLeft + 'px',
+    top: parent.offsetTop + parent.offsetParent.offsetTop + 35 + 'px',
+    width: parent.clientWidth + 'px',
+    height: parent.clientHeight + 'px',
+    opacity: 0.2
+  }, { duration: 300, easing: 'swing', queue: true, complete: function () { removePopups() } });
+}
+
+function removePopups() {
+  $('.settings-view').css('visibility', 'hidden');
+  $('#popups').css('display', 'none')
+}
+
 !function (e, n, t) {
   function r(e, n) {
     return typeof e === n
@@ -1252,7 +1297,8 @@ function ja(a) {
       b.bb(null)
     };
     //console.log(a.g);
-    b.bb(a.g)
+    b.bb(a.g);
+    bringSettings();
   };
   a.get('staty').onclick = function (el) {
 
@@ -11777,7 +11823,7 @@ jb.N = '<div class=\'connecting-view\'><div class=\'dialog\'><h1>Connecting</h1>
 ib.N = '<div class=\'create-room-view\'><div class=\'dialog\'><h1>Create room</h1><div class=\'label-input\'><label>Room name:</label><input data-hook=\'name\' required /></div><div class=\'label-input\'><label>Password:</label><input data-hook=\'pass\' /></div><div class=\'label-input\'><label>Max players:</label><select data-hook=\'max-pl\'></select></div><button data-hook=\'unlisted\'></button><div class=\'row\'><button data-hook=\'cancel\'>Cancel</button><button data-hook=\'create\'>Create</button></div></div></div>';
 Ka.N = '<div class=\'disconnected-view\'><div class=\'dialog basic-dialog\'><h1>Disconnected</h1><p data-hook=\'reason\'></p><div class=\'buttons\'><button data-hook=\'ok\'>Ok</button><button data-hook=\'replay\'>Save replay</button></div></div></div>';
 hb.N = '<div id=\'game-state-view\' class=\'game-state-view\'><div class=\'bar-container\'><div class=\'bar\'><div class=\'scoreboard\'><div class=\'teamicon red\'></div><div class=\'score\' data-hook=\'red-score\'>0</div><div>-</div><div class=\'score\' data-hook=\'blue-score\'>0</div><div class=\'teamicon blue\'></div></div><div data-hook=\'timer\'></div></div></div><div class=\'canvas\' data-hook=\'canvas\'></div></div>';
-ja.N = '<div class=\'game-view\' tabindex=\'-1\'><div class=\'top-section\' data-hook=\'gameplay-section\'></div><div class=\'bottom-section\'><div data-hook=\'stats\'></div><div data-hook=\'chatbox\'></div><div class=\'buttons\'><button data-hook=\'menu\'>☰ Menu<span class=\'tooltip\'>Toggle room menu [Escape]</span></button><button data-hook=\'settings\'>⛭ Settings</button><button id=\'button_staty\' data-hook=\'staty\'>📈 Game stats</button><button id=\'button_gif\' data-hook=\'gif_creator\' style=\'display:none\'>📷 Create GIF</button></div></div><div data-hook=\'popups\'></div></div>';
+ja.N = '<div class=\'game-view\' tabindex=\'-1\'><div class=\'top-section\' data-hook=\'gameplay-section\'></div><div class=\'bottom-section\'><div data-hook=\'stats\'></div><div data-hook=\'chatbox\'></div><div class=\'buttons\'><button data-hook=\'menu\'>☰ Menu<span class=\'tooltip\'>Toggle room menu [Escape]</span></button><button id="settings_button" data-hook=\'settings\'>⛭ Settings</button><button id=\'button_staty\' data-hook=\'staty\'>📈 Game stats</button><button id=\'button_gif\' data-hook=\'gif_creator\' style=\'display:none\'>📷 Create GIF</button></div></div><div id="popups" data-hook=\'popups\'></div></div>';
 gb.N = '<div class=\'dialog kick-player-view\'><h1 id="tytul" data-hook=\'title\'></h1><div class=label-input><label>Reason: </label><input type=\'text\' data-hook=\'reason\' /></div><button data-hook=\'ban-btn\'><i class=\'icon-block\'></i>Ban from rejoining: <span data-hook=\'ban-text\'></span></button><div class="row"><button data-hook=\'close\'>Cancel</button><button data-hook=\'kick\'>Kick</button></div></div>';
 gxd.N = '';
 exd.N = '<div class=\'simple-dialog-view\'><div class=\'dialog basic-dialog\'><h1 data-hook=\'title\'></h1><p data-hook=\'content\'></p><div class=\'buttons\' data-hook=\'buttons\'></div></div></div>';
