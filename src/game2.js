@@ -94,6 +94,9 @@ function bringSettings() {
     'height': parent.clientHeight + 'px'
   })
   $('.settings-view').css('visibility', 'visible');
+  $('#popups').animate({
+    opacity: 1
+  }, { duration: 300, easing: 'swing', queue: false });
   $('.settings-view').animate({
     visibility: 'visible',
     opacity: 1,
@@ -108,13 +111,16 @@ function bringSettings() {
 function leaveSettings() {
   const parent = $("#settings_button")[0];
 
+  $('#popups').animate({
+    opacity: 0
+  }, { duration: 300, easing: 'swing', queue: false });
+
   $('.settings-view').animate({
     left: parent.offsetLeft + 'px',
     top: parent.offsetTop + parent.offsetParent.offsetTop + 35 + 'px',
     width: parent.clientWidth + 'px',
     height: parent.clientHeight + 'px',
-    opacity: 0.2
-  }, { duration: 300, easing: 'swing', queue: true, complete: function () { removePopups() } });
+  }, { duration: 300, easing: 'swing', queue: false, complete: function () { removePopups() } });
 }
 
 function removePopups() {
@@ -694,7 +700,8 @@ function aa(a) {
   };
   r();
   this.nd.onclick = function () {
-    A.i(k.qb)
+    leaveSettings();
+    // A.i(k.qb)
   }
 }
 function Ya(a) {
