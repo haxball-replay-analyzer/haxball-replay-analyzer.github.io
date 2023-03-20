@@ -4,13 +4,14 @@ import { handleFile } from "../game2.js";
 import LoadingScreen from "./LoadingScreen";
 import { useSelector, useDispatch } from "react-redux";
 import { setMainMode } from "../slices/mainModeSlice";
-import { setDivStyle, setStats, setPlayerList, setPlayerPos } from "../slices/gameStatsSlice";
+import { setDivStyle, setStats, setPlayerList, setPlayerPos, clearStats } from "../slices/gameStatsSlice";
 import GameStats from "./game stats/GameStats";
 
 export function showStats() { }
 export function setGameStats() { }
 export function dispatchPlayerList() { }
 export function dispatchPlayerPos() { }
+export function dispatchClearStats() { }
 
 function Home() {
 
@@ -37,10 +38,15 @@ function Home() {
     dispatch(setPlayerPos(el));
   }
 
+  function dispatchClearStatsExp() {
+    dispatch(clearStats());
+  }
+
   showStats = showStatsExp;
   setGameStats = setGameStatsExp;
   dispatchPlayerList = setPlayerListExp;
   dispatchPlayerPos = setPlayerPosExp;
+  dispatchClearStats = dispatchClearStatsExp;
 
   function callbackFn(e) {
     handleFile(e);

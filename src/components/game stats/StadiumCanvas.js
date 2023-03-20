@@ -1,3 +1,5 @@
+import { classic } from "../../vendor/classic";
+
 var bg_patterns = {};
 
 var haxball = {
@@ -97,6 +99,7 @@ function calculate_arc(a, b, curve) {
 }
 
 export function drawStadium(ctx, stadium) {
+  if (stadium == false) stadium = classic;
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.scale(500 / stadium.width / 2, 250 / stadium.height / 2)
   ctx.translate(stadium.width, stadium.height);

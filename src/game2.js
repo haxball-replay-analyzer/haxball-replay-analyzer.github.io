@@ -17,11 +17,17 @@
 
 import $ from 'jquery';
 import './vendor/pako-jszip.min.js';
-import { showStats, setGameStats, dispatchPlayerList, dispatchPlayerPos } from './components/Home';
+import { showStats, setGameStats, dispatchPlayerList, dispatchPlayerPos, dispatchClearStats } from './components/Home';
 
 var loading = {};
 
+function resetReplay() {
+
+}
+
 function newReplay() {
+  dispatchClearStats();
+  keepUpdating = true;
   loading = {
     recLength: 1,
     progress: 0,
@@ -30,7 +36,6 @@ function newReplay() {
     done: false
   }
 }
-newReplay();
 
 function bringReplayer() {
   $('.top-section').animate({
@@ -51,12 +56,10 @@ function bringReplayer() {
 }
 
 function leaveReplayer() {
-  keepUpdating = true;
   kicker, lastKicker, goals = [], match = [{ stadium: false, started: true, stopped: false, spaceMode: false, touches: [], thirds: [0, 0, 0], changes: [], gameTicks: -1, kicks: [], shots: [], redTeam: [], blueTeam: [], shotsRed: 0, shotsBlue: 0, passes: [], passesRed: 0, passesBlue: 0, kicksRed: 0, kicksBlue: 0, possRed: 0, possBlue: 0, scoreRed: 0, scoreBlue: 0, player: [], goals: [] }], player = [], players = [], playerList = [], updatePlayers = true;
-  mtc = 0, playSounds = false, pileczka = [], keepUpdating = true, keepUpdatingStadium = true;
-  redGoalCord = [], blueGoalCord = [], goalParsed = 0, playerPos = [];
-
-  newReplay();
+  mtc = 0, playSounds = false, pileczka = [];
+  redGoalCord = [], blueGoalCord = [], goalParsed = 0, playerPos = [], checkTeams = true;
+  playerList = [];
 
   $('.roomlist-view').animate({
     left: 0,
@@ -72,7 +75,7 @@ function leaveReplayer() {
 
   $('.replay-controls-view').animate({
     left: '150%',
-  }, { duration: 700, easing: 'swing', queue: false });
+  }, { duration: 700, easing: 'swing', queue: false, complete: function () { resetReplay() } });
 
   $("#loading-screen").css('left', '150%')
 }
@@ -404,7 +407,7 @@ function removePopups() {
 }(window, document);
 
 var kicker, lastKicker, goals = [], match = [{ stadium: false, started: true, stopped: false, spaceMode: false, touches: [], thirds: [0, 0, 0], changes: [], gameTicks: -1, kicks: [], shots: [], redTeam: [], blueTeam: [], shotsRed: 0, shotsBlue: 0, passes: [], passesRed: 0, passesBlue: 0, kicksRed: 0, kicksBlue: 0, possRed: 0, possBlue: 0, scoreRed: 0, scoreBlue: 0, player: [], goals: [] }], player = [], players = [], playerList = [], updatePlayers = true;
-var toucher = { name: "", team: "0" }, lastToucher = "", mtc = 0, playSounds = false, pileczka = [], keepUpdating = true, keepUpdatingStadium = true;
+var toucher = { name: "", team: "0" }, lastToucher = "", mtc = 0, playSounds = false, pileczka = [], keepUpdating = true;
 var redGoalCord = [], blueGoalCord = [], checkTeams = true, autoClick = false, autoClickValue;
 var goalParsed = 0, playerPos = [], ballRadius = 10;
 var playerToFollow = 0, mainCanvas, mousepos = { clientX: 0, clientY: 0 };
@@ -807,6 +810,7 @@ function $a(a) {
 export function handleFile(e) {
   var c = this;
   var a = e.target.files;
+  newReplay();
   if (!(1 > a.length)) {
     var a = a.item(0),
       b = new FileReader;
@@ -841,7 +845,7 @@ function Aa(a) {
   ];
   var c = this;
   this.gs = a;
-  Aa.tj = '<div class=\'roomlist-view\'><div class=\'notice\' data-hook=\'notice\' hidden><div data-hook=\'notice-contents\'>Testing the notice.</div><div data-hook=\'notice-close\'><i class=\'icon-cancel\'></i></div></div><div class=\'dialog\'><h1>Haxball Replay Analyzer v1.17</h1><p>Contact: <br>Discord: Falafel#3895, you can find me at discord.io/haxracing<br>turbofalafel@gmail.com</p><br><br><div class=\'splitter\'><div style=\'display: none\' class=\'list\'><table class=\'header\'><colgroup><col><col><col><col></colgroup><thead><tr><td>Name</td><td>Players</td><td>Pass</td><td>Distance</td></tr></thead></table><div class=\'separator\'></div><div class=\'content\' data-hook=\'listscroll\'><table><colgroup><col><col><col><col></colgroup><tbody data-hook=\'list\'></tbody></table></div><div class=\'filters\'><span class=\'bool\' data-hook=\'fil-pass\'>Show locked <i></i></span><span class=\'bool\' data-hook=\'fil-full\'>Show full <i></i></span></div></div><div class=\'buttons\'><button style=\'display: none\' data-hook=\'refresh\'><i class=\'icon-cw\'></i><div>Refresh</div></button><button style=\'display: none\' data-hook=\'join\'><i class=\'icon-login\'></i><div>Join Room</div></button><button style=\'display: none\' data-hook=\'create\'><i class=\'icon-plus\'></i><div>Create Room</div></button><div style=\'display: none\' class=\'spacer\'></div><div class=\'file-btn\'><label for=\'replayfile\'>►<div>Load replay</div></label><input id=\'replayfile\' type=\'file\' accept=\'.hbr2\' data-hook=\'replayfile\'/></div><button style=\'display: none\' data-hook=\'settings\'><i class=\'icon-cog\'></i><div>Settings</div></button><button style=\'display: none\' data-hook=\'changenick\'><i class=\'icon-cw\'></i><div>Change Nick</div></button><br><br></div></div></div></div>';
+  Aa.tj = '<div style="display: none" class=\'roomlist-view\'><div class=\'notice\' data-hook=\'notice\' hidden><div data-hook=\'notice-contents\'>Testing the notice.</div><div data-hook=\'notice-close\'><i class=\'icon-cancel\'></i></div></div><div class=\'dialog\'><h1>Haxball Replay Analyzer v1.17</h1><p>Contact: <br>Discord: Falafel#3895, you can find me at discord.io/haxracing<br>turbofalafel@gmail.com</p><br><br><div class=\'splitter\'><div style=\'display: none\' class=\'list\'><table class=\'header\'><colgroup><col><col><col><col></colgroup><thead><tr><td>Name</td><td>Players</td><td>Pass</td><td>Distance</td></tr></thead></table><div class=\'separator\'></div><div class=\'content\' data-hook=\'listscroll\'><table><colgroup><col><col><col><col></colgroup><tbody data-hook=\'list\'></tbody></table></div><div class=\'filters\'><span class=\'bool\' data-hook=\'fil-pass\'>Show locked <i></i></span><span class=\'bool\' data-hook=\'fil-full\'>Show full <i></i></span></div></div><div class=\'buttons\'><button style=\'display: none\' data-hook=\'refresh\'><i class=\'icon-cw\'></i><div>Refresh</div></button><button style=\'display: none\' data-hook=\'join\'><i class=\'icon-login\'></i><div>Join Room</div></button><button style=\'display: none\' data-hook=\'create\'><i class=\'icon-plus\'></i><div>Create Room</div></button><div style=\'display: none\' class=\'spacer\'></div><div class=\'file-btn\'><label for=\'replayfile\'>►<div>Load replay</div></label><input id=\'replayfile\' type=\'file\' accept=\'.hbr2\' data-hook=\'replayfile\'/></div><button style=\'display: none\' data-hook=\'settings\'><i class=\'icon-cog\'></i><div>Settings</div></button><button style=\'display: none\' data-hook=\'changenick\'><i class=\'icon-cw\'></i><div>Change Nick</div></button><br><br></div></div></div></div>';
   this.Ja = v.Ga(Aa.tj);
   // console.log(Aa.tj);
   var d = v.Ea(this.Ja),
@@ -1013,6 +1017,9 @@ function ha(a) {
   this.fp = d.get('leave');
   this.fp.onclick = function () {
     // A.i(c.de);
+    resetReplay = function () {
+      A.i(c.de);
+    }
     leaveReplayer();
   }
 }
@@ -5132,7 +5139,6 @@ Gb.prototype = {
           match[match.length - 1].player[i].kicks = 0;
         }
       }
-      keepUpdatingStadium = true;
       c.j.Qa.Gb('Game started' + b(a))
     };
     a.vf = function (a) {
@@ -5145,7 +5151,6 @@ Gb.prototype = {
       null != a && c.j.Qa.Gb('Game stopped' + b(a))
     };
     a.Ii = function (a, e) {
-      keepUpdatingStadium = true;
       if (!e.Pe()) {
         var d = J.Vg(e.Sj(), 8);
         //console.log("stadium loaded",a,e);
@@ -5645,6 +5650,7 @@ u.po = function (a) {
       document.getElementById("play_button").click();
       //document.getElementById("spddown").click();
     }, 1000);
+    keepUpdating = true;
     x.La(b.j.g)
   } catch (e) {
     var c = e instanceof q ? e.Ta : e;
@@ -6357,11 +6363,12 @@ O.prototype = {
       null != b && b();
       if (updatePlayers && keepUpdating) {
         let li = this.Ma.I;
-        //console.log("chyba lista graczy",li);
+        // console.log("chyba lista graczy", li);
         players = players.concat(li);
         for (var i = 0; i < li.length; i++) {
           if (!playerList.includes(li[i].w)) {
             playerList.push(li[i].w);
+            // console.log('dodałem', li[i].w);
             match[match.length - 1].player.push({
               id: li[i].V,
               nick: li[i].w,
@@ -6512,7 +6519,7 @@ O.prototype = {
       } else if (1 == this.Bb) {
         this.Hc +=
           0.016666666666666666;
-        if (keepUpdatingStadium) {
+        if (!match[match.length - 1].stadium) {
           //console.log(a.S);//cały czas wyyświetlany stadion checkpoint
           // console.log('stadion', match, p.fa, this.S);
           // console.log(this.S)
@@ -6652,7 +6659,6 @@ O.prototype = {
             // console.log('out', segments[i])
           }
           if (this.S.tc.length < 2) {
-            keepUpdatingStadium = false;
             return;
           }
           var std = this.S.tc[0];
@@ -6676,7 +6682,6 @@ O.prototype = {
             blueGoalCord.push(blueGoalCord[1]);
             blueGoalCord.splice(1, 1);
           }
-          keepUpdatingStadium = false;
         }
         //console.log("coś",this.Hc);//checkpoint every tick
         //if (Math.random()<0.01) console.log(b); // gracze są na v==4 i v==2 (redblue)
@@ -11842,7 +11847,7 @@ za.N = '<div class=\'player-list-view\'><div class=\'buttons\'><button data-hook
 ha.N = '<div class=\'replay-controls-view\'><button id=\'reset_button\' data-hook=\'reset\'>⏮<span class="tooltip">Reset</span></button><button id=\'play_button\' data-hook=\'play\'><i data-hook=\'playicon\'></i><span class="tooltip">Play/Pause</span></button><div data-hook=\'spd\'>1x</div><button id=\'spddown\' data-hook=\'spddn\'>-<span class="tooltip">Slower</span></button><button data-hook=\'spdup\'>+<span class="tooltip">Faster</span></button><div data-hook=\'time\'>00:00</div><div class=\'timebar\' data-hook=\'timebar\'><div class=\'barbg\'><div class=\'bar\' data-hook=\'progbar\'></div></div><div class=\'timetooltip\' data-hook=\'timetooltip\'></div></div><button id=\'button_leave\' data-hook=\'leave\'>Leave</button></div>';
 bb.N = '<div class=\'dialog basic-dialog room-link-view\'><h1>Room link</h1><p>Use this url to link others directly into this room.</p><input data-hook=\'link\' readonly></input><div class=\'buttons\'><button data-hook=\'close\'>Close</button><button data-hook=\'copy\'>Copy to clipboard</button></div></div>';
 ab.tj = '<tr><td><span data-hook=\'tag\'></span><span data-hook=\'name\'></span></td><td data-hook=\'players\'></td><td data-hook=\'pass\'></td><td><div data-hook=\'flag\' class=\'flagico\'></div><span data-hook=\'distance\'></span></td></tr>';
-Aa.tj = '<div class=\'roomlist-view\'><div class=\'notice\' data-hook=\'notice\' hidden><div data-hook=\'notice-contents\'>Testing the notice.</div><div data-hook=\'notice-close\'><i class=\'icon-cancel\'></i></div></div><div class=\'dialog\'><h1>Haxball Replay Analyzer v1.17</h1><p>Contact: <br>Discord: Falafel#3895, you can find me at discord.io/haxracing<br>turbofalafel@gmail.com</p><br><br><div class=\'splitter\'><div style=\'display: none\' class=\'list\'><table class=\'header\'><colgroup><col><col><col><col></colgroup><thead><tr><td>Name</td><td>Players</td><td>Pass</td><td>Distance</td></tr></thead></table><div class=\'separator\'></div><div class=\'content\' data-hook=\'listscroll\'><table><colgroup><col><col><col><col></colgroup><tbody data-hook=\'list\'></tbody></table></div><div class=\'filters\'><span class=\'bool\' data-hook=\'fil-pass\'>Show locked <i></i></span><span class=\'bool\' data-hook=\'fil-full\'>Show full <i></i></span></div></div><div class=\'buttons\'><button style=\'display: none\' data-hook=\'refresh\'><i class=\'icon-cw\'></i><div>Refresh</div></button><button style=\'display: none\' data-hook=\'join\'><i class=\'icon-login\'></i><div>Join Room</div></button><button style=\'display: none\' data-hook=\'create\'><i class=\'icon-plus\'></i><div>Create Room</div></button><div style=\'display: none\' class=\'spacer\'></div><div class=\'file-btn\'><label for=\'replayfile\'>►<div>Load replay</div></label><input id=\'replayfile\' type=\'file\' accept=\'.hbr2\' data-hook=\'replayfile\'/></div><button style=\'display: none\' data-hook=\'settings\'><i class=\'icon-cog\'></i><div>Settings</div></button><button style=\'display: none\' data-hook=\'changenick\'><i class=\'icon-cw\'></i><div>Change Nick</div></button><br><br></div></div></div></div>';
+Aa.tj = '<div></div>';
 Za.N = '<div class=\'room-password-view\'><div class=\'dialog\'><h1>Password required</h1><div class=\'label-input\'><label>Password:</label><input data-hook=\'input\' /></div><div class=\'buttons\'><button data-hook=\'cancel\'>Cancel</button><button data-hook=\'ok\'>Ok</button></div></div></div>';
 Ya.N = '<div id=\'room-view\' class=\'room-view\'><div class=\'container\'><h1 data-hook=\'room-name\'></h1><div class=\'header-btns\'><button data-hook=\'rec-btn\'><i class=\'icon-circle\'></i>Rec</button><button data-hook=\'link-btn\'><i class=\'icon-link\'></i>Link</button><button data-hook=\'leave-btn\'><i class=\'icon-logout\'></i>Leave</button></div><div class=\'teams\'><div class=\'tools admin-only\'><button data-hook=\'auto-btn\'>Auto</button><button data-hook=\'rand-btn\'>Rand</button><button data-hook=\'lock-btn\'>Lock</button><button data-hook=\'reset-all-btn\'>Reset</button></div><div data-hook=\'red-list\'></div><div data-hook=\'spec-list\'></div><div data-hook=\'blue-list\'></div><div class=\'spacer admin-only\'></div></div><div class=\'settings\'><div><label class=\'lbl\'>Time limit</label><select data-hook=\'time-limit-sel\'></select></div><div><label class=\'lbl\'>Score limit</label><select data-hook=\'score-limit-sel\'></select></div><div><label class=\'lbl\'>Stadium</label><label class=\'val\' data-hook=\'stadium-name\'>testing the stadium name</label><button class=\'admin-only\' data-hook=\'stadium-pick\'>Pick</button></div></div><div class=\'controls admin-only\'><button data-hook=\'start-btn\'><i class=\'icon-play\'></i>Start game</button><button data-hook=\'stop-btn\'><i class=\'icon-stop\'></i>Stop game</button><button data-hook=\'pause-btn\'><i class=\'icon-pause\'></i>Pause</button></div></div></div>';
 aa.N = '<div class=\'dialog settings-view\'><h1>Settings</h1><button data-hook=\'close\'>Close</button><div class=\'tabs\'><button data-hook=\'soundbtn\'>Sound</button><button data-hook=\'videobtn\'>Video</button><button data-hook=\'inputbtn\'>Input</button><button data-hook=\'miscbtn\'>Misc</button></div><div data-hook=\'presskey\' tabindex=\'-1\'><div>Press a key</div></div><div class=\'tabcontents\'><div class=\'section\' data-hook=\'miscsec\'><div class=\'loc\' data-hook=\'loc\'></div><div class=\'loc\' data-hook=\'loc-ovr\'></div><button data-hook=\'loc-ovr-btn\'></button></div><div class=\'section\' data-hook=\'soundsec\'><div data-hook="tsound-main">Sounds enabled</div><div data-hook="tsound-chat">Chat sound enabled</div><div data-hook="tsound-highlight">Nick highlight sound enabled</div><div data-hook="tsound-crowd">Crowd sound enabled</div></div><div class=\'section\' data-hook=\'inputsec\'></div><div class=\'section\' data-hook=\'videosec\'><div>Viewport Mode:<select data-hook=\'viewmode\'><option>Dynamic</option><option>Restricted 840x410</option><option>Full 1x Zoom</option><option>Full 1.25x Zoom</option><option>Full 1.5x Zoom</option><option>Full 1.75x Zoom</option><option>Full 2x Zoom</option><option>Full 2.25x Zoom</option><option>Full 2.5x Zoom</option></select></div><div>FPS Limit:<select data-hook=\'fps\'><option>None (Recommended)</option><option>30</option></select></div><div>Resolution Scaling:<select data-hook=\'resscale\'><option>100%</option><option>75%</option><option>50%</option><option>25%</option></select></div><div>Player To Follow:<select data-hook=\'follow\'>' + playersToFollowList() + '</select></div><div data-hook="tvideo-teamcol">Custom team colors enabled</div><div data-hook="tvideo-showindicators">Show chat indicators</div><div data-hook="tvideo-showavatars">Show player avatars</div></div></div></div>';
