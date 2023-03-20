@@ -1,5 +1,5 @@
 import { useSelector, useDispatch } from "react-redux";
-import { selectStat, selectPlayer } from "../../slices/gameStatsSlice";
+import { selectStat, selectPlayer, selectHeatmap } from "../../slices/gameStatsSlice";
 import React from "react";
 
 function PlayerStats() {
@@ -64,9 +64,15 @@ function PlayerStats() {
 
   function showHeatMap(e) {
     e.target.style.cursor = 'pointer';
+    e.target.bgColor = '#244a67'
     if (e.target.className === 'leftStat') {
+      dispatch(selectHeatmap('Heatmap'))
       dispatch(selectPlayer(e.target.textContent.substring(1)))
     }
+  }
+
+  function changeHeatmap(e) {
+    dispatch(selectHeatmap(e.target.attributes.stat.value))
   }
 
   return (
@@ -93,10 +99,10 @@ function PlayerStats() {
           <React.Fragment key={index}>
             <tr style={{ height: 5 }}></tr>
             <tr style={{ backgroundColor: match[mtc].redTeam.includes(stat[0]) ? '#9c0603' : '#244a67' }}>
-              <td className="leftStat" onMouseOver={showHeatMap}>
+              <td className="leftStat" onMouseOver={showHeatMap} onMouseOut={handleMouseOut}>
                 <div className={"flagico f-" + stat[1]} /> {stat[0]}
               </td>
-              <td className="centerStat">{stat[2]}</td>
+              <td className="centerStat" onClick={changeHeatmap} onMouseOver={handleMouseOver} onMouseOut={handleMouseOut} stat={"Goals " + stat[0]}>{stat[2]}</td>
               <td className="centerStat">{stat[3]}</td>
               <td className="centerStat">{stat[4]}</td>
               <td className="centerStat">{stat[5]}</td>

@@ -10,23 +10,33 @@ function HeatMap() {
   const playerPos = useSelector(state => state.gameStats.playerPos)
   const playerList = useSelector(state => state.gameStats.playerList)
   const selectedPlayer = useSelector(state => state.gameStats.selectedPlayer)
+  const selectedHeatmap = useSelector(state => state.gameStats.selectedHeatmap)
   const stadium = match[mtc].stadium
   const canvasRef = useRef(null);
 
-  function draw(ctx2) {
+  function draw(ctx) {
 
-    drawStadium(ctx2, stadium);
+    drawStadium(ctx, stadium);
 
     var par = selectedPlayer;
     if (par === -1) par = match[mtc].redTeam[0];
 
-    ctx2.fillStyle = "rgba(255, 0, 0, 0.006)";
-    const pos = playerPos[mtc][playerList.indexOf(par)];
-    if (pos === undefined) return;
-    for (var i = 0; i < pos.length; i++) {
-      ctx2.beginPath();
-      ctx2.arc(pos[i].x, pos[i].y, 15, 0, 2 * Math.PI);
-      ctx2.fill();
+    if (selectedHeatmap === 'Heatmap') {
+      ctx.fillStyle = "rgba(255, 0, 0, 0.006)";
+      const pos = playerPos[mtc][playerList.indexOf(par)];
+      if (pos === undefined) return;
+      for (var i = 0; i < pos.length; i++) {
+        ctx.beginPath();
+        ctx.arc(pos[i].x, pos[i].y, 15, 0, 2 * Math.PI);
+        ctx.fill();
+      }
+    } else {
+      const stat = selectedHeatmap.split(' ');
+      if (stat[0] === 'Goals') {
+
+      } else if (stat[0] === 'Assists') {
+
+      }
     }
   };
 

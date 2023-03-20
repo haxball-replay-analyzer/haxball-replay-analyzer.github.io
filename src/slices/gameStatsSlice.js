@@ -9,7 +9,8 @@ export const gameStatsSlice = createSlice({
     playerList: [],
     selectedMatch: 0,
     selectedStat: -1,
-    selectedPlayer: -1
+    selectedPlayer: -1,
+    selectedHeatmap: 'Heatmap'
   },
   reducers: {
     setDivStyle: (state, action) => {
@@ -40,6 +41,9 @@ export const gameStatsSlice = createSlice({
     selectPlayer: (state, action) => {
       state.selectedPlayer = action.payload
     },
+    selectHeatmap: (state, action) => {
+      state.selectedHeatmap = action.payload
+    },
     setPlayerPos: (state, action) => {
       var x = action.payload;
       for (var i = 0; i < x.length; i++) {
@@ -58,13 +62,14 @@ export const gameStatsSlice = createSlice({
         playerList: [],
         selectedMatch: 0,
         selectedStat: -1,
-        selectedPlayer: -1
+        selectedPlayer: -1,
+        selectedHeatmap: 'Heatmap'
       }
     }
   },
 })
 
 // Action creators are generated for each case reducer function
-export const { setDivStyle, setStats, showNextMatch, showPreviousMatch, selectMatch, selectStat, selectPlayer, setPlayerList, setPlayerPos, clearStats } = gameStatsSlice.actions
+export const { setDivStyle, setStats, showNextMatch, showPreviousMatch, selectMatch, selectStat, selectPlayer, selectHeatmap, setPlayerList, setPlayerPos, clearStats } = gameStatsSlice.actions
 
 export default gameStatsSlice.reducer

@@ -14,6 +14,7 @@ function GameStats() {
   const match = useSelector((state) => state.gameStats.matches)
   const mtc = useSelector((state) => state.gameStats.selectedMatch);
   const selectedPlayer = useSelector(state => state.gameStats.selectedPlayer)
+  const selectedHeatmap = useSelector(state => state.gameStats.selectedHeatmap)
   const dispatch = useDispatch();
 
   const [redTeamName, setRedTeamName] = useState('RED');
@@ -276,7 +277,7 @@ function GameStats() {
             <ThirdStats />
           </div>
           <div style={{ height: '50%', overflow: 'hidden' }}>
-            <p style={{ textAlign: 'center', fontSize: 18 }}>Heatmap of {selectedPlayer}:</p>
+            <p style={{ textAlign: 'center', fontSize: 18 }}>{selectedHeatmap.split(' ')[0]} of {selectedPlayer == -1 ? match[mtc].redTeam[0] : selectedPlayer}:</p>
             {match[mtc].stadium ? <HeatMap /> : null}
           </div>
         </div >
