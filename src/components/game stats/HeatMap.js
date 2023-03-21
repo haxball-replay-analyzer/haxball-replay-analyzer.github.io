@@ -91,6 +91,15 @@ function HeatMap() {
             drawArrow(ctx, pass.lastShot, pass.shot)
           }
         }
+      } else if (stat === 'Shots') {
+        for (let shot of match[mtc].shots) {
+          if (shot.player === player) {
+            ctx.beginPath();
+            ctx.strokeStyle = 'red';
+            ctx.lineWidth = 5;
+            drawArrow(ctx, shot.from, shot.to)
+          }
+        }
       }
     }
   };

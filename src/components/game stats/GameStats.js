@@ -209,13 +209,13 @@ function GameStats() {
               return (
                 <tr key={index}>
                   <td className="Red" onClick={watchGoal_} goalindex={index} onMouseOverCapture={handleMouseOver} onMouseOutCapture={handleMouseOut} style={{ width: '45%', textAlign: 'right' }}>
-                    {goal.for === 'Red' && goal.scorer + (goal.assist ? ' (' + goal.assist + ')' : '')}
+                    {goal.for === 'Red' && goal.scorer + (goal.assist ? ' (' + goal.assist.player + ')' : '')}
                   </td>
                   <td style={{ width: '10%', textAlign: 'center', padding: 2 }}>
                     {goal.currentScore[0] + ':' + goal.currentScore[1]}
                   </td>
                   <td className="Blue" onClick={watchGoal_} goalindex={index} onMouseOverCapture={handleMouseOver} onMouseOutCapture={handleMouseOut} style={{ width: '45%', textAlign: 'left' }}>
-                    {goal.for === 'Blue' && goal.scorer + (goal.assist ? ' (' + goal.assist + ')' : '')}
+                    {goal.for === 'Blue' && goal.scorer + (goal.assist ? ' (' + goal.assist.player + ')' : '')}
                   </td>
                 </tr>
               )

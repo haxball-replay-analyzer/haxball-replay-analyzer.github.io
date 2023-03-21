@@ -6446,14 +6446,34 @@ O.prototype = {
                       let poz = rA * blueGoalCord[0] + rC;
                       if (poz > blueGoalCord[1] && poz < blueGoalCord[2]) {
                         //console.log("Celny strzał "+d.w);
-                        match[match.length - 1].shots.push(d.w);
+                        match[match.length - 1].shots.push({
+                          player: d.w,
+                          from: {
+                            x: ball.x,
+                            y: ball.y
+                          },
+                          to: {
+                            x: blueGoalCord[0],
+                            y: poz
+                          }
+                        });
                         match[match.length - 1].shotsRed++;
                       }
                     } else if (d.ea.w == "Blue" && ball.vx < 0 && 99.762 * ball.vx + ball.x < redGoalCord[0] && ball.x > redGoalCord[0]) {
                       let poz = rA * redGoalCord[0] + rC;
                       if (poz > redGoalCord[1] && poz < redGoalCord[2]) {
                         //console.log("Celny strzał"+d.w);
-                        match[match.length - 1].shots.push(d.w);
+                        match[match.length - 1].shots.push({
+                          player: d.w,
+                          from: {
+                            x: ball.x,
+                            y: ball.y
+                          },
+                          to: {
+                            x: redGoalCord[0],
+                            y: poz
+                          }
+                        });
                         match[match.length - 1].shotsBlue++;
                       }
                     }
