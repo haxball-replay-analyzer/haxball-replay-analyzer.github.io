@@ -14,6 +14,7 @@ function Header() {
       <a href="https://haxball-stadium-editor.github.io" target="_blank" rel='noreferrer'>Stadium Editor</a>
       <a href="https://github.com/haxball-replay-analyzer/haxball-replay-analyzer.github.io/issues" target="_blank" rel='noreferrer'>Report Bugs</a>
       <a href="https://kpias760.github.io/haxball-replay-analyzer.github.io/" target="_blank" rel='noreferrer'>Old version</a>
+      <a href="https://github.com/haxball-replay-analyzer/haxball-replay-analyzer.github.io#readme" target="_blank" rel='noreferrer'>Help</a>
     </div >
   );
 }

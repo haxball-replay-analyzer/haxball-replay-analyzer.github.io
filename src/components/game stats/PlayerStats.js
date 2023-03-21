@@ -1,5 +1,5 @@
 import { useSelector, useDispatch } from "react-redux";
-import { selectStat, selectPlayer } from "../../slices/gameStatsSlice";
+import { selectStat, selectPlayer, selectHeatmap } from "../../slices/gameStatsSlice";
 import React from "react";
 
 function PlayerStats() {
@@ -14,11 +14,11 @@ function PlayerStats() {
     var pr = match[mtc].player[i], prGoals = 0, prAssists = 0, prKicks = 0, prPasses = 0, prShots = 0, prBumps = 0, prTouches = 0;
     for (var j = 0; j < match[mtc].goals.length; j++) {
       if (match[mtc].goals[j].scorer === pr.nick) prGoals++;
-      else if (match[mtc].goals[j].assist === pr.nick) prAssists++;
+      else if (match[mtc].goals[j].assist.player === pr.nick) prAssists++;
     }
-    for (var j = 0; j < match[mtc].kicks.length; j++) if (match[mtc].kicks[j] === pr.nick) prKicks++;
-    for (var j = 0; j < match[mtc].passes.length; j++) if (match[mtc].passes[j] === pr.nick) prPasses++;
-    for (var j = 0; j < match[mtc].shots.length; j++) if (match[mtc].shots[j] === pr.nick) prShots++;
+    for (var j = 0; j < match[mtc].kicks.length; j++) if (match[mtc].kicks[j].player === pr.nick) prKicks++;
+    for (var j = 0; j < match[mtc].passes.length; j++) if (match[mtc].passes[j].player === pr.nick) prPasses++;
+    for (var j = 0; j < match[mtc].shots.length; j++) if (match[mtc].shots[j].player === pr.nick) prShots++;
     if (match[mtc].spaceMode) {
       for (var j = 0; j < match[mtc].bumps.length; j++) if (match[mtc].bumps[j] === pr.nick) prBumps++;
       for (var j = 0; j < match[mtc].touches.length; j++) if (match[mtc].touches[j] === pr.nick) prTouches++;
@@ -55,7 +55,7 @@ function PlayerStats() {
   function handleMouseOver(e) {
     // console.log('over', e.target)
     e.target.style.cursor = 'pointer';
-    e.target.bgColor = '#244a67'
+    e.target.bgColor = 'darkgrey'
   }
 
   function handleMouseOut(e) {
@@ -64,9 +64,16 @@ function PlayerStats() {
 
   function showHeatMap(e) {
     e.target.style.cursor = 'pointer';
+    e.target.bgColor = 'darkgrey'
     if (e.target.className === 'leftStat') {
+      dispatch(selectHeatmap('Heatmap'))
       dispatch(selectPlayer(e.target.textContent.substring(1)))
     }
+  }
+
+  function changeHeatmap(e) {
+    dispatch(selectPlayer(e.target.attributes.player.value))
+    dispatch(selectHeatmap(e.target.attributes.stat.value))
   }
 
   return (
@@ -93,14 +100,14 @@ function PlayerStats() {
           <React.Fragment key={index}>
             <tr style={{ height: 5 }}></tr>
             <tr style={{ backgroundColor: match[mtc].redTeam.includes(stat[0]) ? '#9c0603' : '#244a67' }}>
-              <td className="leftStat" onMouseOver={showHeatMap}>
+              <td className="leftStat" onMouseOver={showHeatMap} onMouseOut={handleMouseOut}>
                 <div className={"flagico f-" + stat[1]} /> {stat[0]}
               </td>
-              <td className="centerStat">{stat[2]}</td>
-              <td className="centerStat">{stat[3]}</td>
-              <td className="centerStat">{stat[4]}</td>
-              <td className="centerStat">{stat[5]}</td>
-              <td className="centerStat">{stat[6]}</td>
+              <td className="centerStat" onClick={changeHeatmap} onMouseOver={handleMouseOver} onMouseOut={handleMouseOut} stat={"Goals"} player={stat[0]}>{stat[2]}</td>
+              <td className="centerStat" onClick={changeHeatmap} onMouseOver={handleMouseOver} onMouseOut={handleMouseOut} stat={"Assists"} player={stat[0]}>{stat[3]}</td>
+              <td className="centerStat" onClick={changeHeatmap} onMouseOver={handleMouseOver} onMouseOut={handleMouseOut} stat={"Kicks"} player={stat[0]}>{stat[4]}</td>
+              <td className="centerStat" onClick={changeHeatmap} onMouseOver={handleMouseOver} onMouseOut={handleMouseOut} stat={"Passes"} player={stat[0]}>{stat[5]}</td>
+              <td className="centerStat" onClick={changeHeatmap} onMouseOver={handleMouseOver} onMouseOut={handleMouseOut} stat={"Shots"} player={stat[0]}>{stat[6]}</td>
               {match[mtc].spaceMode && (
                 <>
                   <td className="centerStat">{stat[7]}</td>

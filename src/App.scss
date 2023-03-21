@@ -194,6 +194,17 @@ table {
   }
 }
 
+#game-stats {
+  select {
+    background-color: #244967;
+    margin: 0px 5px;
+
+    option {
+      font-size: 16px;
+    }
+  }
+}
+
 .view-wrapper {
   position: absolute;
   width: 100%;
@@ -299,4 +310,11 @@ table {
 
 .flexGrow {
   flex-grow: 1
+}
+
+.simple-dialog-view {
+  position: fixed;
+  top: calc(50% - 7.5vh);
+  left: calc(50% - 15vw);
+  width: 30vw;
 }

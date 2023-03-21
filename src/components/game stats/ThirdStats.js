@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useSelector } from 'react-redux';
 import { useRef, useEffect } from 'react';
-import { drawStadium } from './HeatMap';
+import { drawStadium } from './StadiumCanvas';
 
 function ThirdStats() {
 
