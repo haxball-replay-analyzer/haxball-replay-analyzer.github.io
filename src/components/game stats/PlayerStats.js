@@ -55,7 +55,7 @@ function PlayerStats() {
   function handleMouseOver(e) {
     // console.log('over', e.target)
     e.target.style.cursor = 'pointer';
-    e.target.bgColor = '#244a67'
+    e.target.bgColor = 'darkgrey'
   }
 
   function handleMouseOut(e) {
@@ -64,7 +64,7 @@ function PlayerStats() {
 
   function showHeatMap(e) {
     e.target.style.cursor = 'pointer';
-    e.target.bgColor = '#244a67'
+    e.target.bgColor = 'darkgrey'
     if (e.target.className === 'leftStat') {
       dispatch(selectHeatmap('Heatmap'))
       dispatch(selectPlayer(e.target.textContent.substring(1)))
@@ -72,6 +72,7 @@ function PlayerStats() {
   }
 
   function changeHeatmap(e) {
+    dispatch(selectPlayer(e.target.attributes.player.value))
     dispatch(selectHeatmap(e.target.attributes.stat.value))
   }
 
@@ -102,7 +103,7 @@ function PlayerStats() {
               <td className="leftStat" onMouseOver={showHeatMap} onMouseOut={handleMouseOut}>
                 <div className={"flagico f-" + stat[1]} /> {stat[0]}
               </td>
-              <td className="centerStat" onClick={changeHeatmap} onMouseOver={handleMouseOver} onMouseOut={handleMouseOut} stat={"Goals " + stat[0]}>{stat[2]}</td>
+              <td className="centerStat" onClick={changeHeatmap} onMouseOver={handleMouseOver} onMouseOut={handleMouseOut} stat={"Goals"} player={stat[0]}>{stat[2]}</td>
               <td className="centerStat">{stat[3]}</td>
               <td className="centerStat">{stat[4]}</td>
               <td className="centerStat">{stat[5]}</td>

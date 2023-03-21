@@ -18,12 +18,12 @@ function HeatMap() {
 
     drawStadium(ctx, stadium);
 
-    var par = selectedPlayer;
-    if (par === -1) par = match[mtc].redTeam[0];
+    var player = selectedPlayer;
+    if (player === -1) player = match[mtc].redTeam[0];
 
     if (selectedHeatmap === 'Heatmap') {
       ctx.fillStyle = "rgba(255, 0, 0, 0.006)";
-      const pos = playerPos[mtc][playerList.indexOf(par)];
+      const pos = playerPos[mtc][playerList.indexOf(player)];
       if (pos === undefined) return;
       for (var i = 0; i < pos.length; i++) {
         ctx.beginPath();
@@ -31,10 +31,20 @@ function HeatMap() {
         ctx.fill();
       }
     } else {
-      const stat = selectedHeatmap.split(' ');
-      if (stat[0] === 'Goals') {
-
-      } else if (stat[0] === 'Assists') {
+      const stat = selectedHeatmap.split(' ')[0];
+      if (stat === 'Goals') {
+        console.log(match[mtc].goals)
+        for (let goal of match[mtc].goals) {
+          if (goal.scorer == player) {
+            ctx.beginPath();
+            ctx.strokeStyle = 'red';
+            ctx.lineWidth = 5;
+            ctx.moveTo(goal.shot.x, goal.shot.y);
+            ctx.lineTo(goal.ballCoord.x, goal.ballCoord.y);
+            ctx.stroke();
+          }
+        }
+      } else if (stat === 'Assists') {
 
       }
     }

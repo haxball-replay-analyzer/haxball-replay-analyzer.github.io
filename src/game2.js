@@ -5074,12 +5074,17 @@ Gb.prototype = {
       //console.log("Tu niby gol", match[match.length-1].goals/*a,b,c.j.Fb.xc.Ke,d,e,f,g,h,i,j,k*/);
       //console.log("GOOOOOOOOOOOOOOOOOOOOOOOOOOOOL",kicker.name, kicker.team, lastKicker.name, match[match.length-1].scoreRed, match[match.length-1].scoreBlue);
       //console.log(ha.Wk(20494*16.6666666666666));
+      // console.log(c.j.Fb.Eb.Ya);
+      // console.log(this.K.Ma.K.ta.F[0].a); - BALL COORDINATES
       if (keepUpdating) {
         if (a.w == "Red") match[match.length - 1].scoreRed++;//aktualny wynik red lub blue = a.$
         else match[match.length - 1].scoreBlue++;
         if (match[match.length - 1].spaceMode) {
           if (a.w == toucher.team) {
-            match[match.length - 1].goals.push({ scorer: toucher.name, currentScore: [match[match.length - 1].scoreRed, match[match.length - 1].scoreBlue] });
+            match[match.length - 1].goals.push({
+              scorer: toucher.name,
+              currentScore: [match[match.length - 1].scoreRed, match[match.length - 1].scoreBlue]
+            });
             match[match.length - 1].player[playerList.indexOf(toucher.name)].goals++;
             if (lastToucher.name != undefined && a.w == lastToucher.team) {
               match[match.length - 1].goals[match[match.length - 1].goals.length - 1].assist = lastToucher.name;
@@ -5092,7 +5097,15 @@ Gb.prototype = {
           }
         } else {
           if (a.w == kicker.team) {
-            match[match.length - 1].goals.push({ scorer: kicker.name, currentScore: [match[match.length - 1].scoreRed, match[match.length - 1].scoreBlue] });
+            match[match.length - 1].goals.push({
+              scorer: kicker.name,
+              currentScore: [match[match.length - 1].scoreRed, match[match.length - 1].scoreBlue],
+              shot: match[match.length - 1].kicks[match[match.length - 1].kicks.length - 1],
+              ballCoord: {
+                x: this.K.Ma.K.ta.F[0].a.x,
+                y: this.K.Ma.K.ta.F[0].a.y
+              }
+            });
             match[match.length - 1].player[playerList.indexOf(kicker.name)].goals++;
             if (lastKicker != undefined && a.w == lastKicker.team) {
               match[match.length - 1].goals[match[match.length - 1].goals.length - 1].assist = lastKicker.name;
@@ -6445,7 +6458,11 @@ O.prototype = {
                     else match[match.length - 1].kicksBlue++;
                     //console.log("sprawdzenie czasu po kopnięciu",this.Hc)
                     //console.log("UWAGA",match,playerList)
-                    match[match.length - 1].kicks.push(d.w);
+                    match[match.length - 1].kicks.push({
+                      player: d.w,
+                      x: ball.x,
+                      y: ball.y
+                    });
                     pileczka.push(/*[k[0].D,k[0].a]*/[t, l]);
                     //console.log("sprawdzenie czegoś tam",k[0].D,k[0].a);
                     if (match[match.length - 1].spaceMode) {
