@@ -5,7 +5,7 @@ import PlayerStats from "./PlayerStats";
 import ThirdStats from "./ThirdStats";
 import { watchGoal } from "../../game2";
 import $ from 'jquery'
-import { selectMatch, showNextMatch, showPreviousMatch } from "../../slices/gameStatsSlice";
+import { selectMatch, showNextMatch, showPreviousMatch, setStats } from "../../slices/gameStatsSlice";
 import HeatMap from "./HeatMap";
 
 function GameStats() {
@@ -76,8 +76,16 @@ function GameStats() {
     }
   }
 
-  function nextMatch() { showMatch('next') }
-  function prevMatch() { showMatch('prev') }
+  function nextMatch() {
+    if (mtc < match.length - 1) {
+      showMatch('next')
+    }
+  }
+  function prevMatch() {
+    if (mtc != 0) {
+      showMatch('prev')
+    }
+  }
 
   function handleInput(x) {
     if (x.target.id === 'redTeam') {
@@ -113,6 +121,69 @@ function GameStats() {
       }
       closeStats(watchGoal(goalindex))
     }
+  }
+
+  function connectHalves(e) {
+    var newMatch = {
+      gameTicks: match[0].gameTicks + match[1].gameTicks,
+      goals: [...match[0].goals],
+      kicks: match[0].kicks.concat(match[1].kicks),
+      kicksRed: match[0].kicksRed + match[1].kicksBlue,
+      kicksBlue: match[0].kicksBlue + match[1].kicksRed,
+      passes: match[0].passes.concat(match[1].passes),
+      passesRed: match[0].passesRed + match[1].passesBlue,
+      passesBlue: match[0].passesBlue + match[1].passesRed,
+      player: [...match[0].player],
+      possRed: match[0].possRed + match[1].possBlue,
+      possBlue: match[0].possBlue + match[1].possRed,
+      scoreRed: match[0].scoreRed + match[1].scoreBlue,
+      scoreBlue: match[0].scoreBlue + match[1].scoreRed,
+      shots: match[0].shots.concat(match[1].shots),
+      shotsRed: match[0].shotsRed + match[1].shotsBlue,
+      shotsBlue: match[0].shotsBlue + match[1].shotsRed,
+      spaceMode: match[0].spaceMode,
+      stadium: match[0].stadium,
+      thirds: [...match[0].thirds]
+    }
+
+    var newPlayers = [];
+    for (let player of match[1].player) {
+      if (!newMatch.player.includes(player)) newPlayers.push(player)
+    }
+    newMatch.player = match[0].player.concat(newPlayers);
+
+    newMatch.redTeam = match[0].redTeam;
+    var newRed = [];
+    for (let player of match[1].blueTeam) {
+      if (!newMatch.redTeam.includes(player)) newRed.push(player);
+    }
+    newMatch.redTeam = match[0].redTeam.concat(newRed)
+
+    var newBlue = [];
+    newMatch.blueTeam = match[0].blueTeam;
+    for (let player of match[1].redTeam) {
+      if (!newMatch.blueTeam.includes(player)) newBlue.push(player);
+    }
+    newMatch.blueTeam = match[0].blueTeam.concat(newBlue)
+
+    for (let goal of match[1].goals) {
+      var newGoal = JSON.parse(JSON.stringify(goal));
+      newGoal.currentScore = [...newMatch.goals[newMatch.goals.length - 1].currentScore];
+      if (newGoal.for === 'Red') {
+        newGoal.for = 'Blue';
+        newGoal.currentScore[1]++;
+      } else {
+        newGoal.for = 'Red';
+        newGoal.currentScore[0]++;
+      }
+      newMatch.goals.push(newGoal)
+    }
+
+    newMatch.thirds[0] += match[1].thirds[2];
+    newMatch.thirds[1] += match[1].thirds[1];
+    newMatch.thirds[2] += match[1].thirds[0];
+
+    dispatch(setStats([newMatch]))
   }
 
   function showButtons() {
@@ -170,6 +241,7 @@ function GameStats() {
               {index + 1}: Red {match[index].scoreRed}:{match[index].scoreBlue} Blue
             </option>)}
           </select>
+          {match.length === 2 && <button onClick={connectHalves} style={{ margin: '0 10px 0 30px' }}>Connect 2 halves</button>}
           {match[mtc].stadium.canBeStored && <button onClick={downloadMap} style={{ margin: '0 10px 0 30px' }}>Download map</button>}
         </h1>
         <button onClick={closeStats} style={{ position: 'absolute', right: 20 }} >Close ❌</button>

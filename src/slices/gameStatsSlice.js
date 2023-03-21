@@ -25,6 +25,7 @@ export const gameStatsSlice = createSlice({
       state.selectedMatch = 0;
       state.selectedPlayer = -1;
       state.selectedStat = -1;
+      state.selectedHeatmap = 'Heatmap';
     },
     showNextMatch: (state) => {
       state.selectedMatch++
