@@ -5,6 +5,21 @@ import { useEffect } from 'react';
 
 const changelog = [
   {
+    version: '2.1.0',
+    date: '21.03.2023',
+    changes: [
+      'Heatmaps are generated with background of actual match stadium, instead of the default one',
+      'Added possibility to connect 2 halves of the match - if replay has 2 matches in it, the Connect 2 Halves button appears next to list of matches',
+      'Added possibility to check almost every player statistic\'s heatmap - click on choosen player Goals, Assists, Kicks, Passes, Shots on Goal to see where they occured',
+      'Changed the way analyzer behaves after user clicked a goal on game stats - now it rewind the recording to 5 seconds before the goal',
+      'Added some tooltips to replay and game stats buttons',
+      'Some visual improvements',
+      'Added link to "Help" in a header',
+      'Fixed incorrect display of "Couldn\'t load the file" error',
+      'Fixed bug occuring when two separate replays are loaded one after one'
+    ]
+  },
+  {
     version: '2.0.2',
     date: '15.03.2023',
     changes: [
