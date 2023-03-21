@@ -14,6 +14,20 @@ function HeatMap() {
   const stadium = match[mtc].stadium
   const canvasRef = useRef(null);
 
+  function drawArrow(ctx, from, to) {
+    var headlen = 15; // length of head in pixels
+    var dx = to.x - from.x;
+    var dy = to.y - from.y;
+    var angle = Math.atan2(dy, dx);
+    ctx.beginPath();
+    ctx.moveTo(from.x, from.y);
+    ctx.lineTo(to.x, to.y);
+    ctx.lineTo(to.x - headlen * Math.cos(angle - Math.PI / 6), to.y - headlen * Math.sin(angle - Math.PI / 6));
+    ctx.moveTo(to.x, to.y);
+    ctx.lineTo(to.x - headlen * Math.cos(angle + Math.PI / 6), to.y - headlen * Math.sin(angle + Math.PI / 6));
+    ctx.stroke();
+  }
+
   function draw(ctx) {
 
     drawStadium(ctx, stadium);
@@ -57,6 +71,24 @@ function HeatMap() {
             ctx.arc(goal.shot.x, goal.shot.y, 10, 0, 2 * Math.PI)
             ctx.fillStyle = 'red'
             ctx.fill();
+          }
+        }
+      } else if (stat === 'Kicks') {
+        for (let kick of match[mtc].kicks) {
+          if (kick.player === player) {
+            ctx.beginPath();
+            ctx.fillStyle = 'red'
+            ctx.arc(kick.x, kick.y, 5, 0, 2 * Math.PI)
+            ctx.fill();
+          }
+        }
+      } else if (stat === 'Passes') {
+        for (let pass of match[mtc].passes) {
+          if (pass.player === player) {
+            ctx.beginPath();
+            ctx.strokeStyle = 'red';
+            ctx.lineWidth = 5;
+            drawArrow(ctx, pass.lastShot, pass.shot)
           }
         }
       }

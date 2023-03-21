@@ -6489,7 +6489,11 @@ O.prototype = {
                         lastKicker = kicker;
                         if (lastKicker.team == d.ea.w) {
                           //console.log("Podanie ",lastKicker.name+" do "+d.w);
-                          match[match.length - 1].passes.push(lastKicker.name);
+                          match[match.length - 1].passes.push({
+                            player: lastKicker.name,
+                            shot: ball,
+                            lastShot: match[match.length - 1].kicks[match[match.length - 1].kicks.length - 2]
+                          });
                           if (lastKicker.team == "Red") match[match.length - 1].passesRed++;
                           else match[match.length - 1].passesBlue++;
                         }
