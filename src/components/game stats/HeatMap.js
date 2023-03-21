@@ -33,7 +33,6 @@ function HeatMap() {
     } else {
       const stat = selectedHeatmap.split(' ')[0];
       if (stat === 'Goals') {
-        console.log(match[mtc].goals)
         for (let goal of match[mtc].goals) {
           if (goal.scorer == player) {
             ctx.beginPath();
@@ -45,7 +44,21 @@ function HeatMap() {
           }
         }
       } else if (stat === 'Assists') {
-
+        for (let goal of match[mtc].goals) {
+          if (goal.assist?.player === player) {
+            ctx.beginPath();
+            ctx.strokeStyle = 'red';
+            ctx.lineWidth = 5;
+            ctx.moveTo(goal.assist.shot.x, goal.assist.shot.y);
+            ctx.lineTo(goal.shot.x, goal.shot.y);
+            ctx.lineTo(goal.ballCoord.x, goal.ballCoord.y);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(goal.shot.x, goal.shot.y, 10, 0, 2 * Math.PI)
+            ctx.fillStyle = 'red'
+            ctx.fill();
+          }
+        }
       }
     }
   };

@@ -14,9 +14,9 @@ function PlayerStats() {
     var pr = match[mtc].player[i], prGoals = 0, prAssists = 0, prKicks = 0, prPasses = 0, prShots = 0, prBumps = 0, prTouches = 0;
     for (var j = 0; j < match[mtc].goals.length; j++) {
       if (match[mtc].goals[j].scorer === pr.nick) prGoals++;
-      else if (match[mtc].goals[j].assist === pr.nick) prAssists++;
+      else if (match[mtc].goals[j].assist.player === pr.nick) prAssists++;
     }
-    for (var j = 0; j < match[mtc].kicks.length; j++) if (match[mtc].kicks[j] === pr.nick) prKicks++;
+    for (var j = 0; j < match[mtc].kicks.length; j++) if (match[mtc].kicks[j].player === pr.nick) prKicks++;
     for (var j = 0; j < match[mtc].passes.length; j++) if (match[mtc].passes[j] === pr.nick) prPasses++;
     for (var j = 0; j < match[mtc].shots.length; j++) if (match[mtc].shots[j] === pr.nick) prShots++;
     if (match[mtc].spaceMode) {
@@ -104,7 +104,7 @@ function PlayerStats() {
                 <div className={"flagico f-" + stat[1]} /> {stat[0]}
               </td>
               <td className="centerStat" onClick={changeHeatmap} onMouseOver={handleMouseOver} onMouseOut={handleMouseOut} stat={"Goals"} player={stat[0]}>{stat[2]}</td>
-              <td className="centerStat">{stat[3]}</td>
+              <td className="centerStat" onClick={changeHeatmap} onMouseOver={handleMouseOver} onMouseOut={handleMouseOut} stat={"Assists"} player={stat[0]}>{stat[3]}</td>
               <td className="centerStat">{stat[4]}</td>
               <td className="centerStat">{stat[5]}</td>
               <td className="centerStat">{stat[6]}</td>

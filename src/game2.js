@@ -5108,7 +5108,10 @@ Gb.prototype = {
             });
             match[match.length - 1].player[playerList.indexOf(kicker.name)].goals++;
             if (lastKicker != undefined && a.w == lastKicker.team) {
-              match[match.length - 1].goals[match[match.length - 1].goals.length - 1].assist = lastKicker.name;
+              match[match.length - 1].goals[match[match.length - 1].goals.length - 1].assist = {
+                player: lastKicker.name,
+                shot: match[match.length - 1].kicks[match[match.length - 1].kicks.length - 2]
+              }
               match[match.length - 1].player[playerList.indexOf(lastKicker.name)].assists++;
             } else {
               match[match.length - 1].goals[match[match.length - 1].goals.length - 1].assist = false;
