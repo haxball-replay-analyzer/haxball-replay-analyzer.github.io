@@ -248,12 +248,13 @@ table {
   left: 150%;
   position: absolute;
   width: 80%;
+  overflow-y: scroll;
   height: calc(90% - 35px);
   top: calc(5% + 35px);
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  // justify-content: center;
+  align-items: start;
   background-color: #1A2125;
   padding: 10px;
   overflow: hidden;
@@ -263,7 +264,7 @@ table {
   h1 {
     top: 0%;
     position: absolute;
-    width: 95%;
+    width: calc(100% - 20px);
     text-align: center;
     font-size: 20px;
     font-weight: 600;
@@ -275,13 +276,28 @@ table {
     border-bottom-color: #c13535;
     border-bottom-style: solid
   }
+}
 
-  #closeReplaysButton {
-    position: absolute;
-    // top: calc(-42.5% + 35px);
-    top: 0px;
-    @include haxball-button;
-  }
+#closeReplaysButton {
+  position: absolute;
+  // top: calc(-42.5% + 35px);
+  right: 0px;
+  @include haxball-button;
+}
+
+.replayInfo {
+  position: absolute;
+  top: 10%;
+  width: calc(100% - 20px);
+  height: 20%;
+  padding-top: 6px;
+  padding-bottom: 5px;
+  border-bottom: 1px;
+  border-bottom-color: #717171;
+  border-bottom-style: solid;
+  display: flex;
+  flex-direction: row;
+  overflow-x: scroll;
 }
 
 .header {
