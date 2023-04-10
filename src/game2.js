@@ -17,7 +17,7 @@
 
 import $ from 'jquery';
 import './vendor/pako-jszip.min.js';
-import { showStats, setGameStats, dispatchPlayerList, dispatchPlayerPos, dispatchClearStats } from './components/Home';
+import { showStats, setGameStats, dispatchPlayerList, dispatchPlayerPos, dispatchClearStats, sendSocketMessage } from './components/Home';
 
 var loading = {};
 
@@ -815,6 +815,7 @@ export function handleFile(e) {
     var a = a.item(0),
       b = new FileReader;
     b.onload = function () {
+      // sendSocketMessage(b.result);
       y.i(parseReplay, b.result)
     };
     b.readAsArrayBuffer(a)
@@ -4568,7 +4569,7 @@ xa.prototype = C(V.prototype, {
       loading.analyzed = loading.recLength - a.o.byteLength + a.a;
       const progress = Math.floor(loading.analyzed / loading.recLength * 100);
       if (progress < loading.progress) {
-        // console.log('koniec analizy');
+        // console.log('koniec analizy', a);
         loading.done = true;
         keepUpdating = false;
         dispatchPlayerList(playerList);

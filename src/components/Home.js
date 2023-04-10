@@ -6,14 +6,20 @@ import { useSelector, useDispatch } from "react-redux";
 import { setMainMode } from "../slices/mainModeSlice";
 import { setDivStyle, setStats, setPlayerList, setPlayerPos, clearStats } from "../slices/gameStatsSlice";
 import GameStats from "./game stats/GameStats";
+import useWebSocket, { ReadyState } from 'react-use-websocket';
+import { useEffect } from "react";
 
 export function showStats() { }
 export function setGameStats() { }
 export function dispatchPlayerList() { }
 export function dispatchPlayerPos() { }
 export function dispatchClearStats() { }
+export function sendSocketMessage() { }
 
 function Home() {
+
+  const socketUrl = 'ws://localhost:8080/';
+  const { sendMessage, readyState, getWebSocket } = useWebSocket(socketUrl);
 
   const dispatch = useDispatch();
   const mainMode = useSelector((state) => state.mainMode.value);
@@ -42,17 +48,25 @@ function Home() {
     dispatch(clearStats());
   }
 
+  function sendSocketMessageExp(m) {
+    sendMessage(m);
+  }
+
   showStats = showStatsExp;
   setGameStats = setGameStatsExp;
   dispatchPlayerList = setPlayerListExp;
   dispatchPlayerPos = setPlayerPosExp;
   dispatchClearStats = dispatchClearStatsExp;
+  sendSocketMessage = sendSocketMessageExp;
 
   function callbackFn(e) {
     handleFile(e);
   }
 
   function handleChange(e) {
+
+    // sendMessage('Hello');
+    getWebSocket().onmessage = ev => console.log(ev.data);
 
     $(function () {
 
@@ -68,9 +82,18 @@ function Home() {
 
   }
 
+
+  useEffect(() => {
+
+  }, []);
+
   return (
     <>
       <div className='roomlist-view' style={{ zIndex: 5 }}>
+        <div className="sqlReplays">
+          <button>Most viewed replays</button>
+          <button>New replays</button>
+        </div>
         <div className='dialog'>
           <h1>Haxball Replay Analyzer v{version}</h1>
           <p>Contact: <br />Discord: Falafel#3895, you can find me at discord.io/haxracing<br />turbofalafel@gmail.com</p>
