@@ -7,7 +7,6 @@ import { watchGoal } from "../../game2";
 import $ from 'jquery'
 import { selectMatch, showNextMatch, showPreviousMatch, setStats } from "../../slices/gameStatsSlice";
 import HeatMap from "./HeatMap";
-import { sendSocketMessage } from "../Home";
 
 function GameStats() {
 
@@ -223,8 +222,6 @@ function GameStats() {
     $('#greyer').animate({
       opacity: 0.5
     }, { duration: 300, easing: 'swing', queue: false });
-
-    sendSocketMessage('poka')
 
   }, [])
 

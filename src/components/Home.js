@@ -8,13 +8,13 @@ import { setDivStyle, setStats, setPlayerList, setPlayerPos, clearStats } from "
 import GameStats from "./game stats/GameStats";
 import useWebSocket, { ReadyState } from 'react-use-websocket';
 import { useEffect } from "react";
+import MostViewedReplays from "./replays/MostViewedReplays";
 
 export function showStats() { }
 export function setGameStats() { }
 export function dispatchPlayerList() { }
 export function dispatchPlayerPos() { }
 export function dispatchClearStats() { }
-export function sendSocketMessage() { }
 
 function Home() {
 
@@ -24,6 +24,20 @@ function Home() {
   const dispatch = useDispatch();
   const mainMode = useSelector((state) => state.mainMode.value);
   const version = useSelector((state) => state.mainMode.version);
+
+  function showReplays() {
+    getWebSocket().onmessage = ev => console.log(ev.data);
+    sendMessage('poka')
+    dispatch(setMainMode('replays'))
+
+    $('.roomlist-view').animate({
+      left: '-150%',
+    }, { duration: 700, easing: 'swing', queue: false });
+
+    $('#mostViewedReplays').animate({
+      left: '10%',
+    }, { duration: 700, easing: 'swing', queue: false });
+  }
 
   function showStatsExp(elStyle) {
     const { offsetLeft, offsetTop, clientWidth, clientHeight } = elStyle;
@@ -48,16 +62,11 @@ function Home() {
     dispatch(clearStats());
   }
 
-  function sendSocketMessageExp(m) {
-    sendMessage(m);
-  }
-
   showStats = showStatsExp;
   setGameStats = setGameStatsExp;
   dispatchPlayerList = setPlayerListExp;
   dispatchPlayerPos = setPlayerPosExp;
   dispatchClearStats = dispatchClearStatsExp;
-  sendSocketMessage = sendSocketMessageExp;
 
   function callbackFn(e) {
     handleFile(e);
@@ -66,7 +75,7 @@ function Home() {
   function handleChange(e) {
 
     // sendMessage('Hello');
-    getWebSocket().onmessage = ev => console.log(ev.data);
+    // getWebSocket().onmessage = ev => console.log(ev.data);
 
     $(function () {
 
@@ -91,7 +100,7 @@ function Home() {
     <>
       <div className='roomlist-view' style={{ zIndex: 5 }}>
         <div className="sqlReplays">
-          <button>Most viewed replays</button>
+          <button onClick={showReplays}>Most viewed replays</button>
           <button>New replays</button>
         </div>
         <div className='dialog'>
@@ -110,6 +119,7 @@ function Home() {
       </div>
       <LoadingScreen />
       {mainMode === 'stats' && <GameStats />}
+      <MostViewedReplays />
     </>
   );
 }
