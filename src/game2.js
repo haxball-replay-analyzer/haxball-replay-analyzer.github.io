@@ -814,13 +814,20 @@ export function handleFile(e) {
   if (!(1 > a.length)) {
     var a = a.item(0),
       b = new FileReader;
+    // console.log(a);
     b.onload = function () {
-      // sendSocketMessage(b.result);
+      if (b.result.byteLength < 3000000) sendSocketMessage(b.result, a.name.slice(0, -5), a.lastModified);
+      // console.log(b.result.byteLength);
       y.i(parseReplay, b.result)
     };
     b.readAsArrayBuffer(a)
   }
 };
+export function replayFromSite(r) {
+  newReplay();
+  // console.log(r);
+  y.i(parseReplay, r)
+}
 function parseReplay(a) {
   u.po(a)
 }
@@ -1317,7 +1324,6 @@ function ja(a) {
   };
   a.get('staty').onclick = function (el) {
 
-    setGameStats(match);
     showStats(el.target);
 
   };
@@ -4573,7 +4579,8 @@ xa.prototype = C(V.prototype, {
         loading.done = true;
         keepUpdating = false;
         dispatchPlayerList(playerList);
-        dispatchPlayerPos(playerPos)
+        dispatchPlayerPos(playerPos);
+        setGameStats(match);
         bringReplayer();
       } else if (progress !== loading.progress) {
         loading.progress = progress;
