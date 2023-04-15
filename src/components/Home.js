@@ -23,19 +23,19 @@ function Home() {
 
   const socketUrl = 'ws://localhost:8080/';
   const STATIC_OPTIONS = {
-    onOpen: () => {
-      console.log('Connected with WebSocket')
-      if (paramsChecked) {
-        sendQueryMessages();
-      } else {
-        checkParams();
-        setParamsChecked(true)
-      }
-    },
-    onClose: () => {
-      console.log('Connection closed');
-    },
-    shouldReconnect: (closeEvent) => true
+    // onOpen: () => {
+    //   console.log('Connected with WebSocket')
+    //   if (paramsChecked) {
+    //     sendQueryMessages();
+    //   } else {
+    //     checkParams();
+    //     setParamsChecked(true)
+    //   }
+    // },
+    // onClose: () => {
+    //   console.log('Connection closed');
+    // },
+    // shouldReconnect: (closeEvent) => true
   }
   const { sendMessage, readyState, getWebSocket } = useWebSocket(socketUrl, STATIC_OPTIONS);
   const connectionStatus = {
