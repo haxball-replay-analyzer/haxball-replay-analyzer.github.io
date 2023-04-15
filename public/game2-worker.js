@@ -16,13 +16,18 @@
 /* eslint-disable no-undef */
 /* eslint-disable no-unused-expressions */
 
-importScripts("jquery-3.6.4.min.js");
-importScripts('./vendor/pako-jszip.min.js');
+// potem posprawdzać jquerowe rzeczy
+
+// importScripts('./src/vendor/pako-jszip.min.js');
 
 var loading = {};
 var document, window;
 
+console.log('chyba załadowałem')
+
 self.onmessage = function (event) {
+  console.log('przyszła wiadomość do workera');
+  self.postMessage('eeee')
   var data = event.data;
   if (data?.do === 'newReplay') {
     newReplay();
@@ -48,21 +53,21 @@ function newReplay() {
 }
 
 function bringReplayer() {
-  $('.top-section').animate({
-    left: 0,
-  }, { duration: 700, easing: 'swing', queue: false });
+  // $('.top-section').animate({
+  //   left: 0,
+  // }, { duration: 700, easing: 'swing', queue: false });
 
-  $('.bottom-section').animate({
-    left: 0,
-  }, { duration: 700, easing: 'swing', queue: false });
+  // $('.bottom-section').animate({
+  //   left: 0,
+  // }, { duration: 700, easing: 'swing', queue: false });
 
-  $('.replay-controls-view').animate({
-    left: 0,
-  }, { duration: 700, easing: 'swing', queue: false });
+  // $('.replay-controls-view').animate({
+  //   left: 0,
+  // }, { duration: 700, easing: 'swing', queue: false });
 
-  $('#loading-screen').animate({
-    left: '-150%',
-  }, { duration: 700, easing: 'swing', queue: false });
+  // $('#loading-screen').animate({
+  //   left: '-150%',
+  // }, { duration: 700, easing: 'swing', queue: false });
 }
 
 function leaveReplayer() {
@@ -71,74 +76,74 @@ function leaveReplayer() {
   redGoalCord = [], blueGoalCord = [], goalParsed = 0, playerPos = [], checkTeams = true;
   playerList = [];
 
-  $('.roomlist-view').animate({
-    left: 0,
-  }, { duration: 700, easing: 'swing', queue: false });
+  // $('.roomlist-view').animate({
+  //   left: 0,
+  // }, { duration: 700, easing: 'swing', queue: false });
 
-  $('.top-section').animate({
-    left: '150%',
-  }, { duration: 700, easing: 'swing', queue: false });
+  // $('.top-section').animate({
+  //   left: '150%',
+  // }, { duration: 700, easing: 'swing', queue: false });
 
-  $('.bottom-section').animate({
-    left: '150%',
-  }, { duration: 700, easing: 'swing', queue: false });
+  // $('.bottom-section').animate({
+  //   left: '150%',
+  // }, { duration: 700, easing: 'swing', queue: false });
 
-  $('.replay-controls-view').animate({
-    left: '150%',
-  }, { duration: 700, easing: 'swing', queue: false, complete: function () { resetReplay() } });
+  // $('.replay-controls-view').animate({
+  //   left: '150%',
+  // }, { duration: 700, easing: 'swing', queue: false, complete: function () { resetReplay() } });
 
-  $("#loading-screen").css('left', '150%')
+  // $("#loading-screen").css('left', '150%')
 }
 
 function bringSettings() {
-  $("#popups").click(function (e) {
-    if (e.target.id == 'popups') {
-      leaveSettings();
-    }
-  })
+  // $("#popups").click(function (e) {
+  //   if (e.target.id == 'popups') {
+  //     leaveSettings();
+  //   }
+  // })
 
-  const parent = $("#settings_button")[0];
+  // const parent = $("#settings_button")[0];
 
-  $('.settings-view').css({
-    'position': 'fixed',
-    'left': parent.offsetLeft + 'px',
-    'top': parent.offsetTop + parent.offsetParent.offsetTop + 35 + 'px',
-    'width': parent.clientWidth + 'px',
-    'height': parent.clientHeight + 'px'
-  })
-  $('.settings-view').css('visibility', 'visible');
-  $('#popups').animate({
-    opacity: 1
-  }, { duration: 300, easing: 'swing', queue: false });
-  $('.settings-view').animate({
-    visibility: 'visible',
-    opacity: 1,
-    width: '25vw',
-    height: '50vh',
-    maxHeight: '400px',
-    top: '25vh',
-    left: '37.5vw'
-  }, { duration: 300, easing: 'swing', queue: false });
+  // $('.settings-view').css({
+  //   'position': 'fixed',
+  //   'left': parent.offsetLeft + 'px',
+  //   'top': parent.offsetTop + parent.offsetParent.offsetTop + 35 + 'px',
+  //   'width': parent.clientWidth + 'px',
+  //   'height': parent.clientHeight + 'px'
+  // })
+  // $('.settings-view').css('visibility', 'visible');
+  // $('#popups').animate({
+  //   opacity: 1
+  // }, { duration: 300, easing: 'swing', queue: false });
+  // $('.settings-view').animate({
+  //   visibility: 'visible',
+  //   opacity: 1,
+  //   width: '25vw',
+  //   height: '50vh',
+  //   maxHeight: '400px',
+  //   top: '25vh',
+  //   left: '37.5vw'
+  // }, { duration: 300, easing: 'swing', queue: false });
 }
 
 function leaveSettings() {
-  const parent = $("#settings_button")[0];
+  // const parent = $("#settings_button")[0];
 
-  $('#popups').animate({
-    opacity: 0
-  }, { duration: 300, easing: 'swing', queue: false });
+  // $('#popups').animate({
+  //   opacity: 0
+  // }, { duration: 300, easing: 'swing', queue: false });
 
-  $('.settings-view').animate({
-    left: parent.offsetLeft + 'px',
-    top: parent.offsetTop + parent.offsetParent.offsetTop + 35 + 'px',
-    width: parent.clientWidth + 'px',
-    height: parent.clientHeight + 'px',
-  }, { duration: 300, easing: 'swing', queue: false, complete: function () { removePopups() } });
+  // $('.settings-view').animate({
+  //   left: parent.offsetLeft + 'px',
+  //   top: parent.offsetTop + parent.offsetParent.offsetTop + 35 + 'px',
+  //   width: parent.clientWidth + 'px',
+  //   height: parent.clientHeight + 'px',
+  // }, { duration: 300, easing: 'swing', queue: false, complete: function () { removePopups() } });
 }
 
 function removePopups() {
-  $('.settings-view').css('visibility', 'hidden');
-  $('#popups').css('display', 'none')
+  // $('.settings-view').css('visibility', 'hidden');
+  // $('#popups').css('display', 'none')
 }
 
 !function (e, n, t) {
@@ -607,9 +612,9 @@ function aa(a) {
     b.Jm.onclick = function (el) {
       g(b);
       if (el.target.id === 'video_button') {
-        $("#selectPlayerToFollow")[0].onchange = function () {
-          setPlayerToFollow();
-        }
+        // $("#selectPlayerToFollow")[0].onchange = function () {
+        //   setPlayerToFollow();
+        // }
       }
     }
   }
@@ -5679,9 +5684,9 @@ u.po = function (a) {
       d.Va = function () {
         d.Va = null;
         // u.xb()
-        $('.simple-dialog-view').animate({
-          left: '150%',
-        }, { duration: 700, easing: 'swing', queue: false });
+        // $('.simple-dialog-view').animate({
+        //   left: '150%',
+        // }, { duration: 700, easing: 'swing', queue: false });
         leaveReplayer();
       }
     }
@@ -5809,11 +5814,11 @@ x.b = !0;
 x.ks = function () {
   // CHECKPOINT overwrite
   return true;
-  try {
-    return window.self != window.top
-  } catch (a) {
-    return !0
-  }
+  // try {
+  //   return window.self != window.top
+  // } catch (a) {
+  //   return !0
+  // }
 };
 x.Wg = function (a) {
   return new Promise(function (b, c) {
