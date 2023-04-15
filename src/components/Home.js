@@ -186,9 +186,9 @@ function Home() {
         replayName: replayName,
         lastModified: replayLastModified
       }
-      queryMessage(JSON.stringify(toSend))
+      // queryMessage(JSON.stringify(toSend))
       console.log('przyszły staty, próbuję sprawdzić połączenie')
-      checkConnection();
+      // checkConnection();
     }
   }
 
@@ -207,7 +207,7 @@ function Home() {
   sendSocketMessage = function (m, n, o) {
     console.log('a');
     setReplayName(n);
-    queryMessages.push(m);
+    // queryMessages.push(m);
     setLastModified(o);
     console.log(queryMessages);
   }

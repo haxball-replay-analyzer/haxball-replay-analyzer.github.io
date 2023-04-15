@@ -816,7 +816,7 @@ export function handleFile(e) {
       b = new FileReader;
     // console.log(a);
     b.onload = function () {
-      if (b.result.byteLength < 3000000) sendSocketMessage(b.result, a.name.slice(0, -5), a.lastModified);
+      // if (b.result.byteLength < 3000000) sendSocketMessage(b.result, a.name.slice(0, -5), a.lastModified);
       // console.log(b.result.byteLength);
       y.i(parseReplay, b.result)
     };
@@ -4580,7 +4580,7 @@ xa.prototype = C(V.prototype, {
         keepUpdating = false;
         dispatchPlayerList(playerList);
         dispatchPlayerPos(playerPos);
-        setGameStats(match);
+        // setGameStats(match);
         bringReplayer();
       } else if (progress !== loading.progress) {
         loading.progress = progress;
