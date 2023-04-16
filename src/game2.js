@@ -817,7 +817,43 @@ export function handleFile(e) {
     // console.log(a);
     b.onload = function () {
       if (b.result.byteLength < 3000000) sendSocketMessage(b.result, a.name.slice(0, -5), a.lastModified);
-      // console.log(b.result.byteLength);
+      if (b.result.byteLength > 50_000) {
+        ///////////////////////////////////////
+        // console.log(b.result);
+        // var replayParts = [], newBuffer, replayData = [];
+        // var x = new Uint8Array(b.result);
+        // x = Array.from(x)
+        // do {
+        //   replayParts.push(x.splice(0, 50_000))
+        // } while (x.length > 50_000)
+        // replayParts.push(x);
+        // console.log(replayParts)
+        // for (let part of replayParts) {
+        //   const buffer = new ArrayBuffer(part.length);
+        //   const uint8View = new Uint8Array(buffer);
+        //   for (let i = 0; i < part.length; i++) {
+        //     uint8View[i] = part[i];
+        //   }
+        //   newBuffer = uint8View.buffer;
+        //   console.log(newBuffer);
+        // }
+        // for (let part of replayParts) {
+        //   var x = new Uint8Array(part);
+        //   x = Array.from(part)
+        //   replayData = replayData.concat(x)
+        // }
+        // const buffer = new ArrayBuffer(replayData.length);
+        // const uint8View = new Uint8Array(buffer);
+        // for (let i = 0; i < replayData.length; i++) {
+        //   uint8View[i] = replayData[i];
+        // }
+        // newBuffer = uint8View.buffer;
+        // console.log(newBuffer, b.result);
+        // console.log(newBuffer == b.result);
+        // console.log(new Uint8Array(newBuffer).every((value, index) => value === new Uint8Array(b.result)[index]));
+        /////////////////////////////////////
+      }
+      // console.log(b.result);
       y.i(parseReplay, b.result)
     };
     b.readAsArrayBuffer(a)

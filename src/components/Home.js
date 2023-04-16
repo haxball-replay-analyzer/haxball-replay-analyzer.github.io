@@ -9,6 +9,7 @@ import GameStats from "./game stats/GameStats";
 import useWebSocket, { ReadyState } from 'react-use-websocket';
 import { useEffect, useState } from "react";
 import MostViewedReplays from "./replays/MostViewedReplays";
+import { setReplays } from "../slices/replaysSlice";
 
 export function showStats() { }
 export function setGameStats() { }
@@ -18,6 +19,7 @@ export function dispatchClearStats() { }
 export function sendSocketMessage() { }
 
 var queryMessages = [];
+var replayData = [];
 
 function Home() {
 
@@ -32,10 +34,10 @@ function Home() {
         setParamsChecked(true)
       }
     },
-    onClose: () => {
-      console.log('Connection closed');
+    onClose: (e) => {
+      console.log('Connection closed', e.reason);
     },
-    shouldReconnect: (closeEvent) => true
+    shouldReconnect: (closeEvent) => false
   }
   const { sendMessage, readyState, getWebSocket } = useWebSocket(socketUrl, STATIC_OPTIONS);
   const connectionStatus = {
@@ -50,6 +52,7 @@ function Home() {
   const mainMode = useSelector((state) => state.mainMode.value);
   const version = useSelector((state) => state.mainMode.version);
   const userDidUpload = useSelector(state => state.mainMode.userUploaded);
+  const stats = useSelector(state => state.gameStats.matches)
   const [replayId, setReplayId] = useState(null);
   const [replayName, setReplayName] = useState(null);
   const [replayLastModified, setLastModified] = useState(null);
@@ -87,10 +90,15 @@ function Home() {
       const addURL = "?replayId=" + x.id;
       window.history.replaceState(null, null, addURL);
       setReplayId(x.id);
-      sendMessage(queryMessages[1]);
-      queryMessages = [];
-    } else if (x.header === 'selected') {
-      const y = x.rec.data
+      // sendMessage(queryMessages[1]);
+      // queryMessages = [];
+    } else if (x.header === 'replayPart') {
+      // console.log(x.rec)
+      replayData = replayData.concat(x.rec.data);
+      // console.log(replayData);
+    } else if (x.header === 'replaySent') {
+      const y = replayData;
+      // console.log(y);
       const buffer = new ArrayBuffer(y.length);
       const uint8View = new Uint8Array(buffer);
       for (let i = 0; i < y.length; i++) {
@@ -99,6 +107,8 @@ function Home() {
       const newBuffer = uint8View.buffer; // konwersja widoku Uint8Array na ArrayBuffer
       // console.log(newBuffer); // wyświetlenie ArrayBuffer w konsoli
       dispatch(setUserUploaded(false));
+      // console.log(newBuffer);
+      replayData = [];
 
       $(function () {
 
@@ -115,6 +125,10 @@ function Home() {
       const addURL = "?replayId=" + x.replayId;
       window.history.replaceState(null, null, addURL);
       setReplayId(x.id);
+    } else if (x.header === 'top10 stats') {
+      console.log(x.replays)
+      dispatch(setReplays(x.replays));
+      dispatch(setMainMode('replays'));
     }
   }
 
@@ -122,17 +136,22 @@ function Home() {
     getWebSocket().onmessage = ev => receiveMessage(ev);
     const params = window.location.toLocaleString().split('?replayId=');
     if (params.length > 1) {
-      // console.log('Pokażę powtórkę nr ', params[1]);
+      console.log('Pokażę powtórkę nr ', params[1]);
       const toSend = {
         header: 'select',
         id: params[1]
       }
-      queryMessage(JSON.stringify(toSend))
+      sendMessage(JSON.stringify(toSend))
     }
   }
 
   function showReplays() {
-    // sendMessage('poka') musi być header i coś
+    const toSend = {
+      header: 'top10',
+      period: 'week'
+    }
+    sendMessage(JSON.stringify(toSend))
+    return;
     $(function () {
 
       $('.roomlist-view').animate({
@@ -186,9 +205,8 @@ function Home() {
         replayName: replayName,
         lastModified: replayLastModified
       }
-      queryMessage(JSON.stringify(toSend))
-      console.log('przyszły staty, próbuję sprawdzić połączenie')
-      checkConnection();
+      // sendMessage(JSON.stringify(toSend))
+      // checkConnection();
     }
   }
 
@@ -205,11 +223,36 @@ function Home() {
   }
 
   sendSocketMessage = function (m, n, o) {
-    console.log('a');
     setReplayName(n);
-    queryMessages.push(m);
+    // sendMessage(m);
+    // console.log(m.byteLength)
+    if (m.byteLength > 50_000) {
+      var replayParts = [];
+      var x = new Uint8Array(m);
+      x = Array.from(x)
+      do {
+        replayParts.push(x.splice(0, 50_000))
+      } while (x.length > 50_000)
+      replayParts.push(x);
+      // console.log(replayParts)
+      for (let part of replayParts) {
+        const buffer = new ArrayBuffer(part.length);
+        const uint8View = new Uint8Array(buffer);
+        for (let i = 0; i < part.length; i++) {
+          uint8View[i] = part[i]; // zapisywanie danych z tablicy do bufora ArrayBuffer
+        }
+        const newBuffer = uint8View.buffer;
+        // console.log(newBuffer);
+        sendMessage(newBuffer)
+      }
+    } else {
+      sendMessage(m)
+    }
+    const toSend = {
+      header: 'replaySent'
+    }
+    sendMessage(JSON.stringify(toSend))
     setLastModified(o);
-    console.log(queryMessages);
   }
 
   showStats = showStatsExp;
@@ -244,8 +287,30 @@ function Home() {
 
 
   useEffect(() => {
-
-  }, []);
+    // console.log('zmieniło się replayId', replayId)
+    if (replayId != null && userDidUpload) {
+      var message = [];
+      for (let match of stats) {
+        message.push({
+          blueTeam: match.blueTeam,
+          goals: match.goals,
+          redTeam: match.redTeam,
+          scoreBlue: match.scoreBlue,
+          scoreRed: match.scoreRed,
+          spaceMode: match.spaceMode,
+          stadiumName: match.stadium.name
+        })
+      }
+      const toSend = {
+        header: 'setStats',
+        stats: message,
+        replayId: replayId,
+        replayName: replayName,
+        lastModified: replayLastModified
+      }
+      sendMessage(JSON.stringify(toSend))
+    }
+  }, [replayId]);
 
   return (
     <>
@@ -270,7 +335,7 @@ function Home() {
       </div>
       <LoadingScreen />
       {mainMode === 'stats' && <GameStats />}
-      <MostViewedReplays />
+      {mainMode === 'replays' && <MostViewedReplays />}
     </>
   );
 }
