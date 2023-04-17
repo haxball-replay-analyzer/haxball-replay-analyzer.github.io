@@ -9,9 +9,11 @@ function MostViewedReplays() {
   const dispatch = useDispatch();
   const replays = useSelector(state => state.replays.replays);
 
-  function closeReplays() {
+  function callbackFn() {
     dispatch(setMainMode('home'))
-    // console.log(replays);
+  }
+
+  function closeReplays() {
 
     $('.roomlist-view').animate({
       left: '0%',
@@ -19,7 +21,7 @@ function MostViewedReplays() {
 
     $('#mostViewedReplays').animate({
       left: '150%',
-    }, { duration: 700, easing: 'swing', queue: false });
+    }, { duration: 700, easing: 'swing', queue: false, complete: { callbackFn } });
   }
 
   useEffect(() => {
@@ -31,7 +33,7 @@ function MostViewedReplays() {
     $('#mostViewedReplays').animate({
       left: '10%',
     }, { duration: 700, easing: 'swing', queue: false });
-  }, [])
+  })
 
   return (
     <div id="mostViewedReplays">
