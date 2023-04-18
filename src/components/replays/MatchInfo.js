@@ -2,23 +2,20 @@ import { useSelector } from "react-redux";
 
 function MatchInfo(props) {
 
-  const i = props.i;
   const ri = props.replayIndex;
   const match = props.match;
-  const test = useSelector(state => state.replays.replays);
-  console.log('xxx', test, ri)
   const goals = useSelector(state => state.replays.replays.goals[ri]).filter(goal => goal.MatchId === match.MatchId)
   const players = useSelector(state => state.replays.replays.players[ri]).filter(player => [match.RedTeamId, match.BlueTeamId].includes(player.TeamId))
   const teams = useSelector(state => state.replays.replays.teams[ri])
-  const redTeamName = teams.filter(team => team.TeamId === match.RedTeamId).TeamName;
-  const blueTeamName = teams.filter(team => team.TeamId === match.BlueTeamId).TeamName;
+  const redTeamName = teams.filter(team => team.TeamId === match.RedTeamId)[0].TeamName;
+  const blueTeamName = teams.filter(team => team.TeamId === match.BlueTeamId)[0].TeamName;
   var newPlayers = JSON.parse(JSON.stringify(players))
 
   for (let player of newPlayers) {
     player.goals = 0;
   }
   for (let goal of goals) {
-    newPlayers.filter(player => player.Nick === goal.Nick).goals++;
+    newPlayers.filter(player => player.Nick === goal.Nick)[0].goals++;
   }
 
   var redTeam = [], blueTeam = []
@@ -31,15 +28,15 @@ function MatchInfo(props) {
   }
 
   return (
-    <div className="matchInfo">
-      <div>
+    <div className="matchInfo" style={{ display: 'flex', flexDirection: 'column' }}>
+      <div style={{ flex: 3, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', fontWeight: 'bold' }}>
         {redTeamName} {match.RedScore}:{match.BlueScore} {blueTeamName}
       </div>
-      <div style={{ display: 'flex', flexDirection: 'row' }}>
-        <div>{redTeam.join(',  ')}</div>
-        <div>{blueTeam.join(',  ')}</div>
+      <div style={{ flex: 3, display: 'flex', flexDirection: 'row', fontSize: '75%' }}>
+        <div style={{ flex: 1, textAlign: 'center', color: '#E56E56' }}>{redTeam.join(',  ')}</div>
+        <div style={{ flex: 1, textAlign: 'center', color: '#5689E5' }}>{blueTeam.join(',  ')}</div>
       </div>
-      <div>
+      <div style={{ flex: 2, textAlign: 'center' }}>
         Stadium: {match.StadiumName}
       </div>
     </div>

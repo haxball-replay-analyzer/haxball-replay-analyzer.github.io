@@ -248,7 +248,6 @@ table {
   left: 150%;
   position: absolute;
   width: 80%;
-  overflow-y: scroll;
   height: calc(90% - 35px);
   top: calc(5% + 35px);
   display: flex;
@@ -257,7 +256,6 @@ table {
   align-items: start;
   background-color: #1A2125;
   padding: 10px;
-  overflow: hidden;
   box-sizing: border-box;
   border-radius: 20px;
 
@@ -276,6 +274,22 @@ table {
     border-bottom-color: #c13535;
     border-bottom-style: solid
   }
+
+  .replaysContainer {
+    height: 100%;
+    overflow-y: auto;
+
+    .replaysFilters {
+      box-sizing: border-box;
+      padding: 5px;
+      border-bottom: solid 1px #c13535;
+    }
+  }
+}
+
+.searchReplay {
+  @include haxball-button;
+  cursor: pointer
 }
 
 #closeReplaysButton {
@@ -290,7 +304,7 @@ table {
   height: 20%;
   padding-top: 6px;
   padding-bottom: 5px;
-  border-bottom: 1px;
+  border-bottom: 3px;
   border-bottom-color: #717171;
   border-bottom-style: solid;
   display: flex;
@@ -302,11 +316,24 @@ table {
     display: flex;
     flex-direction: row;
     overflow-x: auto;
-    white-space: nowrap;
+    // white-space: nowrap;
 
     .matchInfo {
-      width: 50%;
+      min-width: 50%;
+      padding-left: 5px;
+      padding-right: 5px;
+      box-sizing: border-box;
+
+      >div {
+        // border-right: solid 1px #717171;
+        border-left: solid 1px #717171;
+      }
     }
+  }
+
+  .watchReplayButton {
+    @include haxball-button;
+    cursor: pointer;
   }
 }
 

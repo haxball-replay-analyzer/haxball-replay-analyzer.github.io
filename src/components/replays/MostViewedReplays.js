@@ -3,6 +3,7 @@ import { setMainMode } from "../../slices/mainModeSlice";
 import $ from 'jquery'
 import ReplayInfo from "./ReplayInfo";
 import { useEffect } from "react";
+import ReplaysFilters from "./ReplaysFilters";
 
 function MostViewedReplays() {
 
@@ -25,7 +26,6 @@ function MostViewedReplays() {
   }
 
   useEffect(() => {
-    console.log('pojawiam')
     $('.roomlist-view').animate({
       left: '-150%',
     }, { duration: 700, easing: 'swing', queue: false });
@@ -39,7 +39,12 @@ function MostViewedReplays() {
     <div id="mostViewedReplays">
       <h1>Most viewed replays</h1>
       <button onClick={closeReplays} id="closeReplaysButton" >Close ❌</button>
-      {replays.replays.map((r, index) => <ReplayInfo key={index} i={index} />)}
+      <div className="replaysContainer" style={{ display: 'flex', flexDirection: 'column' }}>
+        <ReplaysFilters />
+        <div style={{ height: '85%' }}>
+          {replays.replays.map((r, index) => <ReplayInfo key={index} i={index} />)}
+        </div>
+      </div>
     </div>
   );
 }
