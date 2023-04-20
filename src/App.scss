@@ -243,7 +243,7 @@ table {
   @include haxball-button;
 }
 
-#mostViewedReplays {
+#ReplaysList {
   position: absolute;
   left: 150%;
   position: absolute;
@@ -270,19 +270,29 @@ table {
     margin-bottom: 20px !important;
     padding-top: 6px;
     padding-bottom: 5px;
-    border-bottom: 3px;
+    border-bottom: 4px;
     border-bottom-color: #c13535;
     border-bottom-style: solid
   }
 
   .replaysContainer {
     height: 100%;
+    width: 100%;
     overflow-y: auto;
 
     .replaysFilters {
       box-sizing: border-box;
       padding: 5px;
-      border-bottom: solid 1px #c13535;
+      border-bottom: solid 4px #c13535;
+
+      .replaysFiltersButtons button {
+        @include haxball-button;
+        margin: 5px;
+
+        &.active {
+          border: 1px solid;
+        }
+      }
     }
   }
 }
@@ -297,6 +307,14 @@ table {
   // top: calc(-42.5% + 35px);
   right: 0px;
   @include haxball-button;
+  cursor: pointer;
+}
+
+#otherReplaysButton {
+  position: absolute !important;
+  right: 20px;
+  @include haxball-button;
+  cursor: pointer;
 }
 
 .replayInfo {

@@ -15,7 +15,7 @@ function MatchInfo(props) {
     player.goals = 0;
   }
   for (let goal of goals) {
-    newPlayers.filter(player => player.Nick === goal.Nick)[0].goals++;
+    if (!goal.Nick.endsWith('(own goal)')) newPlayers.filter(player => player.Nick === goal.Nick)[0].goals++;
   }
 
   var redTeam = [], blueTeam = []

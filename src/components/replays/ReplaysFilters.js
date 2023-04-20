@@ -1,32 +1,94 @@
 import { useState } from "react";
+import { search4Replays } from "../Home";
+import $ from 'jquery';
+import { useSelector, useDispatch } from "react-redux";
+import { setReplaysType } from "../../slices/replaysSlice";
 
 function ReplaysFilters(props) {
 
   const [filterPlayer, setFilterPlayer] = useState(true)
+  const [filterTeam, setFilterTeam] = useState(false)
+  const [filterReplay, setFilterReplay] = useState(false)
+  const [filterGoal, setFilterGoal] = useState(false)
+  const [filterStadium, setFilterStadium] = useState(false)
+  const [filterSpaceMode, setFilterSpaceMode] = useState(false)
+  const [filterRealSoccer, setFilterRealSoccer] = useState(false)
+  const [searchText, setSearchText] = useState(null);
+  const [currentPeriod, setCurrentPeriod] = useState('all-time')
+  const replaysType = useSelector(state => state.replays.type)
 
   function toggleFilter(ev) {
     if (ev.target.id === 'filterPlayer') setFilterPlayer(!filterPlayer)
+    else if (ev.target.id === 'filterTeam') setFilterTeam(!filterTeam)
+    else if (ev.target.id === 'filterReplay') setFilterReplay(!filterReplay)
+    else if (ev.target.id === 'filterGoal') setFilterGoal(!filterGoal)
+    else if (ev.target.id === 'filterStadium') setFilterStadium(!filterStadium)
+    else if (ev.target.id === 'filterSpaceMode') setFilterSpaceMode(!filterSpaceMode)
+    else if (ev.target.id === 'filterRealSoccer') setFilterRealSoccer(!filterRealSoccer)
+  }
+
+  function searchInput(ev) {
+    setSearchText(ev.target.value);
+  }
+
+  function searchReplay() {
+    const toSend = {
+      header: 'top10 filtered',
+      type: replaysType,
+      searchText: searchText,
+      filterPlayer: filterPlayer,
+      filterGoal: filterGoal,
+      filterRealSoccer: filterRealSoccer,
+      filterReplay: filterReplay,
+      filterSpaceMode: filterSpaceMode,
+      filterStadium: filterStadium,
+      filterTeam: filterTeam,
+      period: currentPeriod
+    }
+    search4Replays(toSend)
+  }
+
+  function filterPeriod(ev) {
+    $('#filterByWeek').removeClass('active')
+    $('#filterByMonth').removeClass('active')
+    $('#filterByAlltime').removeClass('active')
+    $('#' + ev.target.id).addClass('active')
+    setCurrentPeriod(ev.target.textContent.toLowerCase());
+    searchReplay();
   }
 
   return (
     <div className="replaysFilters" style={{ height: '15%', width: '100%', display: "flex", flexDirection: "row" }}>
-      <div style={{ flex: 1, display: "flex", justifyContent: "center", alignItems: "center", fontSize: '150%', fontWeight: 'bold' }}>Filters</div>
+      <div style={{ flex: 1, display: "flex", flexDirection: 'column', justifyContent: "center", alignItems: "center" }}>
+        <div style={{ flex: 1, display: "flex", justifyContent: "center", alignItems: "center", fontSize: '150%', fontWeight: 'bold' }}>Filters</div>
+        {replaysType === 'mostViewed' && <div className="replaysFiltersButtons" style={{ flex: 1 }}>
+          <button id="filterByWeek" className="active" onClick={filterPeriod}>Week</button>
+          <button id="filterByMonth" onClick={filterPeriod}>Month</button>
+          <button id="filterByAlltime" onClick={filterPeriod}>All-time</button>
+        </div>}
+      </div>
       <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center" }}>
-        <input type="text" style={{ backgroundColor: 'lightgrey', borderRadius: 4, padding: "3px", margin: '5px', width: '80%' }} placeholder="Search..." />
+        <input
+          type="text"
+          style={{ backgroundColor: 'lightgrey', borderRadius: 4, padding: "3px", margin: '5px', width: '80%' }}
+          placeholder="Search..."
+          value={searchText}
+          onChange={searchInput}
+        />
         <div>
-          <label style={{ margin: '5px' }}><input type="checkbox" />Replay Name</label>
-          <label style={{ margin: '5px' }}><input type="checkbox" />Team Name</label>
+          <label style={{ margin: '5px' }}><input type="checkbox" id='filterReplay' checked={filterReplay} onChange={toggleFilter} />Replay Name</label>
+          <label style={{ margin: '5px' }}><input type="checkbox" id='filterTeam' checked={filterTeam} onChange={toggleFilter} />Team Name</label>
         </div>
       </div>
       <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
         <label style={{ margin: '5px' }}><input type="checkbox" id='filterPlayer' checked={filterPlayer} onChange={toggleFilter} />Player</label>
-        <label style={{ margin: '5px' }}><input type="checkbox" />Goal Scorer</label>
-        <label style={{ margin: '5px' }}><input type="checkbox" />Stadium Name</label>
+        <label style={{ margin: '5px' }}><input type="checkbox" id='filterGoal' checked={filterGoal} onChange={toggleFilter} />Goal Scorer</label>
+        <label style={{ margin: '5px' }}><input type="checkbox" id='filterStadium' checked={filterStadium} onChange={toggleFilter} />Stadium Name</label>
       </div>
       <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
-        <label style={{ margin: '5px' }}><input type="checkbox" />Only SpaceMode</label>
-        <label style={{ margin: '5px' }}><input type="checkbox" />Only Real Soccer</label>
-        <button className="searchReplay">Search</button>
+        <label style={{ margin: '5px' }}><input type="checkbox" id='filterSpaceMode' checked={filterSpaceMode} onChange={toggleFilter} />Only SpaceMode</label>
+        <label style={{ margin: '5px' }}><input type="checkbox" id='filterRealSoccer' checked={filterRealSoccer} onChange={toggleFilter} />Only Real Soccer</label>
+        <button className="searchReplay" onClick={searchReplay}>Search</button>
       </div>
     </div>
   )
