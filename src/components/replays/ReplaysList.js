@@ -5,6 +5,7 @@ import ReplayInfo from "./ReplayInfo";
 import { useEffect } from "react";
 import ReplaysFilters from "./ReplaysFilters";
 import { setReplaysType } from "../../slices/replaysSlice";
+import { search4Replays } from "../Home";
 
 function ReplaysList() {
 
@@ -28,9 +29,14 @@ function ReplaysList() {
   }
 
   function changeReplaysType(ev) {
-    console.log('e');
+    // console.log('e');
+    const toSend = {
+      header: 'top10',
+      replaysType: (replaysType === 'latest' ? 'mostViewed' : 'latest')
+    }
     if (ev.target.textContent.startsWith('Most vi')) dispatch(setReplaysType('mostViewed'))
     else dispatch(setReplaysType('latest'))
+    search4Replays(toSend)
   }
 
   useEffect(() => {
@@ -41,7 +47,7 @@ function ReplaysList() {
     $('#ReplaysList').animate({
       left: '10%',
     }, { duration: 700, easing: 'swing', queue: false });
-  })
+  }, [])
 
   return (
     <div id="ReplaysList">
@@ -50,12 +56,17 @@ function ReplaysList() {
       <button id="otherReplaysButton" onClick={changeReplaysType}>{replaysType === 'mostViewed' ? 'Latest replays' : 'Most viewed replays'}</button>
       <div className="replaysContainer" style={{ display: 'flex', flexDirection: 'column' }}>
         <ReplaysFilters />
-        <div style={{ height: '85%' }}>
-          {replays.replays.map((r, index) => <ReplayInfo key={index} i={index} />)}
+        <div className="replaysList" style={{ height: '85%' }}>
+          {
+            replays.replays.length !== 0 ?
+              replays.replays.map((r, index) => <ReplayInfo key={index} i={index} />) :
+              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%' }}>
+                <div style={{ textAlign: 'center' }}>There is no replay with given filters</div>
+              </div>
+          }
         </div>
       </div>
     </div>
-  );
+  )
 }
-
 export default ReplaysList;

@@ -15,7 +15,8 @@ function MatchInfo(props) {
     player.goals = 0;
   }
   for (let goal of goals) {
-    if (!goal.Nick.endsWith('(own goal)')) newPlayers.filter(player => player.Nick === goal.Nick)[0].goals++;
+    console.log(goal.Nick, newPlayers);
+    if (!goal.Nick.endsWith('(own goal)')) newPlayers.filter(player => player.Nick === goal.Nick.trim())[0].goals++;
   }
 
   var redTeam = [], blueTeam = []
@@ -29,14 +30,14 @@ function MatchInfo(props) {
 
   return (
     <div className="matchInfo" style={{ display: 'flex', flexDirection: 'column' }}>
-      <div style={{ flex: 3, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', fontWeight: 'bold' }}>
+      <div style={{ flex: 2, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', fontWeight: 'bold' }}>
         {redTeamName} {match.RedScore}:{match.BlueScore} {blueTeamName}
       </div>
       <div style={{ flex: 3, display: 'flex', flexDirection: 'row', fontSize: '75%' }}>
         <div style={{ flex: 1, textAlign: 'center', color: '#E56E56' }}>{redTeam.join(',  ')}</div>
         <div style={{ flex: 1, textAlign: 'center', color: '#5689E5' }}>{blueTeam.join(',  ')}</div>
       </div>
-      <div style={{ flex: 2, textAlign: 'center' }}>
+      <div style={{ flex: 1, textAlign: 'center', fontSize: '80%' }}>
         Stadium: {match.StadiumName}
       </div>
     </div>

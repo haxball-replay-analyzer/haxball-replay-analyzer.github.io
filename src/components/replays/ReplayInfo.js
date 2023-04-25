@@ -2,17 +2,22 @@ import { useSelector } from "react-redux";
 import MatchInfo from "./MatchInfo";
 import { checkParamsExp } from "../Home";
 import $ from 'jquery'
+import { useDispatch } from "react-redux";
+import { setMainMode } from "../../slices/mainModeSlice";
 
 function ReplayInfo(props) {
 
+  const dispatch = useDispatch();
   function watchReplay(e) {
     // console.log(replays[i].ReplayId);
     const addURL = "?replayId=" + replays[i].ReplayId;
     window.history.replaceState(null, null, addURL);
+    const connectHalves = (replays[i].ConnectedHalves ? true : false)
+    // console.log(replays, i, connectHalves);
     checkParamsExp();
-    $('#mostViewedReplays').animate({
-      left: '150%',
-    }, { duration: 700, easing: 'swing', queue: false });
+    $('#ReplaysList').animate({
+      left: '-150%',
+    }, { duration: 700, easing: 'swing', queue: false, complete: function () { dispatch(setMainMode('home')) } });
   }
 
   const i = props.i;
@@ -27,7 +32,7 @@ function ReplayInfo(props) {
           <div style={{ display: 'flex', fontSize: '200%', alignItems: 'center', padding: '5px', fontWeight: 'bold' }}>{replays[i].ViewsCount}</div>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>views</div>
         </div>
-        <div style={{ flex: 1, display: 'flex', alignItems: 'center' }}>Sent: {new Date(replays[i].LastModified).toISOString().split('T')[0]}</div>
+        <div style={{ flex: 1, display: 'flex', alignItems: 'center' }}>Sent: {replays[i].SentDate && new Date(replays[i].SentDate).toISOString().replace('T', ' ').substring(0, 16)}</div>
       </div>
       <div className="replayMatches">
         {matches[i].map((m, index) => <MatchInfo key={index} match={m} i={index} replayIndex={i} />)}

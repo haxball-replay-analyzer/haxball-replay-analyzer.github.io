@@ -10,7 +10,10 @@ export const gameStatsSlice = createSlice({
     selectedMatch: 0,
     selectedStat: -1,
     selectedPlayer: -1,
-    selectedHeatmap: 'Heatmap'
+    selectedHeatmap: 'Heatmap',
+    connectHalves: false,
+    redTeamNames: [],
+    blueTeamNames: []
   },
   reducers: {
     setDivStyle: (state, action) => {
@@ -66,11 +69,22 @@ export const gameStatsSlice = createSlice({
         selectedPlayer: -1,
         selectedHeatmap: 'Heatmap'
       }
+    },
+    setConnectHalves: (state, action) => {
+      state.connectHalves = action.payload
+    },
+    setRedTeamName: (state, action) => {
+      state.redTeamNames[action.payload.mtc] = action.payload.name
+      console.log(action.payload.mtc, action.payload.name);
+    },
+    setBlueTeamName: (state, action) => {
+      state.blueTeamNames[action.payload.mtc] = action.payload.name
+      console.log(action.payload.mtc, action.payload.name);
     }
   },
 })
 
 // Action creators are generated for each case reducer function
-export const { setDivStyle, setStats, showNextMatch, showPreviousMatch, selectMatch, selectStat, selectPlayer, selectHeatmap, setPlayerList, setPlayerPos, clearStats } = gameStatsSlice.actions
+export const { testFunction, setDivStyle, setStats, showNextMatch, showPreviousMatch, selectMatch, selectStat, selectPlayer, selectHeatmap, setPlayerList, setPlayerPos, clearStats, setConnectHalves, setRedTeamName, setBlueTeamName } = gameStatsSlice.actions
 
 export default gameStatsSlice.reducer

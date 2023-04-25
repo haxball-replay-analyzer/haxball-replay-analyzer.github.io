@@ -34,7 +34,7 @@ function ReplaysFilters(props) {
   function searchReplay() {
     const toSend = {
       header: 'top10 filtered',
-      type: replaysType,
+      replaysType: replaysType,
       searchText: searchText,
       filterPlayer: filterPlayer,
       filterGoal: filterGoal,
@@ -74,6 +74,11 @@ function ReplaysFilters(props) {
           placeholder="Search..."
           value={searchText}
           onChange={searchInput}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter') {
+              searchReplay();
+            }
+          }}
         />
         <div>
           <label style={{ margin: '5px' }}><input type="checkbox" id='filterReplay' checked={filterReplay} onChange={toggleFilter} />Replay Name</label>

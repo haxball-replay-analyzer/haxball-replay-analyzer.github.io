@@ -4,7 +4,7 @@ import { handleFile, replayFromSite } from "../game2.js";
 import LoadingScreen from "./LoadingScreen";
 import { useSelector, useDispatch } from "react-redux";
 import { setMainMode, setUserUploaded } from "../slices/mainModeSlice";
-import { setDivStyle, setStats, setPlayerList, setPlayerPos, clearStats } from "../slices/gameStatsSlice";
+import { setDivStyle, setStats, setPlayerList, setPlayerPos, clearStats, setConnectHalves, setRedTeamName, setBlueTeamName } from "../slices/gameStatsSlice";
 import GameStats from "./game stats/GameStats";
 import useWebSocket, { ReadyState } from 'react-use-websocket';
 import { useEffect, useState } from "react";
@@ -17,8 +17,10 @@ export function dispatchPlayerList() { }
 export function dispatchPlayerPos() { }
 export function dispatchClearStats() { }
 export function sendSocketMessage() { }
+export function sendMessageExp() { }
 export function search4Replays() { }
 export function checkParamsExp() { }
+export function changeTeamNames() { }
 
 var queryMessage = {};
 var replayData = [];
@@ -32,6 +34,7 @@ function Home() {
   const STATIC_OPTIONS = {
     onOpen: () => {
       console.log('Connected with WebSocket')
+      getWebSocket().onmessage = ev => receiveMessage(ev);
       if (paramsChecked) {
         // sendQueryMessages();
       } else {
@@ -62,6 +65,7 @@ function Home() {
   const [replayName, setReplayName] = useState(null);
   const [replayLastModified, setLastModified] = useState(null);
   const [paramsChecked, setParamsChecked] = useState(false);
+  const [IP, setIP] = useState(null)
 
   // function queryMessage(m) {
   //   // console.log(connectionStatus, m);
@@ -107,6 +111,18 @@ function Home() {
       replayData = replayData.concat(x.rec.data);
       // console.log(replayData);
     } else if (x.header === 'replaySent') {
+      console.log(x.connectHalves);
+      if (x?.connectHalves) dispatch(setConnectHalves(true))
+      else dispatch(setConnectHalves(false))
+
+      for (var i = 0; i < x.teamNames.length; i++) {
+        const j = Math.floor(i / 2);
+        if (i % 2 === 0) {
+          dispatch(setRedTeamName({ mtc: j, name: x.teamNames[i].TeamName }))
+          console.log(i, 'ustawiam redów na', x.teamNames[i].TeamName);
+        } else dispatch(setBlueTeamName({ mtc: j, name: x.teamNames[i].TeamName }))
+      }
+
       const y = replayData;
       // console.log(y);
       const buffer = new ArrayBuffer(y.length);
@@ -137,16 +153,43 @@ function Home() {
       setReplayId(x.id);
     } else if (x.header === 'top10 stats') {
       console.log(x.replays)
+      for (var i = 0; i < x.replays.replays.length; i++) {
+        console.log(x.replays.replays[i].ConnectedHalves);
+        if (x.replays.replays[i].ConnectedHalves) {
+          console.log('łączę', x.replays);
+          connectHalves(x.replays, i)
+          console.log('połączyłem', x.replays);
+        }
+      }
       dispatch(setReplays(x.replays));
       dispatch(setMainMode('replays'));
     }
   }
 
+  function connectHalves(replays, i) {
+    const firstMatchId = replays.matches[i][0].MatchId;
+    const firstTeamId = replays.teams[i][0].TeamId;
+    const teamIds = [firstTeamId, firstTeamId + 1, firstTeamId + 2, firstTeamId + 3]
+    for (let goal of replays.goals[i]) {
+      goal.MatchId = firstMatchId;
+    }
+    replays.matches[i][0].RedScore += replays.matches[i][1].BlueScore;
+    replays.matches[i][0].BlueScore += replays.matches[i][1].RedScore;
+    replays.matches[i].splice(1, 1);
+    var tempPlayers = [];
+    for (let player of replays.players[i]) {
+      if (!tempPlayers.includes(player.Nick)) {
+        if (player.TeamId === teamIds[2]) player.TeamId = teamIds[1];
+        if (player.TeamId === teamIds[3]) player.TeamId = teamIds[0];
+      }
+      tempPlayers.push(player.Nick)
+    }
+  }
+
   function checkParams() {
-    getWebSocket().onmessage = ev => receiveMessage(ev);
     const params = window.location.toLocaleString().split('?replayId=');
     if (params.length > 1) {
-      console.log('Pokażę powtórkę nr ', params[1]);
+      // console.log('Pokażę powtórkę nr ', params[1]);
       const toSend = {
         header: 'select',
         id: params[1]
@@ -168,9 +211,16 @@ function Home() {
     const toSend = {
       header: 'top10',
       period: 'week',
-      type: replaysType
+      replaysType: replaysType
     }
     sendMessage(JSON.stringify(toSend))
+  }
+
+  async function getIP() {
+    const response = await fetch('https://ipapi.co/json/')
+    const data = await response.json();
+    console.log(data);
+    setIP(data.ip)
   }
 
   function showStatsExp(elStyle) {
@@ -184,7 +234,10 @@ function Home() {
     dispatch(setStats(stats));
     if (userDidUpload) {
       var message = [];
-      for (let match of stats) {
+      for (var i = 0; i < stats.length; i++) {
+        const match = stats[i];
+        dispatch(setRedTeamName({ mtc: i, name: 'RED' }))
+        dispatch(setBlueTeamName({ mtc: i, name: 'BLUE' }))
         message.push({
           blueTeam: match.blueTeam,
           goals: match.goals,
@@ -200,11 +253,12 @@ function Home() {
         stats: message,
         replayId: replayIdToSend,
         replayName: replayName,
-        lastModified: replayLastModified
+        lastModified: replayLastModified,
+        IP: IP
       }
       queryMessage = toSend;
       waitingForStats = false;
-      console.log('dostaję staty');
+      console.log('dostaję staty', toSend);
       if (!waitingForSocket) {
         sendMessage(JSON.stringify(queryMessage))
       }
@@ -222,6 +276,20 @@ function Home() {
 
   function dispatchClearStatsExp() {
     dispatch(clearStats());
+  }
+
+  changeTeamNames = function (names, matchId) {
+    const toSend = {
+      header: 'changeTeamNames',
+      names: names,
+      matchId: matchId,
+      replayId: replayId
+    }
+    sendMessage(JSON.stringify(toSend))
+  }
+
+  sendMessageExp = function (m) {
+    sendMessage(JSON.stringify(m))
   }
 
   sendSocketMessage = function (m, n, o) {
@@ -279,6 +347,7 @@ function Home() {
 
     // sendMessage('Hello');
     dispatch(setUserUploaded(true));
+    setConnectHalves(false)
     setReplayId(null);
     waitingForSocket = true;
     waitingForStats = true;
@@ -300,29 +369,30 @@ function Home() {
 
   useEffect(() => {
     // console.log('zmieniło się replayId', replayId)
-    if (replayId != null && userDidUpload) {
-      var message = [];
-      for (let match of stats) {
-        message.push({
-          blueTeam: match.blueTeam,
-          goals: match.goals,
-          redTeam: match.redTeam,
-          scoreBlue: match.scoreBlue,
-          scoreRed: match.scoreRed,
-          spaceMode: match.spaceMode,
-          stadiumName: match.stadium.name
-        })
-      }
-      const toSend = {
-        header: 'setStats',
-        stats: message,
-        replayId: replayId,
-        replayName: replayName,
-        lastModified: replayLastModified
-      }
-      sendMessage(JSON.stringify(toSend))
-    }
-  }, [replayId]);
+    getIP();
+    // if (replayId != null && userDidUpload) {
+    //   var message = [];
+    //   for (let match of stats) {
+    //     message.push({
+    //       blueTeam: match.blueTeam,
+    //       goals: match.goals,
+    //       redTeam: match.redTeam,
+    //       scoreBlue: match.scoreBlue,
+    //       scoreRed: match.scoreRed,
+    //       spaceMode: match.spaceMode,
+    //       stadiumName: match.stadium.name
+    //     })
+    //   }
+    //   const toSend = {
+    //     header: 'setStats',
+    //     stats: message,
+    //     replayId: replayId,
+    //     replayName: replayName,
+    //     lastModified: replayLastModified
+    //   }
+    //   sendMessage(JSON.stringify(toSend))
+    // }
+  }, []);
 
   return (
     <>
@@ -346,7 +416,7 @@ function Home() {
         </div>
       </div>
       <LoadingScreen />
-      {mainMode === 'stats' && <GameStats />}
+      {mainMode === 'stats' && <GameStats replayId={replayId} />}
       {mainMode === 'replays' && <ReplaysList />}
     </>
   );
