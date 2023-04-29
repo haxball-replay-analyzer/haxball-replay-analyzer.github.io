@@ -5,9 +5,10 @@ import PlayerStats from "./PlayerStats";
 import ThirdStats from "./ThirdStats";
 import { watchGoal } from "../../game2";
 import $ from 'jquery'
-import { selectMatch, showNextMatch, showPreviousMatch, setStats, setConnectHalves, setRedTeamName, setBlueTeamName } from "../../slices/gameStatsSlice";
+import { selectMatch, showNextMatch, showPreviousMatch, setStats, setConnectHalves, setRedTeamName, setBlueTeamName, setConnectedHalves, splitHalves } from "../../slices/gameStatsSlice";
 import HeatMap from "./HeatMap";
 import { changeTeamNames, sendMessageExp } from "../Home";
+import { openModal } from "../Modal";
 
 function GameStats(props) {
 
@@ -20,6 +21,9 @@ function GameStats(props) {
   const doConnectHalves = useSelector(state => state.gameStats.connectHalves)
   const redTeamName = useSelector(state => state.gameStats.redTeamNames[mtc])
   const blueTeamName = useSelector(state => state.gameStats.blueTeamNames[mtc])
+  const redTeamNames = useSelector(state => state.gameStats.redTeamNames)
+  const blueTeamNames = useSelector(state => state.gameStats.blueTeamNames)
+  const connectedHalves = useSelector(state => state.gameStats.connectedHalves)
   const replayId = props.replayId
   const dispatch = useDispatch();
 
@@ -28,11 +32,11 @@ function GameStats(props) {
     top: divStyle.offsetTop + divStyle.offsetParentTop
   }
 
-  function closeStats(e, completeF = null) {
+  function completeFunction() {
+    dispatch(setMainMode('home'))
+  }
 
-    function completeFunction() {
-      dispatch(setMainMode('home'))
-    }
+  function closeStats(e, completeF = null) {
 
     $("#prevMatch").css('display', 'none')
     $("#nextMatch").css('display', 'none')
@@ -93,6 +97,7 @@ function GameStats(props) {
   function handleBlur() {
     if (userUploaded) {
       changeTeamNames([redTeamName, blueTeamName], mtc)
+      openModal('Successfully changed team name', 'green', 3)
     }
   }
 
@@ -110,6 +115,8 @@ function GameStats(props) {
         if (size < 14) size = 14;
         x.target.style['font-size'] = '' + size + 'px';
       } else x.target.style['font-size'] = '40px';
+    } else {
+      openModal('You can\'t edit team names in this replay.', 'darkred', 4)
     }
   }
 
@@ -136,6 +143,7 @@ function GameStats(props) {
 
   function connectHalves(e) {
     dispatch(setConnectHalves(false))
+    dispatch(setConnectedHalves(true))
     var newMatch = {
       gameTicks: match[0].gameTicks + match[1].gameTicks,
       goals: [...match[0].goals],
@@ -203,6 +211,17 @@ function GameStats(props) {
     sendMessageExp(toSend)
   }
 
+  function splitHalvesFn() {
+    dispatch(setConnectedHalves(false))
+    dispatch(splitHalves());
+    const toSend = {
+      header: 'splitHalves',
+      replayId: replayId
+    }
+    sendMessageExp(toSend);
+    openModal('Successfully splitted match back into 2 halves', 'green', 4)
+  }
+
   function showButtons() {
     $('#prevMatch').css('display', mtc === 0 ? 'none' : 'block')
     $('#nextMatch').css('display', mtc === match.length - 1 ? 'none' : 'block')
@@ -258,10 +277,11 @@ function GameStats(props) {
           Match stats{match[mtc].spaceMode && ' (space mode)'}:
           <select value={mtc} onChange={showMatch}>
             {match.map((m, index) => <option value={index} key={index} >
-              {index + 1}: {redTeamName} {match[index].scoreRed}:{match[index].scoreBlue} {blueTeamName}
+              {index + 1}: {redTeamNames[index]} {match[index].scoreRed}:{match[index].scoreBlue} {blueTeamNames[index]}
             </option>)}
           </select>
           {(match.length === 2 && userUploaded) && <button onClick={connectHalves} style={{ margin: '0 10px 0 30px' }}>Connect 2 halves</button>}
+          {(connectedHalves && userUploaded) && <button onClick={splitHalvesFn} style={{ margin: '0 10px 0 30px' }}>Split halves back</button>}
           {match[mtc].stadium.canBeStored && <button onClick={downloadMap} style={{ margin: '0 10px 0 30px' }}>Download map</button>}
         </h1>
         <button onClick={closeStats} style={{ position: 'absolute', right: 20 }} >Close ❌</button>

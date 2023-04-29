@@ -15,7 +15,7 @@ function MatchInfo(props) {
     player.goals = 0;
   }
   for (let goal of goals) {
-    console.log(goal.Nick, newPlayers);
+    // console.log(goal.Nick, newPlayers);
     if (!goal.Nick.endsWith('(own goal)')) newPlayers.filter(player => player.Nick === goal.Nick.trim())[0].goals++;
   }
 

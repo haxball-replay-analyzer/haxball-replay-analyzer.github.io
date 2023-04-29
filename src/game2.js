@@ -18,6 +18,7 @@
 import $ from 'jquery';
 import './vendor/pako-jszip.min.js';
 import { showStats, setGameStats, dispatchPlayerList, dispatchPlayerPos, dispatchClearStats, sendSocketMessage } from './components/Home';
+import { openModal } from './components/Modal.js';
 
 var loading = {};
 
@@ -817,6 +818,7 @@ export function handleFile(e) {
     // console.log(a);
     b.onload = function () {
       if (b.result.byteLength < 3000000) sendSocketMessage(b.result, a.name.slice(0, -5), a.lastModified);
+      else openModal('This file is too big to be sent to server. But don\'t worry, you can still watch it offline.', 'darkgoldenrod', 7)
       if (b.result.byteLength > 50_000) {
         ///////////////////////////////////////
         // console.log(b.result);

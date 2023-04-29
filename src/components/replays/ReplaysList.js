@@ -11,10 +11,12 @@ function ReplaysList() {
 
   const dispatch = useDispatch();
   const replays = useSelector(state => state.replays.replays);
-  const replaysType = useSelector(state => state.replays.type)
+  const replaysType = useSelector(state => state.replays.type);
+  var mainMode = useSelector(stats => stats.mainMode.value)
 
   function callbackFn() {
     dispatch(setMainMode('home'))
+    console.log('nie robie tego');
   }
 
   function closeReplays() {
@@ -25,7 +27,7 @@ function ReplaysList() {
 
     $('#ReplaysList').animate({
       left: '150%',
-    }, { duration: 700, easing: 'swing', queue: false, complete: { callbackFn } });
+    }, { duration: 700, easing: 'swing', queue: false, complete: callbackFn });
   }
 
   function changeReplaysType(ev) {
@@ -40,14 +42,16 @@ function ReplaysList() {
   }
 
   useEffect(() => {
-    $('.roomlist-view').animate({
-      left: '-150%',
-    }, { duration: 700, easing: 'swing', queue: false });
+    if (mainMode === 'replays') {
+      $('.roomlist-view').animate({
+        left: '-150%',
+      }, { duration: 700, easing: 'swing', queue: false });
 
-    $('#ReplaysList').animate({
-      left: '10%',
-    }, { duration: 700, easing: 'swing', queue: false });
-  }, [])
+      $('#ReplaysList').animate({
+        left: '10%',
+      }, { duration: 700, easing: 'swing', queue: false });
+    }
+  })
 
   return (
     <div id="ReplaysList">

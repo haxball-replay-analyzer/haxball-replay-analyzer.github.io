@@ -4,12 +4,13 @@ import { handleFile, replayFromSite } from "../game2.js";
 import LoadingScreen from "./LoadingScreen";
 import { useSelector, useDispatch } from "react-redux";
 import { setMainMode, setUserUploaded } from "../slices/mainModeSlice";
-import { setDivStyle, setStats, setPlayerList, setPlayerPos, clearStats, setConnectHalves, setRedTeamName, setBlueTeamName } from "../slices/gameStatsSlice";
+import { setDivStyle, setStats, setPlayerList, setPlayerPos, clearStats, setConnectHalves, setRedTeamName, setBlueTeamName, setConnectedHalves } from "../slices/gameStatsSlice";
 import GameStats from "./game stats/GameStats";
 import useWebSocket, { ReadyState } from 'react-use-websocket';
 import { useEffect, useState } from "react";
 import ReplaysList from "./replays/ReplaysList";
 import { setReplays, setReplaysType } from "../slices/replaysSlice";
+import { openModal } from "./Modal";
 
 export function showStats() { }
 export function setGameStats() { }
@@ -89,7 +90,7 @@ function Home() {
   // }
 
   function receiveMessage(m) {
-    console.log('odebrałem ', m);
+    // console.log('odebrałem ', m);
     if (m.data === 'pong') {
       console.log('pong')
       // sendQueryMessages();
@@ -98,7 +99,7 @@ function Home() {
     const x = JSON.parse(m.data);
     if (x.header === 'insertedReplayId') {
       const addURL = "?replayId=" + x.id;
-      window.history.replaceState(null, null, addURL);
+      window.history.pushState(null, null, addURL);
       setReplayId(x.id);
       console.log('dostaję id replaya')
       waitingForSocket = false;
@@ -149,20 +150,24 @@ function Home() {
       })
     } else if (x.header === 'alreadyUploaded') {
       const addURL = "?replayId=" + x.replayId;
-      window.history.replaceState(null, null, addURL);
+      window.history.pushState(null, null, addURL);
       setReplayId(x.id);
+      openModal('This recording has already been uploaded. Redirected to this replay.', 'darkgoldenrod', 5)
     } else if (x.header === 'top10 stats') {
-      console.log(x.replays)
+      // console.log(x.replays)
       for (var i = 0; i < x.replays.replays.length; i++) {
-        console.log(x.replays.replays[i].ConnectedHalves);
+        // console.log(x.replays.replays[i].ConnectedHalves);
         if (x.replays.replays[i].ConnectedHalves) {
-          console.log('łączę', x.replays);
+          // console.log('łączę', x.replays);
           connectHalves(x.replays, i)
-          console.log('połączyłem', x.replays);
+          // console.log('połączyłem', x.replays);
         }
       }
       dispatch(setReplays(x.replays));
+      // console.log('czemu nie dispaczujesz');
       dispatch(setMainMode('replays'));
+    } else if (x.header === 'invalidLink') {
+      openModal('Invalid link - replay with given ID doesn\'t exist', 'darkgoldenrod', 4)
     }
   }
 
@@ -199,27 +204,31 @@ function Home() {
   }
 
   function showReplays(ev) {
+    // console.log('łotwierom');
+    if (connectionStatus === 'Open') {
+      if (ev.target.textContent === 'Most viewed replays') {
+        var replaysType = 'mostViewed'
+      } else {
+        var replaysType = 'latest'
+      }
 
-    if (ev.target.textContent === 'Most viewed replays') {
-      var replaysType = 'mostViewed'
+      dispatch(setReplaysType(replaysType))
+
+      const toSend = {
+        header: 'top10',
+        period: 'week',
+        replaysType: replaysType
+      }
+      sendMessage(JSON.stringify(toSend))
     } else {
-      var replaysType = 'latest'
+      openModal('Error: Can\'t connect to server. Try again later.', 'darkred', 4)
     }
-
-    dispatch(setReplaysType(replaysType))
-
-    const toSend = {
-      header: 'top10',
-      period: 'week',
-      replaysType: replaysType
-    }
-    sendMessage(JSON.stringify(toSend))
   }
 
   async function getIP() {
     const response = await fetch('https://ipapi.co/json/')
     const data = await response.json();
-    console.log(data);
+    // console.log(data);
     setIP(data.ip)
   }
 
@@ -327,7 +336,7 @@ function Home() {
 
   search4Replays = function (toSend) {
     sendMessage(JSON.stringify(toSend))
-    console.log('wysyłam', toSend);
+    // console.log('wysyłam', toSend);
   }
 
   showStats = showStatsExp;
@@ -347,7 +356,8 @@ function Home() {
 
     // sendMessage('Hello');
     dispatch(setUserUploaded(true));
-    setConnectHalves(false)
+    dispatch(setConnectHalves(false))
+    dispatch(setConnectedHalves(false))
     setReplayId(null);
     waitingForSocket = true;
     waitingForStats = true;

@@ -5,6 +5,7 @@ export const gameStatsSlice = createSlice({
   initialState: {
     divStyle: {},
     matches: [],
+    previousStats: [],
     playerPos: [],
     playerList: [],
     selectedMatch: 0,
@@ -12,6 +13,7 @@ export const gameStatsSlice = createSlice({
     selectedPlayer: -1,
     selectedHeatmap: 'Heatmap',
     connectHalves: false,
+    connectedHalves: false,
     redTeamNames: [],
     blueTeamNames: []
   },
@@ -24,6 +26,7 @@ export const gameStatsSlice = createSlice({
       for (var i = 0; i < matches.length; i++) {
         if (matches[i].gameTicks < 0) matches.splice(i, 1);
       }
+      state.previousStats = state.matches;
       state.matches = matches;
       state.selectedMatch = 0;
       state.selectedPlayer = -1;
@@ -80,11 +83,17 @@ export const gameStatsSlice = createSlice({
     setBlueTeamName: (state, action) => {
       state.blueTeamNames[action.payload.mtc] = action.payload.name
       console.log(action.payload.mtc, action.payload.name);
+    },
+    splitHalves: (state) => {
+      state.matches = state.previousStats;
+    },
+    setConnectedHalves: (state, action) => {
+      state.connectedHalves = action.payload;
     }
   },
 })
 
 // Action creators are generated for each case reducer function
-export const { testFunction, setDivStyle, setStats, showNextMatch, showPreviousMatch, selectMatch, selectStat, selectPlayer, selectHeatmap, setPlayerList, setPlayerPos, clearStats, setConnectHalves, setRedTeamName, setBlueTeamName } = gameStatsSlice.actions
+export const { testFunction, setDivStyle, setStats, showNextMatch, showPreviousMatch, selectMatch, selectStat, selectPlayer, selectHeatmap, setPlayerList, setPlayerPos, clearStats, setConnectHalves, setRedTeamName, setBlueTeamName, splitHalves, setConnectedHalves } = gameStatsSlice.actions
 
 export default gameStatsSlice.reducer

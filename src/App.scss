@@ -307,6 +307,19 @@ table {
   }
 }
 
+#modal {
+  position: fixed;
+  box-sizing: border-box;
+  top: 40px;
+  z-index: 9;
+  padding: 5px 15px 5px 15px;
+  border-radius: 8px;
+  font-weight: bold;
+  display: none;
+  border: 2px solid white;
+  left: -150%;
+}
+
 .searchReplay {
   @include haxball-button;
   cursor: pointer

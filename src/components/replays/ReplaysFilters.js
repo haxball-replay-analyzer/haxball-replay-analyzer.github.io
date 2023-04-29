@@ -14,7 +14,7 @@ function ReplaysFilters(props) {
   const [filterSpaceMode, setFilterSpaceMode] = useState(false)
   const [filterRealSoccer, setFilterRealSoccer] = useState(false)
   const [searchText, setSearchText] = useState(null);
-  const [currentPeriod, setCurrentPeriod] = useState('all-time')
+  const [periodState, setPeriodState] = useState('week');
   const replaysType = useSelector(state => state.replays.type)
 
   function toggleFilter(ev) {
@@ -31,7 +31,7 @@ function ReplaysFilters(props) {
     setSearchText(ev.target.value);
   }
 
-  function searchReplay() {
+  function searchReplay(ev, period = null) {
     const toSend = {
       header: 'top10 filtered',
       replaysType: replaysType,
@@ -43,7 +43,7 @@ function ReplaysFilters(props) {
       filterSpaceMode: filterSpaceMode,
       filterStadium: filterStadium,
       filterTeam: filterTeam,
-      period: currentPeriod
+      period: (period || periodState)
     }
     search4Replays(toSend)
   }
@@ -53,8 +53,8 @@ function ReplaysFilters(props) {
     $('#filterByMonth').removeClass('active')
     $('#filterByAlltime').removeClass('active')
     $('#' + ev.target.id).addClass('active')
-    setCurrentPeriod(ev.target.textContent.toLowerCase());
-    searchReplay();
+    searchReplay(null, ev.target.textContent.toLowerCase());
+    setPeriodState(ev.target.textContent.toLowerCase())
   }
 
   return (
