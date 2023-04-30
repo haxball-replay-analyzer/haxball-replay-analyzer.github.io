@@ -34,19 +34,17 @@ function Home() {
   const socketUrl = 'ws://localhost:8080/';
   const STATIC_OPTIONS = {
     onOpen: () => {
-      console.log('Connected with WebSocket')
+      // console.log('Connected with WebSocket')
       getWebSocket().onmessage = ev => receiveMessage(ev);
-      if (paramsChecked) {
-        // sendQueryMessages();
-      } else {
+      if (!paramsChecked) {
         checkParams();
         setParamsChecked(true)
       }
     },
     onClose: (e) => {
-      console.log('Connection closed', e.reason);
+      // console.log('Connection closed', e.reason);
     },
-    shouldReconnect: (closeEvent) => false
+    shouldReconnect: (closeEvent) => true
   }
   const { sendMessage, readyState, getWebSocket } = useWebSocket(socketUrl, STATIC_OPTIONS);
   const connectionStatus = {
@@ -61,58 +59,26 @@ function Home() {
   const mainMode = useSelector((state) => state.mainMode.value);
   const version = useSelector((state) => state.mainMode.version);
   const userDidUpload = useSelector(state => state.mainMode.userUploaded);
-  const stats = useSelector(state => state.gameStats.matches)
   const [replayId, setReplayId] = useState(null);
   const [replayName, setReplayName] = useState(null);
   const [replayLastModified, setLastModified] = useState(null);
   const [paramsChecked, setParamsChecked] = useState(false);
   const [IP, setIP] = useState(null)
 
-  // function queryMessage(m) {
-  //   // console.log(connectionStatus, m);
-  //   // if (connectionStatus === 'Open') sendMessage(m)
-  //   /*else*/ queryMessages.push(m);
-  // }
-
-  function checkConnection() {
-    // console.log('wysyłam przechowywane wiadomości', queryMessages);
-    console.log('sprawdzam połączenie')
-    sendMessage('ping');
-  }
-
-  // function sendQueryMessages() {
-  //   console.log('próbuję wysłać oczekujące wiadomości: ', queryMessages)
-  //   if (queryMessages.length > 0) {
-  //     setTimeout(function () {
-  //       sendMessage(queryMessages[0]);
-  //     }, 1000)
-  //   }
-  // }
-
   function receiveMessage(m) {
-    // console.log('odebrałem ', m);
-    if (m.data === 'pong') {
-      console.log('pong')
-      // sendQueryMessages();
-      return;
-    }
     const x = JSON.parse(m.data);
     if (x.header === 'insertedReplayId') {
       const addURL = "?replayId=" + x.id;
       window.history.pushState(null, null, addURL);
       setReplayId(x.id);
-      console.log('dostaję id replaya')
       waitingForSocket = false;
       replayIdToSend = x.id;
       if (!waitingForStats) {
         sendMessage(JSON.stringify(queryMessage));
       }
     } else if (x.header === 'replayPart') {
-      // console.log(x.rec)
       replayData = replayData.concat(x.rec.data);
-      // console.log(replayData);
     } else if (x.header === 'replaySent') {
-      console.log(x.connectHalves);
       if (x?.connectHalves) dispatch(setConnectHalves(true))
       else dispatch(setConnectHalves(false))
 
@@ -120,21 +86,17 @@ function Home() {
         const j = Math.floor(i / 2);
         if (i % 2 === 0) {
           dispatch(setRedTeamName({ mtc: j, name: x.teamNames[i].TeamName }))
-          console.log(i, 'ustawiam redów na', x.teamNames[i].TeamName);
         } else dispatch(setBlueTeamName({ mtc: j, name: x.teamNames[i].TeamName }))
       }
 
       const y = replayData;
-      // console.log(y);
       const buffer = new ArrayBuffer(y.length);
       const uint8View = new Uint8Array(buffer);
       for (let i = 0; i < y.length; i++) {
         uint8View[i] = y[i]; // zapisywanie danych z tablicy do bufora ArrayBuffer
       }
       const newBuffer = uint8View.buffer; // konwersja widoku Uint8Array na ArrayBuffer
-      // console.log(newBuffer); // wyświetlenie ArrayBuffer w konsoli
       dispatch(setUserUploaded(false));
-      // console.log(newBuffer);
       replayData = [];
 
       $(function () {
@@ -154,17 +116,12 @@ function Home() {
       setReplayId(x.id);
       openModal('This recording has already been uploaded. Redirected to this replay.', 'darkgoldenrod', 5)
     } else if (x.header === 'top10 stats') {
-      // console.log(x.replays)
       for (var i = 0; i < x.replays.replays.length; i++) {
-        // console.log(x.replays.replays[i].ConnectedHalves);
         if (x.replays.replays[i].ConnectedHalves) {
-          // console.log('łączę', x.replays);
           connectHalves(x.replays, i)
-          // console.log('połączyłem', x.replays);
         }
       }
       dispatch(setReplays(x.replays));
-      // console.log('czemu nie dispaczujesz');
       dispatch(setMainMode('replays'));
     } else if (x.header === 'invalidLink') {
       openModal('Invalid link - replay with given ID doesn\'t exist', 'darkgoldenrod', 4)
@@ -194,7 +151,6 @@ function Home() {
   function checkParams() {
     const params = window.location.toLocaleString().split('?replayId=');
     if (params.length > 1) {
-      // console.log('Pokażę powtórkę nr ', params[1]);
       const toSend = {
         header: 'select',
         id: params[1]
@@ -204,7 +160,6 @@ function Home() {
   }
 
   function showReplays(ev) {
-    // console.log('łotwierom');
     if (connectionStatus === 'Open') {
       if (ev.target.textContent === 'Most viewed replays') {
         var replaysType = 'mostViewed'
@@ -228,7 +183,6 @@ function Home() {
   async function getIP() {
     const response = await fetch('https://ipapi.co/json/')
     const data = await response.json();
-    // console.log(data);
     setIP(data.ip)
   }
 
@@ -254,6 +208,7 @@ function Home() {
           scoreBlue: match.scoreBlue,
           scoreRed: match.scoreRed,
           spaceMode: match.spaceMode,
+          realSoccerMode: match.realSoccerMode,
           stadiumName: match.stadium.name
         })
       }
@@ -267,11 +222,9 @@ function Home() {
       }
       queryMessage = toSend;
       waitingForStats = false;
-      console.log('dostaję staty', toSend);
       if (!waitingForSocket) {
         sendMessage(JSON.stringify(queryMessage))
       }
-      // checkConnection();
     }
   }
 
@@ -303,8 +256,6 @@ function Home() {
 
   sendSocketMessage = function (m, n, o) {
     setReplayName(n);
-    // sendMessage(m);
-    // console.log(m.byteLength)
     if (m.byteLength > 50_000) {
       var replayParts = [];
       var x = new Uint8Array(m);
@@ -313,7 +264,6 @@ function Home() {
         replayParts.push(x.splice(0, 50_000))
       } while (x.length > 50_000)
       replayParts.push(x);
-      // console.log(replayParts)
       for (let part of replayParts) {
         const buffer = new ArrayBuffer(part.length);
         const uint8View = new Uint8Array(buffer);
@@ -321,7 +271,6 @@ function Home() {
           uint8View[i] = part[i]; // zapisywanie danych z tablicy do bufora ArrayBuffer
         }
         const newBuffer = uint8View.buffer;
-        // console.log(newBuffer);
         sendMessage(newBuffer)
       }
     } else {
@@ -336,7 +285,6 @@ function Home() {
 
   search4Replays = function (toSend) {
     sendMessage(JSON.stringify(toSend))
-    // console.log('wysyłam', toSend);
   }
 
   showStats = showStatsExp;
@@ -354,7 +302,6 @@ function Home() {
 
   function handleChange(e) {
 
-    // sendMessage('Hello');
     dispatch(setUserUploaded(true));
     dispatch(setConnectHalves(false))
     dispatch(setConnectedHalves(false))
@@ -378,30 +325,7 @@ function Home() {
 
 
   useEffect(() => {
-    // console.log('zmieniło się replayId', replayId)
     getIP();
-    // if (replayId != null && userDidUpload) {
-    //   var message = [];
-    //   for (let match of stats) {
-    //     message.push({
-    //       blueTeam: match.blueTeam,
-    //       goals: match.goals,
-    //       redTeam: match.redTeam,
-    //       scoreBlue: match.scoreBlue,
-    //       scoreRed: match.scoreRed,
-    //       spaceMode: match.spaceMode,
-    //       stadiumName: match.stadium.name
-    //     })
-    //   }
-    //   const toSend = {
-    //     header: 'setStats',
-    //     stats: message,
-    //     replayId: replayId,
-    //     replayName: replayName,
-    //     lastModified: replayLastModified
-    //   }
-    //   sendMessage(JSON.stringify(toSend))
-    // }
   }, []);
 
   return (

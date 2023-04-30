@@ -10,7 +10,6 @@ export const mainModeSlice = createSlice({
   reducers: {
     setMainMode: (state, action) => {
       state.value = action.payload;
-      console.log('zmieniam mainmode na', action.payload);
     },
     setVersion: (state, action) => {
       state.version = action.payload

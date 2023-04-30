@@ -78,11 +78,9 @@ export const gameStatsSlice = createSlice({
     },
     setRedTeamName: (state, action) => {
       state.redTeamNames[action.payload.mtc] = action.payload.name
-      console.log(action.payload.mtc, action.payload.name);
     },
     setBlueTeamName: (state, action) => {
       state.blueTeamNames[action.payload.mtc] = action.payload.name
-      console.log(action.payload.mtc, action.payload.name);
     },
     splitHalves: (state) => {
       state.matches = state.previousStats;

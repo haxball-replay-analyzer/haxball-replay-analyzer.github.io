@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { search4Replays } from "../Home";
 import $ from 'jquery';
-import { useSelector, useDispatch } from "react-redux";
-import { setReplaysType } from "../../slices/replaysSlice";
+import { useSelector } from "react-redux";
 
 function ReplaysFilters(props) {
 

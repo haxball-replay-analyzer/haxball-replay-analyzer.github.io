@@ -10,7 +10,7 @@ function Modal() {
   const [color, setColor] = useState('black')
   const [message, setMessage] = useState('')
 
-  openModal = function (message, color, timeout = 3) {
+  openModal = function (message, color, timeouter = 3) {
     doHideModal = false;
     setMessage(message);
     setColor(color);
@@ -21,7 +21,7 @@ function Modal() {
     clearTimeout(timeout)
     timeout = setTimeout(function () {
       closeModal()
-    }, (timeout * 1000))
+    }, (timeouter * 1000))
   }
 
   function closeModal() {

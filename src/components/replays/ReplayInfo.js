@@ -9,11 +9,8 @@ function ReplayInfo(props) {
 
   const dispatch = useDispatch();
   function watchReplay(e) {
-    // console.log(replays[i].ReplayId);
     const addURL = "?replayId=" + replays[i].ReplayId;
     window.history.replaceState(null, null, addURL);
-    const connectHalves = (replays[i].ConnectedHalves ? true : false)
-    // console.log(replays, i, connectHalves);
     checkParamsExp();
     $('#ReplaysList').animate({
       left: '-150%',

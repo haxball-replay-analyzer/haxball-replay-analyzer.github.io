@@ -16,7 +16,6 @@ function ReplaysList() {
 
   function callbackFn() {
     dispatch(setMainMode('home'))
-    console.log('nie robie tego');
   }
 
   function closeReplays() {
@@ -31,7 +30,6 @@ function ReplaysList() {
   }
 
   function changeReplaysType(ev) {
-    // console.log('e');
     const toSend = {
       header: 'top10',
       replaysType: (replaysType === 'latest' ? 'mostViewed' : 'latest')
