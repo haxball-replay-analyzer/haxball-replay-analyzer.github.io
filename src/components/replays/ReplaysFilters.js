@@ -12,7 +12,7 @@ function ReplaysFilters(props) {
   const [filterStadium, setFilterStadium] = useState(false)
   const [filterSpaceMode, setFilterSpaceMode] = useState(false)
   const [filterRealSoccer, setFilterRealSoccer] = useState(false)
-  const [searchText, setSearchText] = useState(null);
+  const [searchText, setSearchText] = useState('');
   const [periodState, setPeriodState] = useState('week');
   const replaysType = useSelector(state => state.replays.type)
 

@@ -44,7 +44,7 @@ function Home() {
     onClose: (e) => {
       // console.log('Connection closed', e.reason);
     },
-    shouldReconnect: (closeEvent) => true
+    shouldReconnect: (closeEvent) => false
   }
   const { sendMessage, readyState, getWebSocket } = useWebSocket(socketUrl, STATIC_OPTIONS);
   const connectionStatus = {
@@ -345,8 +345,8 @@ function Home() {
             </label>
             <input id='replayfile' type='file' accept='.hbr2' data-hook='replayfile' onChange={handleChange} />
             <br /><br />
-            <Changelog />
           </div>
+          <Changelog />
         </div>
       </div>
       <LoadingScreen />

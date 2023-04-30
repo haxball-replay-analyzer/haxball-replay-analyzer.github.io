@@ -168,7 +168,7 @@
   &>.log {
     position: relative;
     flex-grow: 1;
-    overflow: hidden;
+    overflow-y: scroll;
     line-height: 1.3;
 
     p {

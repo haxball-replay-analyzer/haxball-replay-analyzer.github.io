@@ -10610,7 +10610,9 @@ Xa.prototype = {
     this.wp.textContent = '' + a
   },
   hm: function (a) {
-    this.wo.textContent = null == a ? 'null' : '' + a
+    if (this.wo !== undefined) {
+      this.wo.textContent = null == a ? 'null' : '' + a
+    }
   },
   f: Xa
 };

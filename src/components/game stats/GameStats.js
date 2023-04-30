@@ -244,7 +244,6 @@ function GameStats(props) {
 
   useEffect(() => {
 
-    console.log(doConnectHalves);
     if (doConnectHalves) connectHalves();
 
     $("#prevMatch").css('display', 'none')

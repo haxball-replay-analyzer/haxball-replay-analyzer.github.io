@@ -8,7 +8,7 @@ import { setMainMode } from "../../slices/mainModeSlice";
 function ReplayInfo(props) {
 
   const dispatch = useDispatch();
-  function watchReplay(e) {
+  function watchReplay() {
     const addURL = "?replayId=" + replays[i].ReplayId;
     window.history.replaceState(null, null, addURL);
     checkParamsExp();
@@ -48,7 +48,7 @@ function ReplayInfo(props) {
         {matches[i].map((m, index) => <MatchInfo key={index} match={m} i={index} replayIndex={i} />)}
       </div>
       <div style={{ display: 'flex', flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-        <button onClick={watchReplay} className="watchReplayButton" replayId={replays[i].ReplayId}>Watch</button>
+        <button onClick={watchReplay} className="watchReplayButton">Watch</button>
       </div>
     </div>
   );
