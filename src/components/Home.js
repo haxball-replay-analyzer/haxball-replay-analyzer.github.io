@@ -31,7 +31,7 @@ var replayIdToSend;
 
 function Home() {
 
-  const socketUrl = 'ws://34.116.179.44:8080/';
+  const socketUrl = 'wss://34.116.179.44:8080/';
   const STATIC_OPTIONS = {
     onOpen: () => {
       // console.log('Connected with WebSocket')
