@@ -8,6 +8,7 @@ const changelog = [
     version: '3.0.0',
     date: '01.05.2023',
     changes: [
+      '----- WORK IN PROGRESS -----',
       'Database in Haxball Replay Analyzer! Uploaded replays are now stored in the database.',
       'Every time you upload the replay, unique link is generated - look at the address bar.',
       'Link to specific replay will automatically load the recording',
