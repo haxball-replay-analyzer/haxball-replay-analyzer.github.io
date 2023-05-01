@@ -3,6 +3,7 @@ import Header from './components/Header';
 import Home from './components/Home';
 import React, { useEffect } from 'react';
 import $ from 'jquery'
+import Modal from './components/Modal';
 
 function App() {
 
@@ -15,6 +16,7 @@ function App() {
       <Header />
       <div className="flexRow flexGrow">
         <Home />
+        <Modal />
       </div>
     </div>
   );

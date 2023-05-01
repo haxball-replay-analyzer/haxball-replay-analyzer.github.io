@@ -5,12 +5,17 @@ export const gameStatsSlice = createSlice({
   initialState: {
     divStyle: {},
     matches: [],
+    previousStats: [],
     playerPos: [],
     playerList: [],
     selectedMatch: 0,
     selectedStat: -1,
     selectedPlayer: -1,
-    selectedHeatmap: 'Heatmap'
+    selectedHeatmap: 'Heatmap',
+    connectHalves: false,
+    connectedHalves: false,
+    redTeamNames: [],
+    blueTeamNames: []
   },
   reducers: {
     setDivStyle: (state, action) => {
@@ -21,6 +26,7 @@ export const gameStatsSlice = createSlice({
       for (var i = 0; i < matches.length; i++) {
         if (matches[i].gameTicks < 0) matches.splice(i, 1);
       }
+      state.previousStats = state.matches;
       state.matches = matches;
       state.selectedMatch = 0;
       state.selectedPlayer = -1;
@@ -66,11 +72,26 @@ export const gameStatsSlice = createSlice({
         selectedPlayer: -1,
         selectedHeatmap: 'Heatmap'
       }
+    },
+    setConnectHalves: (state, action) => {
+      state.connectHalves = action.payload
+    },
+    setRedTeamName: (state, action) => {
+      state.redTeamNames[action.payload.mtc] = action.payload.name
+    },
+    setBlueTeamName: (state, action) => {
+      state.blueTeamNames[action.payload.mtc] = action.payload.name
+    },
+    splitHalves: (state) => {
+      state.matches = state.previousStats;
+    },
+    setConnectedHalves: (state, action) => {
+      state.connectedHalves = action.payload;
     }
   },
 })
 
 // Action creators are generated for each case reducer function
-export const { setDivStyle, setStats, showNextMatch, showPreviousMatch, selectMatch, selectStat, selectPlayer, selectHeatmap, setPlayerList, setPlayerPos, clearStats } = gameStatsSlice.actions
+export const { testFunction, setDivStyle, setStats, showNextMatch, showPreviousMatch, selectMatch, selectStat, selectPlayer, selectHeatmap, setPlayerList, setPlayerPos, clearStats, setConnectHalves, setRedTeamName, setBlueTeamName, splitHalves, setConnectedHalves } = gameStatsSlice.actions
 
 export default gameStatsSlice.reducer

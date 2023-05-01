@@ -1,35 +1,42 @@
 import { useSelector, useDispatch } from "react-redux";
 import { setMainMode } from "../../slices/mainModeSlice";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import PlayerStats from "./PlayerStats";
 import ThirdStats from "./ThirdStats";
 import { watchGoal } from "../../game2";
 import $ from 'jquery'
-import { selectMatch, showNextMatch, showPreviousMatch, setStats } from "../../slices/gameStatsSlice";
+import { selectMatch, showNextMatch, showPreviousMatch, setStats, setConnectHalves, setRedTeamName, setBlueTeamName, setConnectedHalves, splitHalves } from "../../slices/gameStatsSlice";
 import HeatMap from "./HeatMap";
+import { changeTeamNames, sendMessageExp } from "../Home";
+import { openModal } from "../Modal";
 
-function GameStats() {
+function GameStats(props) {
 
   const divStyle = useSelector((state) => state.gameStats.divStyle);
   const match = useSelector((state) => state.gameStats.matches)
   const mtc = useSelector((state) => state.gameStats.selectedMatch);
   const selectedPlayer = useSelector(state => state.gameStats.selectedPlayer)
   const selectedHeatmap = useSelector(state => state.gameStats.selectedHeatmap)
+  const userUploaded = useSelector(state => state.mainMode.userUploaded)
+  const doConnectHalves = useSelector(state => state.gameStats.connectHalves)
+  const redTeamName = useSelector(state => state.gameStats.redTeamNames[mtc])
+  const blueTeamName = useSelector(state => state.gameStats.blueTeamNames[mtc])
+  const redTeamNames = useSelector(state => state.gameStats.redTeamNames)
+  const blueTeamNames = useSelector(state => state.gameStats.blueTeamNames)
+  const connectedHalves = useSelector(state => state.gameStats.connectedHalves)
+  const replayId = props.replayId
   const dispatch = useDispatch();
-
-  const [redTeamName, setRedTeamName] = useState('RED');
-  const [blueTeamName, setBlueTeamName] = useState('BLUE')
 
   var offset = {
     left: divStyle.offsetLeft,
     top: divStyle.offsetTop + divStyle.offsetParentTop
   }
 
-  function closeStats(e, completeF = null) {
+  function completeFunction() {
+    dispatch(setMainMode('home'))
+  }
 
-    function completeFunction() {
-      dispatch(setMainMode('home'))
-    }
+  function closeStats(e, completeF = null) {
 
     $("#prevMatch").css('display', 'none')
     $("#nextMatch").css('display', 'none')
@@ -87,19 +94,30 @@ function GameStats() {
     }
   }
 
-  function handleInput(x) {
-    if (x.target.id === 'redTeam') {
-      setRedTeamName(x.target.value)
-    } else if (x.target.id === 'blueTeam') {
-      setBlueTeamName(x.target.value)
+  function handleBlur() {
+    if (userUploaded) {
+      changeTeamNames([redTeamName, blueTeamName], mtc)
+      openModal('Successfully changed team name', 'green', 3)
     }
+  }
 
-    var l = x.target.value.length
-    if (l > 6) {
-      var size = 50 - 2 * l;
-      if (size < 14) size = 14;
-      x.target.style['font-size'] = '' + size + 'px';
-    } else x.target.style['font-size'] = '40px';
+  function handleInput(x) {
+    if (userUploaded) {
+      if (x.target.id === 'redTeam') {
+        dispatch(setRedTeamName({ mtc: mtc, name: x.target.value }))
+      } else if (x.target.id === 'blueTeam') {
+        dispatch(setBlueTeamName({ mtc: mtc, name: x.target.value }))
+      }
+
+      var l = x.target.value.length
+      if (l > 6) {
+        var size = 50 - 2 * l;
+        if (size < 14) size = 14;
+        x.target.style['font-size'] = '' + size + 'px';
+      } else x.target.style['font-size'] = '40px';
+    } else {
+      openModal('You can\'t edit team names in this replay.', 'darkred', 4)
+    }
   }
 
   function handleMouseOver(e) {
@@ -124,6 +142,8 @@ function GameStats() {
   }
 
   function connectHalves(e) {
+    dispatch(setConnectHalves(false))
+    dispatch(setConnectedHalves(true))
     var newMatch = {
       gameTicks: match[0].gameTicks + match[1].gameTicks,
       goals: [...match[0].goals],
@@ -184,6 +204,22 @@ function GameStats() {
     newMatch.thirds[2] += match[1].thirds[0];
 
     dispatch(setStats([newMatch]))
+    const toSend = {
+      header: 'connectHalves',
+      replayId: replayId
+    }
+    sendMessageExp(toSend)
+  }
+
+  function splitHalvesFn() {
+    dispatch(setConnectedHalves(false))
+    dispatch(splitHalves());
+    const toSend = {
+      header: 'splitHalves',
+      replayId: replayId
+    }
+    sendMessageExp(toSend);
+    openModal('Successfully splitted match back into 2 halves', 'green', 4)
   }
 
   function showButtons() {
@@ -207,6 +243,8 @@ function GameStats() {
   }, [mtc])
 
   useEffect(() => {
+
+    if (doConnectHalves) connectHalves();
 
     $("#prevMatch").css('display', 'none')
     $("#nextMatch").css('display', 'none')
@@ -238,10 +276,11 @@ function GameStats() {
           Match stats{match[mtc].spaceMode && ' (space mode)'}:
           <select value={mtc} onChange={showMatch}>
             {match.map((m, index) => <option value={index} key={index} >
-              {index + 1}: Red {match[index].scoreRed}:{match[index].scoreBlue} Blue
+              {index + 1}: {redTeamNames[index]} {match[index].scoreRed}:{match[index].scoreBlue} {blueTeamNames[index]}
             </option>)}
           </select>
-          {match.length === 2 && <button onClick={connectHalves} style={{ margin: '0 10px 0 30px' }}>Connect 2 halves</button>}
+          {(match.length === 2 && userUploaded) && <button onClick={connectHalves} style={{ margin: '0 10px 0 30px' }}>Connect 2 halves</button>}
+          {(connectedHalves && userUploaded) && <button onClick={splitHalvesFn} style={{ margin: '0 10px 0 30px' }}>Split halves back</button>}
           {match[mtc].stadium.canBeStored && <button onClick={downloadMap} style={{ margin: '0 10px 0 30px' }}>Download map</button>}
         </h1>
         <button onClick={closeStats} style={{ position: 'absolute', right: 20 }} >Close ❌</button>
@@ -249,13 +288,13 @@ function GameStats() {
           <table style={{ width: '100%' }}><tbody>
             <tr id='trosso' style={{ textAlign: 'center' }}>
               <td style={{ fontSize: 40, color: 'red', width: '40%' }}>
-                <input id='redTeam' type="text" value={redTeamName} onChange={handleInput} style={{ fontSize: 40, textAlign: 'right', color: 'red', borderStyle: 'hidden', backgroundColor: '#1a2125', width: 200 }} />
+                <input id='redTeam' type="text" value={redTeamName} onChange={handleInput} onBlur={handleBlur} style={{ fontSize: 40, textAlign: 'right', color: 'red', borderStyle: 'hidden', backgroundColor: '#1a2125', width: 200 }} />
               </td>
               <td style={{ fontSize: 60, width: '20%' }}>
                 {match[mtc].scoreRed + ':' + match[mtc].scoreBlue}
               </td>
               <td style={{ fontSize: 40, color: 'red', width: '40%' }}>
-                <input id='blueTeam' type="text" value={blueTeamName} onChange={handleInput} style={{ fontSize: 40, textAlign: 'left', color: '#5688e5', borderStyle: 'hidden', backgroundColor: '#1a2125', width: 200 }} />
+                <input id='blueTeam' type="text" value={blueTeamName} onChange={handleInput} onBlur={handleBlur} style={{ fontSize: 40, textAlign: 'left', color: '#5688e5', borderStyle: 'hidden', backgroundColor: '#1a2125', width: 200 }} />
               </td>
             </tr>
             <tr>

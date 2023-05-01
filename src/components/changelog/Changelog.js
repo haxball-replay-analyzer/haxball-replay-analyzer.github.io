@@ -5,6 +5,24 @@ import { useEffect } from 'react';
 
 const changelog = [
   {
+    version: '3.0.0',
+    date: '01.05.2023',
+    changes: [
+      'Database in Haxball Replay Analyzer! Uploaded replays are now stored in the database.',
+      'Every time you upload the replay, unique link is generated - look at the address bar.',
+      'Link to specific replay will automatically load the recording',
+      'New tabs - "Most viewed replays" and "Latest replays"',
+      'You can filter replays by file names, team names, player names, goal scorers, stadiums, space mode, real soccer mode',
+      'Added button to reverse changes made by clicking "Connect 2 halves"',
+      'Added Real Soccer Mode - for now it\'s only for filtering purposes, some new statistics will be added soon',
+      'Modifying team names and connecting/splitting halves is possible only for author of the recording',
+      'Fixed bug which made chat impossible to scroll',
+      'Added some popup information',
+      'Fixed some bugs and made some performance improvements',
+      'I\'m going to make a new "Community" tab with links and some short descriptions. If you want to advertise your haxball community, ' +
+      'feel free to contact with me on discord or by e-mail. In the future, replays will be filtered also by communities.'
+    ]
+  }, {
     version: '2.1.0',
     date: '21.03.2023',
     changes: [

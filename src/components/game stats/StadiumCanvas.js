@@ -147,7 +147,7 @@ export function drawStadium(ctx, stadium) {
     ctx.stroke();
   } else {
     ctx.fillStyle = haxball.grass.bg_color;
-    if (bg.color.match('^[A-Fa-f0-9]{6}$')) ctx.fillStyle = '#' + bg.color;
+    if (bg.color?.match('^[A-Fa-f0-9]{6}$')) ctx.fillStyle = '#' + bg.color;
     ctx.fillRect(-st.width, -st.height, 2 * st.width, 2 * st.height);
   }
 
