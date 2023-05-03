@@ -31,7 +31,8 @@ var replayIdToSend;
 
 function Home() {
 
-  const socketUrl = 'wss://34.116.179.44:443/';
+  const socketUrl = 'wss://haxball-replay-analyzer.com:443/';
+  // const socketUrl = 'ws://localhost:8080/';
   const STATIC_OPTIONS = {
     onOpen: () => {
       // console.log('Connected with WebSocket')
