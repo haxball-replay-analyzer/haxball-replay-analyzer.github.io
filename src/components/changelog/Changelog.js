@@ -5,6 +5,13 @@ import { useEffect } from 'react';
 
 const changelog = [
   {
+    version: '3.0.1',
+    date: '03.05.2023',
+    changes: [
+      'Fixing bugs'
+    ]
+  },
+  {
     version: '3.0.0',
     date: '01.05.2023',
     changes: [
@@ -22,7 +29,8 @@ const changelog = [
       'I\'m going to make a new "Community" tab with links and some short descriptions. If you want to advertise your haxball community, ' +
       'feel free to contact with me on discord or by e-mail. In the future, replays will be filtered also by communities.'
     ]
-  }, {
+  },
+  {
     version: '2.1.0',
     date: '21.03.2023',
     changes: [
