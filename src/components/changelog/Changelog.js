@@ -5,6 +5,13 @@ import { useEffect } from 'react';
 
 const changelog = [
   {
+    version: '3.0.2',
+    date: '04.05.2023',
+    changes: [
+      'Fixed bug which was causing incorrect display of replay\'s views'
+    ]
+  },
+  {
     version: '3.0.1',
     date: '03.05.2023',
     changes: [
