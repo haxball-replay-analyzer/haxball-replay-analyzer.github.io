@@ -8,7 +8,8 @@ const changelog = [
     version: '3.0.2',
     date: '04.05.2023',
     changes: [
-      'Fixed bug which was causing incorrect display of replay\'s views'
+      'Fixed a bug which was causing incorrect display of replay\'s views',
+      'Fixed bug - replay wasn\'t sent when players nick contained an emoji'
     ]
   },
   {
