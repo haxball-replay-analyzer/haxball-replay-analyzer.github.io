@@ -5,11 +5,18 @@ import { useEffect } from 'react';
 
 const changelog = [
   {
+    version: '3.0.3',
+    date: '06.05.2023',
+    changes: [
+      'Fixed some bugs that were crashing a server'
+    ]
+  },
+  {
     version: '3.0.2',
     date: '04.05.2023',
     changes: [
       'Fixed a bug which was causing incorrect display of replay\'s views',
-      'Fixed bug - replay wasn\'t sent when players nick contained an emoji',
+      'Fixed a bug - replay wasn\'t sent when players nick contained an emoji',
       'Fixed some other bugs that were preventing replays from being sent to database'
     ]
   },
