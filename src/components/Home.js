@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import ReplaysList from "./replays/ReplaysList";
 import { setReplays, setReplaysType } from "../slices/replaysSlice";
 import { openModal } from "./Modal";
+import Downloading from "./Downloading";
 
 export function showStats() { }
 export function setGameStats() { }
@@ -102,9 +103,9 @@ function Home() {
 
       $(function () {
 
-        $('.roomlist-view').animate({
+        $('#downloading-screen').animate({
           left: '-150%',
-        }, { duration: 700, easing: 'swing', queue: false });
+        }, { duration: 700, easing: 'swing', queue: false, complete: function () { $("#downloading-screen").css('left', '100%') } });
 
         $('#loading-screen').animate({
           left: '35vw',
@@ -122,6 +123,7 @@ function Home() {
           connectHalves(x.replays, i)
         }
       }
+      // console.log(x.replays);
       dispatch(setReplays(x.replays));
       dispatch(setMainMode('replays'));
     } else if (x.header === 'invalidLink') {
@@ -157,6 +159,17 @@ function Home() {
         id: params[1]
       }
       sendMessage(JSON.stringify(toSend))
+      $(function () {
+
+        $('.roomlist-view').animate({
+          left: '-150%',
+        }, { duration: 700, easing: 'swing', queue: false });
+
+        $('#downloading-screen').animate({
+          left: '35vw',
+        }, { duration: 700, easing: 'swing', queue: false });
+
+      })
     }
   }
 
@@ -350,6 +363,7 @@ function Home() {
           <Changelog />
         </div>
       </div>
+      <Downloading />
       <LoadingScreen />
       {mainMode === 'stats' && <GameStats replayId={replayId} />}
       {mainMode === 'replays' && <ReplaysList />}

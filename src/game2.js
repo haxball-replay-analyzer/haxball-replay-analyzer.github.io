@@ -1362,7 +1362,8 @@ function ja(a) {
   };
   a.get('staty').onclick = function (el) {
 
-    showStats(el.target);
+    if (match.length > 0) showStats(el.target);
+    else openModal('Error: this replay doesn\'t contain any started match.', 'darkred', 4)
 
   };
   this.Jh.appendChild(this.Fb.g);
