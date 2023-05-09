@@ -7,8 +7,8 @@ function MatchInfo(props) {
   const goals = useSelector(state => state.replays.replays.goals[ri]).filter(goal => goal.MatchId === match.MatchId)
   const players = useSelector(state => state.replays.replays.players[ri]).filter(player => [match.RedTeamId, match.BlueTeamId].includes(player.TeamId))
   const teams = useSelector(state => state.replays.replays.teams[ri])
-  const redTeamName = teams.filter(team => team.TeamId === match.RedTeamId)[0].TeamName;
-  const blueTeamName = teams.filter(team => team.TeamId === match.BlueTeamId)[0].TeamName;
+  const redTeamName = teams.filter(team => team.TeamId === match.RedTeamId)[0]?.TeamName;
+  const blueTeamName = teams.filter(team => team.TeamId === match.BlueTeamId)[0]?.TeamName;
   var newPlayers = JSON.parse(JSON.stringify(players))
 
   for (let player of newPlayers) {
@@ -32,7 +32,7 @@ function MatchInfo(props) {
   return (
     <div className="matchInfo" style={{ display: 'flex', flexDirection: 'column' }}>
       <div style={{ flex: 2, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', fontWeight: 'bold' }}>
-        {redTeamName} {match.RedScore}:{match.BlueScore} {blueTeamName}
+        {redTeamName || 'RED'} {match.RedScore}:{match.BlueScore} {blueTeamName || 'BLUE'}
       </div>
       <div style={{ flex: 3, display: 'flex', flexDirection: 'row', fontSize: '75%' }}>
         <div style={{ flex: 1, textAlign: 'center', color: '#E56E56' }}>{redTeam.join(',  ')}</div>

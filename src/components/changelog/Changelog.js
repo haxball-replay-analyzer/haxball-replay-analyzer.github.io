@@ -5,6 +5,15 @@ import { useEffect } from 'react';
 
 const changelog = [
   {
+    version: '3.1.0',
+    date: '09.05.2023',
+    changes: [
+      'Fixed bug that was making "Latest Replays" tab unable to open',
+      'Added info about loading selected replay from database',
+      'If replay doesn\'t contain any match, clicking on "Game Stats" will display the error, instead of crashing the analyzer'
+    ]
+  },
+  {
     version: '3.0.3',
     date: '06.05.2023',
     changes: [
