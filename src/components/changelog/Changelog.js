@@ -5,6 +5,15 @@ import { useEffect } from 'react';
 
 const changelog = [
   {
+    version: '3.1.1',
+    date: '13.05.2023',
+    changes: [
+      'Fixed major incompatibility with the newest version of Mozilla Firefox (113)',
+      'In a specific case, the list of most viewed replays was showing that it was filtered by week, ' +
+      'even though this filter was not enabled and counted all views - it has been fixed'
+    ]
+  },
+  {
     version: '3.1.0',
     date: '09.05.2023',
     changes: [

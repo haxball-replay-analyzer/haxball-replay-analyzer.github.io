@@ -32,6 +32,7 @@ function ReplaysList() {
   function changeReplaysType(ev) {
     const toSend = {
       header: 'top10',
+      period: 'week',
       replaysType: (replaysType === 'latest' ? 'mostViewed' : 'latest')
     }
     if (ev.target.textContent.startsWith('Most vi')) dispatch(setReplaysType('mostViewed'))

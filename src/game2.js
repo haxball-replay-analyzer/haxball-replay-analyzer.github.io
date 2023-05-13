@@ -5923,7 +5923,7 @@ x.fj = function (a) {
   })
 };
 x.es = function (a) {
-  for (var b = Modernizr, c = 'canvas datachannel dataview es6collections peerconnection promises websockets'.split(' '), d = [
+  for (var b = Modernizr, c = 'canvas dataview es6collections peerconnection promises websockets'.split(' '), d = [
   ], e = 0; e < c.length;) {
     var f = c[e];
     ++e;
@@ -11952,7 +11952,7 @@ aa.N = '<div class=\'dialog settings-view\'><h1>Settings</h1><button data-hook=\
 aa.$l = 0;
 P.N = '<div class=\'simple-dialog-view\'><div class=\'dialog basic-dialog\'><h1 data-hook=\'title\'></h1><p data-hook=\'content\'></p><div class=\'buttons\' data-hook=\'buttons\'></div></div></div>';
 Xa.N = '<div class=\'stats-view\'><div data-hook=\'graph\'></div></div>';
-Wa.N = '<div class=\'unsupported-browser-view\'><div class=\'dialog\'><h1>Unsupported Browser</h1><p>Sorry! Your browser doesn\'t yet implement some features which are required for HaxBall to work.</p><p>The missing features are: <span data-hook=\'features\'></span></p><h2>Recommended browsers:</h2><div><a href="https://www.mozilla.org/firefox/new/"><img src="images/firefox-icon.png"/>Firefox</a></div><div><a href="https://www.google.com/chrome/"><img src="images/chrome-icon.png"/>Chrome</a></div><div><a href="http://www.opera.com/"><img src="images/opera-icon.png"/>Opera</a></div></div></div>';
+Wa.N = '<div class=\'unsupported-browser-view\'><div class=\'dialog\'><h1>Firefox issue</h1><p>Sorry! It seems that the newest version of Firefox has some major bug, that doesn\'t allow </p><p>The missing features are: <span data-hook=\'features\'></span></p><h2>Recommended browsers:</h2><div><a href="https://www.mozilla.org/firefox/new/"><img src="images/firefox-icon.png"/>Firefox</a></div><div><a href="https://www.google.com/chrome/"><img src="images/chrome-icon.png"/>Chrome</a></div><div><a href="http://www.opera.com/"><img src="images/opera-icon.png"/>Opera</a></div></div></div>';
 r.sn = {
 }.toString;
 u.qp()
