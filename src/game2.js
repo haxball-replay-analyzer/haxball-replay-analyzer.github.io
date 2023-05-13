@@ -819,6 +819,7 @@ export function handleFile(e) {
     b.onload = function () {
       if (b.result.byteLength < 3000000) sendSocketMessage(b.result, a.name.slice(0, -5), a.lastModified);
       else openModal('This file is too big to be sent to server. But don\'t worry, you can still watch it offline.', 'darkgoldenrod', 7)
+      // console.log(b.result);
       if (b.result.byteLength > 50_000) {
         ///////////////////////////////////////
         // console.log(b.result);
@@ -5702,6 +5703,7 @@ u.po = function (a) {
       b.ia();
       u.xb()
     };
+    // console.log(b.ya.Lc.o); TUTAJ SIE POKAZUJE PRZROBIONY BUFFER POWTORKI
     setTimeout(function () {
       document.getElementById("spddown").click();
       document.getElementById("spddown").click();
