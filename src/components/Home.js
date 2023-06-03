@@ -189,6 +189,8 @@ function Home() {
         replaysType: replaysType
       }
       sendMessage(JSON.stringify(toSend))
+    } else if (connectionStatus === 'Connecting') {
+      openModal('Connecting to server... Please try again after few seconds.', 'darkgoldenrod', 4)
     } else {
       openModal('Error: Can\'t connect to server. Try again later.', 'darkred', 4)
     }
