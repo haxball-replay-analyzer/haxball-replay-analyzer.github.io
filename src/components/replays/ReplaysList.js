@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import ReplaysFilters from "./ReplaysFilters";
 import { setReplaysType } from "../../slices/replaysSlice";
 import { search4Replays } from "../Home";
+import CircularProgress from '@mui/material/CircularProgress';
 
 function ReplaysList() {
 
@@ -13,6 +14,7 @@ function ReplaysList() {
   const replays = useSelector(state => state.replays.replays);
   const replaysType = useSelector(state => state.replays.type);
   var mainMode = useSelector(stats => stats.mainMode.value)
+  var replaysLoaded = useSelector(state => state.replays.loaded)
 
   function callbackFn() {
     dispatch(setMainMode('home'))
@@ -59,15 +61,17 @@ function ReplaysList() {
       <button id="otherReplaysButton" onClick={changeReplaysType}>{replaysType === 'mostViewed' ? 'Latest replays' : 'Most viewed replays'}</button>
       <div className="replaysContainer" style={{ display: 'flex', flexDirection: 'column' }}>
         <ReplaysFilters />
-        <div className="replaysList" style={{ height: '85%' }}>
-          {
-            replays.replays.length !== 0 ?
-              replays.replays.map((r, index) => <ReplayInfo key={index} i={index} />) :
-              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%' }}>
-                <div style={{ textAlign: 'center' }}>There is no replay with given filters</div>
-              </div>
-          }
-        </div>
+        {replaysLoaded ? (
+          <div className="replaysList" style={{ height: '85%' }}>
+            {
+              replays.replays.length !== 0 ?
+                replays.replays.map((r, index) => <ReplayInfo key={index} i={index} />) :
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%' }}>
+                  <div style={{ textAlign: 'center' }}>There is no replay with given filters</div>
+                </div>
+            }
+          </div>
+        ) : (<div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '85%' }}> <CircularProgress /> </div>)}
       </div>
     </div>
   )

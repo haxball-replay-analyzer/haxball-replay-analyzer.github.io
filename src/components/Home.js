@@ -9,7 +9,7 @@ import GameStats from "./game stats/GameStats";
 import useWebSocket, { ReadyState } from 'react-use-websocket';
 import { useEffect, useState } from "react";
 import ReplaysList from "./replays/ReplaysList";
-import { setReplays, setReplaysType } from "../slices/replaysSlice";
+import { setReplays, setReplaysLoaded, setReplaysType } from "../slices/replaysSlice";
 import { openModal } from "./Modal";
 import Downloading from "./Downloading";
 
@@ -124,6 +124,7 @@ function Home() {
         }
       }
       // console.log(x.replays);
+      dispatch(setReplaysLoaded(true));
       dispatch(setReplays(x.replays));
       dispatch(setMainMode('replays'));
     } else if (x.header === 'invalidLink') {
@@ -300,6 +301,7 @@ function Home() {
   }
 
   search4Replays = function (toSend) {
+    dispatch(setReplaysLoaded(false));
     sendMessage(JSON.stringify(toSend))
   }
 

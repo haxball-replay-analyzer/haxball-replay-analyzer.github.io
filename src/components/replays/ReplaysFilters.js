@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { search4Replays } from "../Home";
 import $ from 'jquery';
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { setPlayer4Search } from "../../slices/replaysSlice";
 
 function ReplaysFilters(props) {
 
@@ -14,7 +15,8 @@ function ReplaysFilters(props) {
   const [filterRealSoccer, setFilterRealSoccer] = useState(false)
   const [searchText, setSearchText] = useState('');
   const [periodState, setPeriodState] = useState('week');
-  const replaysType = useSelector(state => state.replays.type)
+  const replaysType = useSelector(state => state.replays.type);
+  const dispatch = useDispatch();
 
   function toggleFilter(ev) {
     if (ev.target.id === 'filterPlayer') setFilterPlayer(!filterPlayer)
@@ -44,6 +46,8 @@ function ReplaysFilters(props) {
       filterTeam: filterTeam,
       period: (period || periodState)
     }
+    if (filterPlayer || filterGoal) dispatch(setPlayer4Search(searchText))
+    else dispatch(setPlayer4Search(null))
     search4Replays(toSend)
   }
 

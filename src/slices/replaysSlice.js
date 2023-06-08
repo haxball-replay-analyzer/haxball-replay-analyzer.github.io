@@ -7,7 +7,9 @@ export const replaysSlice = createSlice({
       name: 'dupa',
       views: 3
     }],
-    type: 'mostViewed'
+    type: 'mostViewed',
+    loaded: false,
+    player4Search: null
   },
   reducers: {
     setReplays: (state, action) => {
@@ -15,11 +17,17 @@ export const replaysSlice = createSlice({
     },
     setReplaysType: (state, action) => {
       state.type = action.payload
+    },
+    setReplaysLoaded: (state, action) => {
+      state.loaded = action.payload
+    },
+    setPlayer4Search: (state, action) => {
+      state.player4Search = action.payload
     }
   },
 })
 
 // Action creators are generated for each case reducer function
-export const { setReplays, setReplaysType } = replaysSlice.actions
+export const { setReplays, setReplaysType, setReplaysLoaded, setPlayer4Search } = replaysSlice.actions
 
 export default replaysSlice.reducer
