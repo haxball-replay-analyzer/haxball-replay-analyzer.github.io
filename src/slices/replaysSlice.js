@@ -9,11 +9,38 @@ export const replaysSlice = createSlice({
     }],
     type: 'mostViewed',
     loaded: false,
-    player4Search: null
+    player4Search: null,
+    filters: {
+      player: true,
+      replay: false,
+      team: false,
+      goal: false,
+      stadium: false,
+      realSoccer: false,
+      spaceMode: false,
+      searchText: '',
+      period: 'week'
+    },
+    loadingMore: false,
+    allReplaysLoaded: false
   },
   reducers: {
     setReplays: (state, action) => {
       state.replays = action.payload
+      if (action.payload.replays.length < 10) state.allReplaysLoaded = true
+      else state.allReplaysLoaded = false
+    },
+    addMoreReplays: (state, action) => {
+      if (!state.allReplaysLoaded) {
+        state.replays = {
+          goals: state.replays.goals.concat(action.payload.goals),
+          matches: state.replays.matches.concat(action.payload.matches),
+          players: state.replays.players.concat(action.payload.players),
+          replayId: state.replays.replayId.concat(action.payload.replayId),
+          replays: state.replays.replays.concat(action.payload.replays),
+          teams: state.replays.teams.concat(action.payload.teams)
+        }
+      }
     },
     setReplaysType: (state, action) => {
       state.type = action.payload
@@ -23,11 +50,41 @@ export const replaysSlice = createSlice({
     },
     setPlayer4Search: (state, action) => {
       state.player4Search = action.payload
-    }
+    },
+    setFilterPlayer: (state, action) => {
+      state.filters.player = action.payload
+    },
+    setFilterTeam: (state, action) => {
+      state.filters.team = action.payload
+    },
+    setFilterReplay: (state, action) => {
+      state.filters.replay = action.payload
+    },
+    setFilterGoal: (state, action) => {
+      state.filters.goal = action.payload
+    },
+    setFilterStadium: (state, action) => {
+      state.filters.stadium = action.payload
+    },
+    setFilterSpaceMode: (state, action) => {
+      state.filters.spaceMode = action.payload
+    },
+    setFilterRealSoccer: (state, action) => {
+      state.filters.realSoccer = action.payload
+    },
+    setSearchText: (state, action) => {
+      state.filters.searchText = action.payload
+    },
+    setPeriodState: (state, action) => {
+      state.filters.period = action.payload
+    },
+    setLoadingMore: (state, action) => {
+      state.filters.loadingMore = action.payload
+    },
   },
 })
 
 // Action creators are generated for each case reducer function
-export const { setReplays, setReplaysType, setReplaysLoaded, setPlayer4Search } = replaysSlice.actions
+export const { setReplays, addMoreReplays, setReplaysType, setReplaysLoaded, setPlayer4Search, setFilterPlayer, setFilterTeam, setFilterReplay, setFilterGoal, setFilterStadium, setFilterSpaceMode, setFilterRealSoccer, setSearchText, setPeriodState, setLoadingMore } = replaysSlice.actions
 
 export default replaysSlice.reducer
