@@ -35,7 +35,10 @@ function ReplayInfo(props) {
   }
 
   return (
-    <div className="replayInfo">
+    <div className="replayInfo" style={{
+      height: props.isScrollingUp ? '20%' : '17.5%',
+      transition: 'height 0.5s'
+    }}>
       <div style={{ flex: 2, display: 'flex', flexDirection: 'column', alignItems: 'start', overflow: "hidden" }}>
         <div style={{ flex: 1, display: 'flex', alignItems: 'center' }}>{replays[i].ReplayName}</div>
         <div style={{ flex: 2, display: 'flex', alignItems: 'center' }}>

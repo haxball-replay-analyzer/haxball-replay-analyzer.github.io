@@ -1,33 +1,35 @@
 import { useState } from "react";
 import { search4Replays } from "../Home";
 import $ from 'jquery';
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { setPlayer4Search, setFilterPlayer, setFilterTeam, setFilterReplay, setFilterGoal, setFilterStadium, setFilterSpaceMode, setFilterRealSoccer, setSearchText, setPeriodState } from "../../slices/replaysSlice";
 
 function ReplaysFilters(props) {
 
-  const [filterPlayer, setFilterPlayer] = useState(true)
-  const [filterTeam, setFilterTeam] = useState(false)
-  const [filterReplay, setFilterReplay] = useState(false)
-  const [filterGoal, setFilterGoal] = useState(false)
-  const [filterStadium, setFilterStadium] = useState(false)
-  const [filterSpaceMode, setFilterSpaceMode] = useState(false)
-  const [filterRealSoccer, setFilterRealSoccer] = useState(false)
-  const [searchText, setSearchText] = useState('');
-  const [periodState, setPeriodState] = useState('week');
-  const replaysType = useSelector(state => state.replays.type)
+  const filterPlayer = useSelector(state => state.replays.filters.player)
+  const filterTeam = useSelector(state => state.replays.filters.team)
+  const filterReplay = useSelector(state => state.replays.filters.replay)
+  const filterGoal = useSelector(state => state.replays.filters.goal)
+  const filterStadium = useSelector(state => state.replays.filters.stadium)
+  const filterSpaceMode = useSelector(state => state.replays.filters.spaceMode)
+  const filterRealSoccer = useSelector(state => state.replays.filters.realSoccer)
+  const searchText = useSelector(state => state.replays.filters.searchText)
+  const periodState = useSelector(state => state.replays.filters.period)
+  const replaysType = useSelector(state => state.replays.type);
+  const dispatch = useDispatch();
 
   function toggleFilter(ev) {
-    if (ev.target.id === 'filterPlayer') setFilterPlayer(!filterPlayer)
-    else if (ev.target.id === 'filterTeam') setFilterTeam(!filterTeam)
-    else if (ev.target.id === 'filterReplay') setFilterReplay(!filterReplay)
-    else if (ev.target.id === 'filterGoal') setFilterGoal(!filterGoal)
-    else if (ev.target.id === 'filterStadium') setFilterStadium(!filterStadium)
-    else if (ev.target.id === 'filterSpaceMode') setFilterSpaceMode(!filterSpaceMode)
-    else if (ev.target.id === 'filterRealSoccer') setFilterRealSoccer(!filterRealSoccer)
+    if (ev.target.id === 'filterPlayer') dispatch(setFilterPlayer(!filterPlayer))
+    else if (ev.target.id === 'filterTeam') dispatch(setFilterTeam(!filterTeam))
+    else if (ev.target.id === 'filterReplay') dispatch(setFilterReplay(!filterReplay))
+    else if (ev.target.id === 'filterGoal') dispatch(setFilterGoal(!filterGoal))
+    else if (ev.target.id === 'filterStadium') dispatch(setFilterStadium(!filterStadium))
+    else if (ev.target.id === 'filterSpaceMode') dispatch(setFilterSpaceMode(!filterSpaceMode))
+    else if (ev.target.id === 'filterRealSoccer') dispatch(setFilterRealSoccer(!filterRealSoccer))
   }
 
   function searchInput(ev) {
-    setSearchText(ev.target.value);
+    dispatch(setSearchText(ev.target.value));
   }
 
   function searchReplay(ev, period = null) {
@@ -44,6 +46,8 @@ function ReplaysFilters(props) {
       filterTeam: filterTeam,
       period: (period || periodState)
     }
+    if (filterPlayer || filterGoal) dispatch(setPlayer4Search(searchText))
+    else dispatch(setPlayer4Search(null))
     search4Replays(toSend)
   }
 
@@ -53,12 +57,30 @@ function ReplaysFilters(props) {
     $('#filterByAlltime').removeClass('active')
     $('#' + ev.target.id).addClass('active')
     searchReplay(null, ev.target.textContent.toLowerCase());
-    setPeriodState(ev.target.textContent.toLowerCase())
+    dispatch(setPeriodState(ev.target.textContent.toLowerCase()))
   }
 
   return (
-    <div className="replaysFilters" style={{ height: '15%', width: '100%', display: "flex", flexDirection: "row" }}>
-      <div style={{ flex: 1, display: "flex", flexDirection: 'column', justifyContent: "center", alignItems: "center" }}>
+    <div className="replaysFilters"
+      style={{
+        height: props.isScrollingUp ? '17.5%' : '0px',
+        transition: 'height 0.5s',
+        width: '100%',
+        display: "flex",
+        flexDirection: "row",
+        overflow: 'hidden'
+      }}>
+      <div
+        style={{
+          flex: 1,
+          display: "flex",
+          flexDirection: 'column',
+          justifyContent: "center",
+          alignItems: "center",
+          height: props.isScrollingUp ? '100%' : '0px',
+          transition: 'height 0.5s',
+          overflow: 'hidden'
+        }}>
         <div style={{ flex: 1, display: "flex", justifyContent: "center", alignItems: "center", fontSize: '150%', fontWeight: 'bold' }}>Filters</div>
         {replaysType === 'mostViewed' && <div className="replaysFiltersButtons" style={{ flex: 1 }}>
           <button id="filterByWeek" className="active" onClick={filterPeriod}>Week</button>
@@ -66,7 +88,16 @@ function ReplaysFilters(props) {
           <button id="filterByAlltime" onClick={filterPeriod}>All-time</button>
         </div>}
       </div>
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center" }}>
+      <div
+        style={{
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          height: props.isScrollingUp ? '100%' : '0px',
+          transition: 'height 0.5s',
+          overflow: 'hidden'
+        }}>
         <input
           type="text"
           style={{ backgroundColor: 'lightgrey', borderRadius: 4, padding: "3px", margin: '5px', width: '80%' }}

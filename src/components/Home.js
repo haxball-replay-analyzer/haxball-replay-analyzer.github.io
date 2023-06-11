@@ -9,7 +9,7 @@ import GameStats from "./game stats/GameStats";
 import useWebSocket, { ReadyState } from 'react-use-websocket';
 import { useEffect, useState } from "react";
 import ReplaysList from "./replays/ReplaysList";
-import { setReplays, setReplaysType } from "../slices/replaysSlice";
+import { setReplays, setReplaysLoaded, setReplaysType, setLoadingMore, addMoreReplays } from "../slices/replaysSlice";
 import { openModal } from "./Modal";
 import Downloading from "./Downloading";
 
@@ -23,6 +23,7 @@ export function sendMessageExp() { }
 export function search4Replays() { }
 export function checkParamsExp() { }
 export function changeTeamNames() { }
+export function loadMoreReplays() { }
 
 var queryMessage = {};
 var replayData = [];
@@ -65,10 +66,23 @@ function Home() {
   const [replayName, setReplayName] = useState(null);
   const [replayLastModified, setLastModified] = useState(null);
   const [paramsChecked, setParamsChecked] = useState(false);
-  const [IP, setIP] = useState(null)
+  const [IP, setIP] = useState(null);
+  const filterPlayer = useSelector(state => state.replays.filters.player)
+  const filterTeam = useSelector(state => state.replays.filters.team)
+  const filterReplay = useSelector(state => state.replays.filters.replay)
+  const filterGoal = useSelector(state => state.replays.filters.goal)
+  const filterStadium = useSelector(state => state.replays.filters.stadium)
+  const filterSpaceMode = useSelector(state => state.replays.filters.spaceMode)
+  const filterRealSoccer = useSelector(state => state.replays.filters.realSoccer)
+  const searchText = useSelector(state => state.replays.filters.searchText)
+  const periodState = useSelector(state => state.replays.filters.period)
+  const replaysType = useSelector(state => state.replays.type);
+  const replays = useSelector(state => state.replays.replays);
+  const replaysQty = replays.replays?.length;
 
   function receiveMessage(m) {
     const x = JSON.parse(m.data);
+    // console.log(x);
     if (x.header === 'insertedReplayId') {
       const addURL = "?replayId=" + x.id;
       window.history.pushState(null, null, addURL);
@@ -124,10 +138,19 @@ function Home() {
         }
       }
       // console.log(x.replays);
+      dispatch(setReplaysLoaded(true));
       dispatch(setReplays(x.replays));
       dispatch(setMainMode('replays'));
     } else if (x.header === 'invalidLink') {
       openModal('Invalid link - replay with given ID doesn\'t exist', 'darkgoldenrod', 4)
+    } else if (x.header === 'next10 stats') {
+      for (var i = 0; i < x.replays.replays.length; i++) {
+        if (x.replays.replays[i].ConnectedHalves) {
+          connectHalves(x.replays, i)
+        }
+      }
+      if (x.replays.replays.length > 0) dispatch(addMoreReplays(x.replays));
+      dispatch(setLoadingMore(false))
     }
   }
 
@@ -189,6 +212,8 @@ function Home() {
         replaysType: replaysType
       }
       sendMessage(JSON.stringify(toSend))
+    } else if (connectionStatus === 'Connecting') {
+      openModal('Connecting to server... Please try again after few seconds.', 'darkgoldenrod', 4)
     } else {
       openModal('Error: Can\'t connect to server. Try again later.', 'darkred', 4)
     }
@@ -264,6 +289,24 @@ function Home() {
     sendMessage(JSON.stringify(toSend))
   }
 
+  loadMoreReplays = function (a) {
+    const toSend = {
+      header: 'next10 filtered',
+      replaysType: replaysType,
+      searchText: searchText,
+      filterPlayer: filterPlayer,
+      filterGoal: filterGoal,
+      filterRealSoccer: filterRealSoccer,
+      filterReplay: filterReplay,
+      filterSpaceMode: filterSpaceMode,
+      filterStadium: filterStadium,
+      filterTeam: filterTeam,
+      period: periodState,
+      alreadyLoaded: replaysQty
+    }
+    sendMessage(JSON.stringify(toSend))
+  }
+
   sendMessageExp = function (m) {
     sendMessage(JSON.stringify(m))
   }
@@ -298,6 +341,7 @@ function Home() {
   }
 
   search4Replays = function (toSend) {
+    dispatch(setReplaysLoaded(false));
     sendMessage(JSON.stringify(toSend))
   }
 
