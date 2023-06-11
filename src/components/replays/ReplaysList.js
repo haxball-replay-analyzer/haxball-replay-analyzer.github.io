@@ -17,6 +17,7 @@ function ReplaysList() {
   var replaysLoaded = useSelector(state => state.replays.loaded)
   const loadingMore = useSelector(state => state.replays.loadingMore)
   const allReplaysLoaded = useSelector(state => state.replays.allReplaysLoaded)
+  const [isScrollingUp, setIsScrollingUp] = useState(true);
 
   function callbackFn() {
     dispatch(setMainMode('home'))
@@ -45,7 +46,14 @@ function ReplaysList() {
   }
 
   function handleScroll(ev) {
-    if (ev.target.scrollTop === ev.target.scrollTopMax) {
+    if (ev.target.className !== 'replaysContainer') return;
+    const scrollTop = ev.target.scrollTop;
+    const isScrollingUpNow = scrollTop < ev.target.dataset.scrollTop;
+
+    setIsScrollingUp(isScrollingUpNow);
+    ev.target.dataset.scrollTop = scrollTop;
+
+    if (ev.target.scrollTop === ev.target.scrollTopMax & ev.target.scrollTop !== 0) {
       if (!loadingMore) {
         dispatch(setLoadingMore(true));
         loadMoreReplays()
@@ -74,13 +82,13 @@ function ReplaysList() {
       <h1>{replaysType === 'mostViewed' ? 'Most viewed replays' : 'Latest replays'}</h1>
       <button onClick={closeReplays} id="closeReplaysButton" >Close ❌</button>
       <button id="otherReplaysButton" onClick={changeReplaysType}>{replaysType === 'mostViewed' ? 'Latest replays' : 'Most viewed replays'}</button>
-      <div className="replaysContainer" style={{ display: 'flex', flexDirection: 'column' }} onScroll={handleScroll}>
-        <ReplaysFilters />
+      <ReplaysFilters isScrollingUp={isScrollingUp} />
+      <div className="replaysContainer" style={{ display: 'flex', flexDirection: 'column' }} onScrollCapture={handleScroll}>
         {replaysLoaded ? (
-          <div className="replaysList" style={{ height: '85%' }}>
+          <div className="replaysList" style={{ height: '100%' }}>
             {
               replays.replays.length !== 0 ?
-                replays.replays.map((r, index) => <ReplayInfo key={index} i={index} />) :
+                replays.replays.map((r, index) => <ReplayInfo key={index} i={index} isScrollingUp={isScrollingUp} />) :
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%' }}>
                   <div style={{ textAlign: 'center' }}>There is no replay with given filters</div>
                 </div>

@@ -82,6 +82,7 @@ function Home() {
 
   function receiveMessage(m) {
     const x = JSON.parse(m.data);
+    // console.log(x);
     if (x.header === 'insertedReplayId') {
       const addURL = "?replayId=" + x.id;
       window.history.pushState(null, null, addURL);

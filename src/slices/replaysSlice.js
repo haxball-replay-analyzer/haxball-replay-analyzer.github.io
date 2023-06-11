@@ -40,6 +40,8 @@ export const replaysSlice = createSlice({
           replays: state.replays.replays.concat(action.payload.replays),
           teams: state.replays.teams.concat(action.payload.teams)
         }
+        if (action.payload.replays.length < 10) state.allReplaysLoaded = true
+        else state.allReplaysLoaded = false
       }
     },
     setReplaysType: (state, action) => {
@@ -79,7 +81,7 @@ export const replaysSlice = createSlice({
       state.filters.period = action.payload
     },
     setLoadingMore: (state, action) => {
-      state.filters.loadingMore = action.payload
+      state.loadingMore = action.payload
     },
   },
 })

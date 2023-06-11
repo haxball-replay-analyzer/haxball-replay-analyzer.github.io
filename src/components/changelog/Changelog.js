@@ -5,6 +5,14 @@ import { useEffect } from 'react';
 
 const changelog = [
   {
+    version: '3.1.2',
+    date: '11.06.2023',
+    changes: [
+      'Scrolling down after reaching the bottom of replays\' list will result in loading more replays with given criteria',
+      'Visual changes and bugfixes'
+    ]
+  },
+  {
     version: '3.1.1',
     date: '13.05.2023',
     changes: [

@@ -61,8 +61,26 @@ function ReplaysFilters(props) {
   }
 
   return (
-    <div className="replaysFilters" style={{ height: '15%', width: '100%', display: "flex", flexDirection: "row" }}>
-      <div style={{ flex: 1, display: "flex", flexDirection: 'column', justifyContent: "center", alignItems: "center" }}>
+    <div className="replaysFilters"
+      style={{
+        height: props.isScrollingUp ? '17.5%' : '0px',
+        transition: 'height 0.5s',
+        width: '100%',
+        display: "flex",
+        flexDirection: "row",
+        overflow: 'hidden'
+      }}>
+      <div
+        style={{
+          flex: 1,
+          display: "flex",
+          flexDirection: 'column',
+          justifyContent: "center",
+          alignItems: "center",
+          height: props.isScrollingUp ? '100%' : '0px',
+          transition: 'height 0.5s',
+          overflow: 'hidden'
+        }}>
         <div style={{ flex: 1, display: "flex", justifyContent: "center", alignItems: "center", fontSize: '150%', fontWeight: 'bold' }}>Filters</div>
         {replaysType === 'mostViewed' && <div className="replaysFiltersButtons" style={{ flex: 1 }}>
           <button id="filterByWeek" className="active" onClick={filterPeriod}>Week</button>
@@ -70,7 +88,16 @@ function ReplaysFilters(props) {
           <button id="filterByAlltime" onClick={filterPeriod}>All-time</button>
         </div>}
       </div>
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center" }}>
+      <div
+        style={{
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          height: props.isScrollingUp ? '100%' : '0px',
+          transition: 'height 0.5s',
+          overflow: 'hidden'
+        }}>
         <input
           type="text"
           style={{ backgroundColor: 'lightgrey', borderRadius: 4, padding: "3px", margin: '5px', width: '80%' }}
