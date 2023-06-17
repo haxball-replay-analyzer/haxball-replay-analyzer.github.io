@@ -144,7 +144,6 @@ function Home() {
       dispatch(setReplaysLoaded(true));
       dispatch(setReplays(x.replays));
       dispatch(setMainMode('replays'));
-      document.title = "test"
     } else if (x.header === 'invalidLink') {
       openModal('Invalid link - replay with given ID doesn\'t exist', 'darkgoldenrod', 4)
     } else if (x.header === 'next10 stats') {
