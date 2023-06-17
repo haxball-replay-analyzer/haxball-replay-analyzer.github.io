@@ -46,7 +46,7 @@ function MatchInfo(props) {
           {redTeam.map((nick, index) => (
             <React.Fragment key={index}>
               {index > 0 && ', '}
-              {(player4Search !== null && player4Search !== '' && nick.includes(player4Search)) ? <span style={{ fontWeight: 700, borderBottom: '1px solid white' }}>{nick}</span> : <span>{nick}</span>}
+              {(player4Search !== null && player4Search !== '' && nick.toLowerCase().includes(player4Search.toLowerCase())) ? <span style={{ fontWeight: 700, borderBottom: '1px solid white' }}>{nick}</span> : <span>{nick}</span>}
             </React.Fragment>
           ))}
         </div>
@@ -54,7 +54,7 @@ function MatchInfo(props) {
           {blueTeam.map((nick, index) => (
             <React.Fragment key={index}>
               {index > 0 && ', '}
-              {(player4Search !== null && player4Search !== '' && nick.includes(player4Search)) ? <span style={{ fontWeight: 700, borderBottom: '1px solid white' }}>{nick}</span> : <span>{nick}</span>}
+              {(player4Search !== null && player4Search !== '' && nick.toLowerCase().includes(player4Search.toLowerCase())) ? <span style={{ fontWeight: 700, borderBottom: '1px solid white' }}>{nick}</span> : <span>{nick}</span>}
             </React.Fragment>
           ))}
         </div>

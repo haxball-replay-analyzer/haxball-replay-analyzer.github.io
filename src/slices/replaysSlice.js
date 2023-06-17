@@ -19,7 +19,9 @@ export const replaysSlice = createSlice({
       realSoccer: false,
       spaceMode: false,
       searchText: '',
-      period: 'week'
+      period: 'week',
+      startDate: null,
+      endDate: null,
     },
     loadingMore: false,
     allReplaysLoaded: false
@@ -74,6 +76,12 @@ export const replaysSlice = createSlice({
     setFilterRealSoccer: (state, action) => {
       state.filters.realSoccer = action.payload
     },
+    setStartDate: (state, action) => {
+      state.filters.startDate = action.payload
+    },
+    setEndDate: (state, action) => {
+      state.filters.endDate = action.payload
+    },
     setSearchText: (state, action) => {
       state.filters.searchText = action.payload
     },
@@ -87,6 +95,6 @@ export const replaysSlice = createSlice({
 })
 
 // Action creators are generated for each case reducer function
-export const { setReplays, addMoreReplays, setReplaysType, setReplaysLoaded, setPlayer4Search, setFilterPlayer, setFilterTeam, setFilterReplay, setFilterGoal, setFilterStadium, setFilterSpaceMode, setFilterRealSoccer, setSearchText, setPeriodState, setLoadingMore } = replaysSlice.actions
+export const { setReplays, addMoreReplays, setStartDate, setEndDate, setReplaysType, setReplaysLoaded, setPlayer4Search, setFilterPlayer, setFilterTeam, setFilterReplay, setFilterGoal, setFilterStadium, setFilterSpaceMode, setFilterRealSoccer, setSearchText, setPeriodState, setLoadingMore } = replaysSlice.actions
 
 export default replaysSlice.reducer

@@ -34,6 +34,7 @@ var replayIdToSend;
 function Home() {
 
   const socketUrl = 'wss://haxball-replay-analyzer.com:443/';
+  // const socketUrl = 'ws://haxball-replay-analyzer.com:8080/';
   // const socketUrl = 'ws://localhost:8080/';
   const STATIC_OPTIONS = {
     onOpen: () => {
@@ -45,7 +46,7 @@ function Home() {
       }
     },
     onClose: (e) => {
-      // console.log('Connection closed', e.reason);
+      console.log('Connection closed', e.reason);
     },
     shouldReconnect: (closeEvent) => false
   }
@@ -79,6 +80,8 @@ function Home() {
   const replaysType = useSelector(state => state.replays.type);
   const replays = useSelector(state => state.replays.replays);
   const replaysQty = replays.replays?.length;
+  const startDate = useSelector(state => state.replays.filters.startDate)
+  const endDate = useSelector(state => state.replays.filters.endDate)
 
   function receiveMessage(m) {
     const x = JSON.parse(m.data);
@@ -141,6 +144,7 @@ function Home() {
       dispatch(setReplaysLoaded(true));
       dispatch(setReplays(x.replays));
       dispatch(setMainMode('replays'));
+      document.title = "test"
     } else if (x.header === 'invalidLink') {
       openModal('Invalid link - replay with given ID doesn\'t exist', 'darkgoldenrod', 4)
     } else if (x.header === 'next10 stats') {
@@ -302,7 +306,9 @@ function Home() {
       filterStadium: filterStadium,
       filterTeam: filterTeam,
       period: periodState,
-      alreadyLoaded: replaysQty
+      alreadyLoaded: replaysQty,
+      startDate: startDate,
+      endDate: endDate
     }
     sendMessage(JSON.stringify(toSend))
   }

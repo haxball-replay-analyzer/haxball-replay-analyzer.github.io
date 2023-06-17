@@ -5,6 +5,14 @@ import { useEffect } from 'react';
 
 const changelog = [
   {
+    version: '3.1.3',
+    date: '17.06.2023',
+    changes: [
+      'Added date filter - you can specify what time period you want to see replays from',
+      'Visual changes and bugfixes'
+    ]
+  },
+  {
     version: '3.1.2',
     date: '11.06.2023',
     changes: [

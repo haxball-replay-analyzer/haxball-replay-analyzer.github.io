@@ -464,3 +464,12 @@ table {
   left: calc(50% - 15vw);
   width: 30vw;
 }
+
+.react-datepicker-wrapper {
+  input {
+    background-color: lightgray;
+    width: 80px;
+    padding-left: 5px;
+    border-radius: 5px;
+  }
+}
