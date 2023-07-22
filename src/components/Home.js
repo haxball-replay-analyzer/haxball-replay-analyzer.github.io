@@ -50,7 +50,7 @@ function Home() {
     },
     shouldReconnect: (closeEvent) => false
   }
-  const { sendMessage, readyState, getWebSocket } = {} // = useWebSocket(socketUrl, STATIC_OPTIONS); może jeszcze kiedyś się wróci
+  const { sendMessage, readyState, getWebSocket } = useWebSocket(socketUrl, STATIC_OPTIONS);
   const connectionStatus = {
     [ReadyState.CONNECTING]: 'Connecting',
     [ReadyState.OPEN]: 'Open',
@@ -178,7 +178,6 @@ function Home() {
   }
 
   function checkParams() {
-    return;
     const params = window.location.toLocaleString().split('?replayId=');
     if (params.length > 1) {
       const toSend = {
@@ -201,8 +200,7 @@ function Home() {
   }
 
   function showReplays(ev) {
-    openModal('I had to suspend the server due to problems with Google Cloud Platform. I hope to solve these issues in a few days.', 'darkred', 8)
-    return;
+    // console.log('showreplays');
     if (connectionStatus === 'Open') {
       if (ev.target.textContent === 'Most viewed replays') {
         var replaysType = 'mostViewed'
@@ -320,7 +318,6 @@ function Home() {
   }
 
   sendSocketMessage = function (m, n, o) {
-    return;
     setReplayName(n);
     if (m.byteLength > 50_000) {
       var replayParts = [];
