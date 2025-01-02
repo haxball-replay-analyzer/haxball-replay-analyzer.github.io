@@ -12,6 +12,7 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "gh-pages": "^5.0.0",
+    "https-browserify": "^1.0.0",
     "jquery": "^3.6.3",
     "react": "^18.2.0",
     "react-datepicker": "^4.13.0",

@@ -12,7 +12,6 @@ import ReplaysList from "./replays/ReplaysList";
 import { setReplays, setReplaysLoaded, setReplaysType, setLoadingMore, addMoreReplays } from "../slices/replaysSlice";
 import { openModal } from "./Modal";
 import Downloading from "./Downloading";
-import Banner from "./ads/Ad1";
 
 export function showStats() { }
 export function setGameStats() { }
@@ -179,13 +178,21 @@ function Home() {
   }
 
   function checkParams() {
-    const params = window.location.toLocaleString().split('?replayId=');
+    const windowUrl = window.location.toLocaleString();
+    var params = windowUrl.split('?replayId=');
+    if (params.length === 1) params = windowUrl.split('?thehax=');
     if (params.length > 1) {
       const toSend = {
         header: 'select',
         id: params[1]
       }
       sendMessage(JSON.stringify(toSend))
+      // Sprawdzanie czy params[1] jest prawidłowym UUIDem
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+      if (!uuidRegex.test(params[1])) {
+        openModal('Invalid replay ID format', 'darkgoldenrod', 4);
+        return;
+      }
       $(function () {
 
         $('.roomlist-view').animate({
@@ -197,6 +204,36 @@ function Home() {
         }, { duration: 700, easing: 'swing', queue: false });
 
       })
+
+      fetch(`https://replay.thehax.pl/${params[1]}/download`)
+        .then(response => {
+          if (!response.ok) {
+            openModal('Replay not found', 'darkred', 4);
+          }
+          if (response.headers.get('content-length') === '0' || response.headers.get('content-length') === null) {
+            openModal('Replay is empty', 'darkred', 4);
+          }
+          return response.arrayBuffer()
+        })
+        .then(data => {
+          dispatch(setConnectHalves(false))
+          const buffer = data; // dane są już w formacie ArrayBuffer
+          dispatch(setUserUploaded(false));
+          replayData = [];
+
+          $(function () {
+            $('#downloading-screen').animate({
+              left: '-150%',
+            }, { duration: 700, easing: 'swing', queue: false, complete: function () { $("#downloading-screen").css('left', '100%') } });
+
+            $('#loading-screen').animate({
+              left: '35vw',
+            }, { duration: 700, easing: 'swing', queue: false, complete: function () { replayFromSite(buffer); } });
+          })
+        })
+        .catch(err => {
+          console.error('Błąd podczas pobierania danych:', err);
+        });
     }
   }
 
@@ -238,6 +275,12 @@ function Home() {
 
   function setGameStatsExp(stats) {
     dispatch(setStats(stats));
+    if (1 === 1) { // na potrzeby thehaxa, może się potem zmieni
+      for (var i = 0; i < stats.length; i++) {
+        dispatch(setRedTeamName({ mtc: i, name: 'RED' }))
+        dispatch(setBlueTeamName({ mtc: i, name: 'BLUE' }))
+      }
+    }
     if (userDidUpload) {
       var message = [];
       for (var i = 0; i < stats.length; i++) {
@@ -390,6 +433,7 @@ function Home() {
 
   useEffect(() => {
     getIP();
+    checkParams();
   }, []);
 
   return (
@@ -413,9 +457,6 @@ function Home() {
           <Changelog />
         </div>
       </div>
-      <div style={{ width: 160, height: 600 }}>
-        <Banner />
-      </div >
       <Downloading />
       <LoadingScreen />
       {mainMode === 'stats' && <GameStats replayId={replayId} />}
