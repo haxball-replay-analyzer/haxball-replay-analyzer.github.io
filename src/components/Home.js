@@ -12,6 +12,7 @@ import ReplaysList from "./replays/ReplaysList";
 import { setReplays, setReplaysLoaded, setReplaysType, setLoadingMore, addMoreReplays } from "../slices/replaysSlice";
 import { openModal } from "./Modal";
 import Downloading from "./Downloading";
+import Banner from "./ads/Ad1";
 
 export function showStats() { }
 export function setGameStats() { }
@@ -412,6 +413,9 @@ function Home() {
           <Changelog />
         </div>
       </div>
+      <div style={{ width: 160, height: 600 }}>
+        <Banner />
+      </div >
       <Downloading />
       <LoadingScreen />
       {mainMode === 'stats' && <GameStats replayId={replayId} />}
