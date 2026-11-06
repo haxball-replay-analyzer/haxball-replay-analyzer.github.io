@@ -1,0 +1,39 @@
+name: Testy i build
+
+on:
+  push:
+    branches-ignore:
+      - gh-pages
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Instalacja zależności
+        run: npm ci
+
+      - name: Testy dekodera
+        run: npm test
+
+      # Create React App przy CI=true (GitHub ustawia to sam) traktuje ostrzeżenia
+      # ESLint jako błędy, a build ma ich dziś dużo. Dopóki lint nie jest
+      # posprzątany, build w CI sprawdza tylko kompilację.
+      - name: Build
+        run: npm run build
+        env:
+          CI: 'false'
