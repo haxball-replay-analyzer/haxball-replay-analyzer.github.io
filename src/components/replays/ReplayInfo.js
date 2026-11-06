@@ -40,12 +40,12 @@ function ReplayInfo(props) {
       transition: 'height 0.5s'
     }}>
       <div style={{ flex: 2, display: 'flex', flexDirection: 'column', alignItems: 'start', overflow: "hidden" }}>
-        <div style={{ flex: 1, display: 'flex', alignItems: 'center' }}>{replays[i].ReplayName}</div>
+        <div style={{ flex: 1, display: 'flex', alignItems: 'center', fontSize: 'max(14px, 2vh)' }}>{replays[i].ReplayName}</div>
         <div style={{ flex: 2, display: 'flex', alignItems: 'center' }}>
-          <div style={{ display: 'flex', fontSize: '200%', alignItems: 'center', padding: '5px', fontWeight: 'bold' }}>{replays[i].ViewsCount}</div>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>views</div>
+          <div style={{ display: 'flex', fontSize: 'max(28px, 4vh)', alignItems: 'center', padding: '5px', fontWeight: 'bold' }}>{replays[i].ViewsCount}</div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 'max(14px, 2vh)' }}>views</div>
         </div>
-        <div style={{ flex: 1, display: 'flex', alignItems: 'center' }}>Sent: {replays[i].SentDate && formatDate(new Date(replays[i].SentDate))}</div>
+        <div style={{ flex: 1, display: 'flex', alignItems: 'center', fontSize: 'max(14px, 2vh)' }}>Sent: {replays[i].SentDate && formatDate(new Date(replays[i].SentDate))}</div>
       </div>
       <div className="replayMatches">
         {matches[i].map((m, index) => <MatchInfo key={index} match={m} i={index} replayIndex={i} />)}

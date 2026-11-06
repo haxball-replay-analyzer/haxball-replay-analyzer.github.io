@@ -38,7 +38,7 @@ function MatchInfo(props) {
 
   return (
     <div className="matchInfo" style={{ display: 'flex', flexDirection: 'column' }}>
-      <div style={{ flex: 2, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', fontWeight: 'bold' }}>
+      <div style={{ flex: 2, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 'max(20px, 2vh)', fontWeight: 'bold' }}>
         {redTeamName || 'RED'} {match.RedScore}:{match.BlueScore} {blueTeamName || 'BLUE'}
       </div>
       <div style={{ flex: 3, display: 'flex', flexDirection: 'row', fontSize: '75%', overflowY: 'auto' }}>

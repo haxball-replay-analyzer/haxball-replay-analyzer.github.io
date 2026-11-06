@@ -5,6 +5,13 @@ import { useEffect } from 'react';
 
 const changelog = [
   {
+    version: '3.1.5',
+    date: '02.01.2025',
+    changes: [
+      'Added integration with Thehax Replays'
+    ]
+  },
+  {
     version: '3.1.4',
     date: '22.07.2023',
     changes: [
