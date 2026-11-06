@@ -1,0 +1,6 @@
+# Pliki binarne: bez konwersji końców linii i bez diffu tekstowego.
+*.hbr2 binary
+*.png binary
+*.ico binary
+*.eot binary
+*.woff2 binary
