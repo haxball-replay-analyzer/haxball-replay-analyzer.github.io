@@ -989,17 +989,16 @@ function ha(a) {
       10000
     ];
   b();
+  // ikony z fontello (src/styles/icons.scss): znak ⏵ (U+23F5) w Open Sans z Google Fonts jest pusty
   var k = d.get('playicon');
-  k.innerHTML = '⏵';
-  //k.classList.add('icon-pause');
+  function setPlayIcon() {
+    k.classList.toggle('icon-play', !e);
+    k.classList.toggle('icon-pause', e)
+  }
+  setPlayIcon();
   d.get('play').onclick = function () {
     e = !e;
-    /*
-      var a = k.classList;
-      a.toggle('icon-play', !e);
-      a.toggle('icon-pause', e);
-    */
-    e ? k.innerHTML = '⏸' : k.innerHTML = '⏵';
+    setPlayIcon();
     b()
   };
   d.get('spdup').onclick = function () {
