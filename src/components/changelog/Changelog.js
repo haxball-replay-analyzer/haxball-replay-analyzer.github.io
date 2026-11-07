@@ -5,6 +5,15 @@ import { useEffect } from 'react';
 
 const changelog = [
   {
+    version: '3.2.0',
+    date: '07.11.2026',
+    changes: [
+      'Game stats are now calculated directly from the replay data as soon as it is loaded, which makes them more accurate',
+      'The player opens paused at 1x speed, and the Play/Pause button shows its icon again',
+      'Fixed "Replay error" when a replay was opened before the game resources finished downloading: the analyzer now waits for them, or shows a clear message if they fail to load'
+    ]
+  },
+  {
     version: '3.1.5',
     date: '02.01.2025',
     changes: [
