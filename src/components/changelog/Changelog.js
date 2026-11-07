@@ -5,6 +5,13 @@ import { useEffect } from 'react';
 
 const changelog = [
   {
+    version: '3.2.1',
+    date: '07.11.2026',
+    changes: [
+      'Fixed Player To Follow: the camera now stays on the selected player instead of following someone else or the ball'
+    ]
+  },
+  {
     version: '3.2.0',
     date: '07.11.2026',
     changes: [
