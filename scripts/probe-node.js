@@ -49,7 +49,7 @@ function prepareGame2Source(text) {
     if (i >= modernizrStart && i <= modernizrEnd) return '';
     return l.replace(/^export function /, 'function ');
   }).join('\n');
-  src += '\n;kc.fj();globalThis.__hbra = { Jb, fa, F, V, O, m, parseTime, getMatch: () => match, getPlayerList: () => playerList, getPlayerPos: () => playerPos, getGoals: () => goals, getLoading: () => loading };';
+  src += '\n;kc.fj();globalThis.__hbra = { Jb, fa, F, V, O, m, parseTime, createFootballStats, getLoading: () => loading };';
   return src;
 }
 
@@ -135,16 +135,15 @@ function analyzeReplay(buffer, { simulate = false, positionsEvery = 0, game2Path
   const target = rep.mf;
   // Dl() sprawdza loading.recLength; poprawne wartości ustawia newReplay() -> tu ręcznie
   Object.assign(H.getLoading(), { recLength: 1, progress: 0, analyzed: 0, changed: false, done: false });
-  sandbox.__fake = fakeEl;
-  sandbox.__rep = rep;
-  // Gb = warstwa widoku z callbackami goli/startu/stopu; podpinamy ją z atrapą widoku
-  vm.runInContext('keepUpdating = true; n.Na = __fake(); if (n.A == null) n.A = __fake(); __gb = new Gb(__fake()); __gb.ri(__rep.T);', sandbox);
+  // Statystyki piłkarskie: słuchacz pokoju i pętli fizyki (bez widoku Gb)
+  const stats = H.createFootballStats();
+  stats.attach(rep.T);
 
   // Czas gola: game2.js go nie zapisuje, więc patrzymy, kiedy przybywa goli w bieżącym meczu.
   const goalTimes = [];
   let seenMatches = 0; let seenGoals = 0;
   const watchGoals = () => {
-    const match = H.getMatch();
+    const match = stats.match;
     if (match.length !== seenMatches) { seenMatches = match.length; seenGoals = 0; }
     const cur = match[match.length - 1];
     while (cur.goals.length > seenGoals) {
@@ -167,7 +166,7 @@ function analyzeReplay(buffer, { simulate = false, positionsEvery = 0, game2Path
     }
   }
   const simulateMs = performance.now() - t1;
-  const matches = H.getMatch();
+  const matches = stats.match;
   log('simulated', steps, 'ticks in', Math.round(simulateMs), 'ms');
   log('matches:', matches.length, matches.map((x) => ({ stadium: x.stadium && x.stadium.name, ticks: x.gameTicks, score: x.scoreRed + ':' + x.scoreBlue, goals: x.goals.length, kicks: x.kicks.length, passes: x.passes.length, red: x.redTeam.length, blue: x.blueTeam.length })));
 
@@ -177,8 +176,8 @@ function analyzeReplay(buffer, { simulate = false, positionsEvery = 0, game2Path
     matches,
     goalTimes,
     positions: positionsEvery ? positions : undefined,
-    playerList: H.getPlayerList(), // nicki w kolejności, w jakiej indeksują player[] i playerPos (Redux)
-    playerPos: H.getPlayerPos(), // [mecz][indeks w playerList] = [{x, y}] co tick meczu (heatmapy)
+    playerList: stats.playerList, // nicki w kolejności, w jakiej indeksują player[] i playerPos (Redux)
+    playerPos: stats.playerPos, // [mecz][indeks w playerList] = [{x, y}] co tick meczu (heatmapy)
     playersAtEnd: rep.T.I.map((p) => ({ id: p.V, team: p.ea && p.ea.$ })),
     parseTime: H.parseTime,
   });
