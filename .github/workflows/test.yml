@@ -30,10 +30,5 @@ jobs:
       - name: Testy dekodera
         run: npm test
 
-      # Create React App przy CI=true (GitHub ustawia to sam) traktuje ostrzeżenia
-      # ESLint jako błędy, a build ma ich dziś dużo. Dopóki lint nie jest
-      # posprzątany, build w CI sprawdza tylko kompilację.
       - name: Build
         run: npm run build
-        env:
-          CI: 'false'
