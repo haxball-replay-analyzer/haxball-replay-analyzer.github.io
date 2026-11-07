@@ -54,7 +54,19 @@ function summarize(r) {
     matches,
     positionsEvery: POSITIONS_EVERY,
     positions: r.positions,
+    playerList: r.playerList,
+    playerPos: summarizePlayerPos(r.playerPos),
   }));
+}
+
+// Dane do heatmap są duże (pozycja każdego gracza w każdym ticku), więc w pliku
+// oczekiwanym tylko skrót: liczba meczów, długości list i SHA-256 całości w JSON.
+function summarizePlayerPos(playerPos) {
+  return {
+    matches: playerPos.length,
+    lengths: playerPos.map((m) => m.map((list) => (list ? list.length : null))),
+    sha256: crypto.createHash('sha256').update(JSON.stringify(playerPos)).digest('hex'),
+  };
 }
 
 function pick(obj, keys) {
@@ -108,6 +120,10 @@ for (const name of SAMPLES) {
 
     it('pozycje piłki i graczy co 60 s (fizyka)', () => {
       assert.deepEqual(actual.positions, expected.positions);
+    });
+
+    it('lista graczy i pozycje do heatmap (playerList, skrót playerPos)', () => {
+      assert.deepEqual(pick(actual, ['playerList', 'playerPos']), pick(expected, ['playerList', 'playerPos']));
     });
 
     it('cały wynik (pozostałe pola: stadion, flagi, touches, changes)', () => {

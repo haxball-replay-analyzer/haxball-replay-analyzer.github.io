@@ -180,6 +180,8 @@ function analyzeReplay(buffer, { simulate = false, positionsEvery = 0, game2Path
     matches,
     goalTimes,
     positions: positionsEvery ? positions : undefined,
+    playerList: H.getPlayerList(), // nicki w kolejności, w jakiej indeksują player[] i playerPos (Redux)
+    playerPos: H.getPlayerPos(), // [mecz][indeks w playerList] = [{x, y}] co tick meczu (heatmapy)
     playersAtEnd: rep.T.I.map((p) => ({ id: p.V, team: p.ea && p.ea.$ })),
     parseTime: H.parseTime,
   });
