@@ -5293,11 +5293,12 @@ Tb.prototype = {
         y: this.Ya.y
       }
       if (playerToFollow != 0) {
-        var followedPlayer = players.find(element => element.V == playerToFollow)
-        followedPlayer = players.indexOf(followedPlayer);
-        if (a.I[followedPlayer] && a.I[followedPlayer].H != null) {
-          translatetoDisc.x = a.I[followedPlayer].H.a.x;
-          translatetoDisc.y = a.I[followedPlayer].H.a.y;
+        // gracz po id w bieżącym pokoju (a.na); indeks z listy wejść `players` nie pasuje do a.I
+        // po wejściach przed grą, wyjściach i zmianie kolejności graczy (TD-034)
+        var followedPlayer = a.na(Number(playerToFollow));
+        if (null != followedPlayer && null != followedPlayer.H) {
+          translatetoDisc.x = followedPlayer.H.a.x;
+          translatetoDisc.y = followedPlayer.H.a.y;
         }
       }
       this.c.translate(- translatetoDisc.x, - translatetoDisc.y);
