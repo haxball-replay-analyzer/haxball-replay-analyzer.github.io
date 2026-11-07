@@ -2,10 +2,14 @@
   "name": "replay-analyzer-in-react",
   "version": "0.1.0",
   "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
   "homepage": "https://haxball-replay-analyzer.github.io",
   "dependencies": {
     "@emotion/react": "^11.11.0",
     "@emotion/styled": "^11.11.0",
+    "@hbra/replay-core": "0.1.0",
     "@mui/material": "^5.13.3",
     "@reduxjs/toolkit": "^1.9.2",
     "@testing-library/jest-dom": "^5.16.5",

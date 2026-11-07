@@ -1,0 +1,119 @@
+// Analiza powtórki bez odtwarzacza i bez DOM (kod HBRA, MIT).
+/* eslint-disable eqeqeq, no-sequences, no-unused-expressions */
+
+import { F, Jb, fa, kc, m } from './haxball.js';
+import { createFootballStats, parseTime } from './stats/football.js';
+
+// Nagłówek pliku .hbr2 (big endian): "HBR2", wersja, długość w tickach.
+function readReplayHeader(data) {
+  var dv = new DataView(data.buffer, data.byteOffset, data.byteLength),
+    magic = dv.getUint32(0);
+  return {
+    magic: '0x' + magic.toString(16) + ' (' + String.fromCharCode(data[0], data[1], data[2], data[3]) + ')',
+    version: dv.getUint32(4),
+    totalFrames: dv.getUint32(8),
+    bytes: data.length
+  }
+}
+
+function discPos(d) {
+  return d && d.a ? [d.a.x, d.a.y] : null
+}
+
+// Analiza powtórki bez odtwarzacza i bez DOM: dekodowanie, symulacja tick po ticku (pętla z Jb.C bez
+// czasu rzeczywistego) i statystyki piłkarskie (createFootballStats).
+//   bytes: ArrayBuffer / Uint8Array z plikiem .hbr2
+//   options.simulate (domyślnie true): false = tylko nagłówek, znaczniki i zdarzenia
+//   options.positionsEvery: co ile ticków zapisać pozycje piłki i graczy (0 = wcale)
+//   options.collectors: dodatkowi słuchacze pokoju ({ attach(room), detach() }), np. inne statystyki
+//   options.onProgress(ułamek), options.progressEvery (ticki, domyślnie 6000)
+// Rzuca błąd HaxBalla (q z Kb) przy wersji pliku innej niż 3.
+export function analyzeReplay(bytes, options) {
+  options = options || {};
+  var simulate = false !== options.simulate,
+    positionsEvery = options.positionsEvery || 0,
+    collectors = options.collectors || [],
+    onProgress = options.onProgress,
+    progressEvery = options.progressEvery || 6000;
+  kc.fj();
+  var data = new Uint8Array(bytes); // Jb czyta data.buffer od początku, więc kopia albo widok całego bufora
+  var header = readReplayHeader(data);
+  // konstruktor: magic, wersja, inflate, znaczniki, stan początkowy
+  var rep = new Jb(data, new fa, 3);
+  var st = rep.T;
+  // zdarzenia: kopia czytnika, żeby nie przesunąć rep
+  var L = rep.Lc,
+    L2 = new F(new DataView(L.o.buffer, L.o.byteOffset, L.o.byteLength), !1);
+  L2.a = L.a;
+  var events = 0,
+    eventsByClass = {};
+  while (0 < L2.o.byteLength - L2.a) {
+    L2.Ab();
+    L2.Ob();
+    var ev = m.fh(L2),
+      name = ev.f && ev.f.name || '?'; // nazwa klasy po minifikacji (np. Ga); w buildzie strony inna
+    eventsByClass[name] = (eventsByClass[name] || 0) + 1;
+    events++
+  }
+  var result = {
+    header: header,
+    totalFrames: rep.mf,
+    markers: rep.Vk.map(function (k) { return { mj: k.mj, kind: k.kind } }),
+    initialState: { stadium: st.S ? st.S.w : null, players: st.I ? st.I.length : null },
+    events: events,
+    eventsByClass: eventsByClass
+  };
+  if (!simulate) return result;
+
+  var t1 = performance.now(),
+    steps = 0,
+    target = rep.mf,
+    stats = createFootballStats();
+  stats.attach(rep.T);
+  for (var i = 0; i < collectors.length; i++) collectors[i].attach(rep.T);
+  // czas gola: statystyki go nie zapisują, więc sprawdzamy, kiedy przybywa goli w bieżącym meczu
+  var goalTimes = [],
+    seenMatches = 0,
+    seenGoals = 0;
+  function watchGoals() {
+    var match = stats.match;
+    match.length !== seenMatches && (seenMatches = match.length, seenGoals = 0);
+    for (var cur = match[match.length - 1]; cur.goals.length > seenGoals;) goalTimes.push({ match: match.length - 1, goal: seenGoals, replayTick: rep.Y, gameTicks: cur.gameTicks, time: parseTime(cur.gameTicks) }), seenGoals++
+  }
+  var positions = [];
+  while (rep.Y < target) {
+    for (; null != rep.gg && rep.hg == rep.Y;) {
+      var e = rep.gg;
+      e.apply(rep.T);
+      null != rep.fc && rep.fc(e);
+      rep.Dl();
+      watchGoals()
+    }
+    rep.Y++;
+    rep.T.C(1);
+    steps++;
+    watchGoals();
+    if (positionsEvery && 0 === rep.Y % positionsEvery) {
+      var game = rep.T.K, // trwająca gra (null poza meczem); piłka to pierwszy dysk
+        players = [];
+      for (var j = 0, ps = rep.T.I; j < ps.length; j++) ps[j].H && players.push([ps[j].V, ps[j].H.a.x, ps[j].H.a.y]);
+      positions.push({ tick: rep.Y, ball: game && game.ta && game.ta.F ? discPos(game.ta.F[0]) : null, players: players })
+    }
+    onProgress && 0 === steps % progressEvery && onProgress(rep.Y / target)
+  }
+  stats.detach();
+  for (i = 0; i < collectors.length; i++) collectors[i].detach && collectors[i].detach();
+  result.ticks = steps;
+  result.simulateMs = performance.now() - t1;
+  result.matches = stats.match;
+  result.goalTimes = goalTimes;
+  result.positions = positionsEvery ? positions : void 0;
+  result.playersAtEnd = rep.T.I.map(function (p) { return { id: p.V, team: p.ea && p.ea.$ } });
+  result.playerList = stats.playerList; // nicki w kolejności, w jakiej indeksują player[] i playerPos
+  result.playerPos = stats.playerPos; // [mecz][indeks w playerList] = [{x, y}] co tick meczu (heatmapy)
+  // wejścia graczy w kolejności (z powtórzeniami): lista "Player To Follow" i kamera w odtwarzaczu
+  result.playerEntries = stats.players.map(function (p) { return { id: p.V, name: p.w } });
+  return result
+}
+
+export { readReplayHeader };

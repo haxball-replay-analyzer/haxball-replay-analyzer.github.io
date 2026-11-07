@@ -1,5 +1,6 @@
-// Testy charakteryzujące dekoder .hbr2 (src/game2.js uruchamiany przez scripts/probe-node.js).
-// Utrwalają to, co dekoder liczy dziś na dwóch publicznych próbkach; niczego nie oceniają.
+// Testy charakteryzujące dekoder .hbr2 (@hbra/replay-core, packages/replay-core, import wprost:
+// bez vm, bez DOM i bez wycinania linii). Utrwalają to, co dekoder liczy na dwóch publicznych
+// próbkach; niczego nie oceniają.
 //
 //   npm test                              porównanie z test/fixtures/<próbka>.expected.json
 //   HBRA_UPDATE_FIXTURES=1 npm test       zapis nowych plików oczekiwanych z obecnego kodu
@@ -10,7 +11,10 @@ const assert = require('node:assert/strict');
 const crypto = require('node:crypto');
 const fs = require('node:fs');
 const path = require('node:path');
-const { analyzeReplay } = require('../scripts/probe-node.js');
+
+// Paczka jest modułem ES; test zostaje w CommonJS i ładuje ją przez import().
+let core;
+const loadCore = async () => (core ??= await import('@hbra/replay-core'));
 
 const FIXTURES = path.join(__dirname, 'fixtures');
 const SAMPLES = ['2020-05-07', 'HBReplay-2020-04-02-23h11m'];
@@ -28,7 +32,7 @@ function summarize(r) {
       stadium: stadium
         ? { name: stadium.name, width: stadium.width, height: stadium.height, sha256: crypto.createHash('sha256').update(JSON.stringify(stadium)).digest('hex') }
         : stadium,
-      time: r.parseTime(gameTicks),
+      time: core.parseTime(gameTicks),
       gameTicks,
       scoreRed,
       scoreBlue,
@@ -80,8 +84,9 @@ for (const name of SAMPLES) {
     let actual;
     let expected;
 
-    before(() => {
-      actual = summarize(analyzeReplay(fs.readFileSync(replayFile), { simulate: true, positionsEvery: POSITIONS_EVERY }));
+    before(async () => {
+      const { analyzeReplay } = await loadCore();
+      actual = summarize(analyzeReplay(fs.readFileSync(replayFile), { positionsEvery: POSITIONS_EVERY }));
       if (UPDATE) fs.writeFileSync(expectedFile, JSON.stringify(actual, null, 1) + '\n');
       expected = JSON.parse(fs.readFileSync(expectedFile, 'utf8'));
     });
@@ -134,12 +139,13 @@ for (const name of SAMPLES) {
 
 const race = process.env.HBRA_RACE_REPLAY;
 describe('powtórka wyścigu (lokalnie)', () => {
-  it('analiza do końca, czas gry 26:45', { skip: race ? false : 'brak zmiennej HBRA_RACE_REPLAY ze ścieżką do pliku' }, (t) => {
+  it('analiza do końca, czas gry 26:45', { skip: race ? false : 'brak zmiennej HBRA_RACE_REPLAY ze ścieżką do pliku' }, async (t) => {
+    const { analyzeReplay, parseTime } = await loadCore();
     const t0 = performance.now();
-    const r = analyzeReplay(fs.readFileSync(race), { simulate: true });
+    const r = analyzeReplay(fs.readFileSync(race));
     const seconds = (performance.now() - t0) / 1000;
     const longest = r.matches.reduce((a, b) => (b.gameTicks > a.gameTicks ? b : a));
     t.diagnostic(`czas analizy: ${seconds.toFixed(1)} s (symulacja ${(r.simulateMs / 1000).toFixed(1)} s), ticki: ${r.ticks}, zdarzenia: ${r.events}, mecze: ${r.matches.length}`);
-    assert.equal(r.parseTime(longest.gameTicks), '26:45');
+    assert.equal(parseTime(longest.gameTicks), '26:45');
   });
 });
