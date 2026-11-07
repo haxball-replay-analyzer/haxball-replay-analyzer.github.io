@@ -1,6 +1,6 @@
 import Changelog from "./changelog/Changelog";
 import $ from 'jquery'
-import { handleFile, replayFromSite } from "../game2.js";
+import { handleFile, replayFromSite, configureReplayer } from "../game2.js";
 import LoadingScreen from "./LoadingScreen";
 import { useSelector, useDispatch } from "react-redux";
 import { setMainMode, setUserUploaded } from "../slices/mainModeSlice";
@@ -13,12 +13,6 @@ import { setReplays, setReplaysLoaded, setReplaysType, setLoadingMore, addMoreRe
 import { openModal } from "./Modal";
 import Downloading from "./Downloading";
 
-export function showStats() { }
-export function setGameStats() { }
-export function dispatchPlayerList() { }
-export function dispatchPlayerPos() { }
-export function dispatchClearStats() { }
-export function sendSocketMessage() { }
 export function sendMessageExp() { }
 export function search4Replays() { }
 export function checkParamsExp() { }
@@ -361,7 +355,7 @@ function Home() {
     sendMessage(JSON.stringify(m))
   }
 
-  sendSocketMessage = function (m, n, o) {
+  function uploadReplay(m, n, o) {
     setReplayName(n);
     if (m.byteLength > 50_000) {
       var replayParts = [];
@@ -395,11 +389,17 @@ function Home() {
     sendMessage(JSON.stringify(toSend))
   }
 
-  showStats = showStatsExp;
-  setGameStats = setGameStatsExp;
-  dispatchPlayerList = setPlayerListExp;
-  dispatchPlayerPos = setPlayerPosExp;
-  dispatchClearStats = dispatchClearStatsExp;
+  // Przy każdym renderze, tak jak dawniej nadpisywane eksporty: funkcje widzą bieżące
+  // userDidUpload, IP, replayName (stan z tego renderu).
+  configureReplayer({
+    onShowStats: showStatsExp,
+    onStats: setGameStatsExp,
+    onPlayerList: setPlayerListExp,
+    onPlayerPos: setPlayerPosExp,
+    onClearStats: dispatchClearStatsExp,
+    onUpload: uploadReplay,
+    onMessage: (message, color, seconds) => openModal(message, color, seconds)
+  });
   checkParamsExp = function () {
     checkParams();
   }

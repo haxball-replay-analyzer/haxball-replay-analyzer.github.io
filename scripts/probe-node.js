@@ -1,6 +1,6 @@
 // Dekoder .hbr2 z src/game2.js uruchamiany w Node bez DOM (vm + atrapy), bez zmian w src/.
-// To nie jest kod produkcyjny: tnie game2.js po numerach linii (importy 18-21, Modernizr 135-408)
-// i sprawdza, że te zakresy dalej tam są; po zmianie game2.js trzeba je poprawić.
+// To nie jest kod produkcyjny: wycina z game2.js importy i IIFE Modernizra (szuka ich po treści
+// linii, rzuca błąd, gdy ich nie ma). pako bierze z npm, tak jak import w game2.js.
 // Start UI (u.qp) siedzi w eksporcie startApp(), którego tu nikt nie woła.
 //
 // Jako moduł (testy w test/decoder.test.js):
@@ -9,6 +9,7 @@
 //
 // Z wiersza poleceń (z rootu repo):
 //   node scripts/probe-node.js src/game2.js src/vendor/pako-jszip.min.js <plik.hbr2> [--simulate] [--positions=60]
+// (drugi argument zostaje dla zgodności i jest pomijany: pako jest z npm)
 // Z --simulate zapisuje <plik.hbr2>.stats.json obok powtórki: trzymaj powtórki poza repo (nicki, czat).
 'use strict';
 const fs = require('fs');
@@ -16,7 +17,6 @@ const path = require('path');
 const vm = require('vm');
 
 const DEFAULT_GAME2 = path.join(__dirname, '..', 'src', 'game2.js');
-const DEFAULT_PAKO = path.join(__dirname, '..', 'src', 'vendor', 'pako-jszip.min.js');
 
 // Nagłówek bez game2.js (big endian, wg wiki).
 function readHeader(buf) {
@@ -33,21 +33,20 @@ function readHeader(buf) {
 // Tekst game2.js gotowy do vm: bez importów i Modernizra, eksporty jako zwykłe funkcje.
 function prepareGame2Source(text) {
   const lines = text.split('\n');
-  const expect = (n, re, what) => {
-    if (!re.test(lines[n - 1] || '')) {
-      throw new Error(`probe-node: linia ${n} game2.js to nie ${what} (zmienił się układ pliku, popraw zakresy w scripts/probe-node.js)`);
-    }
+  const find = (re, what) => {
+    const i = lines.findIndex((l) => re.test(l));
+    if (i < 0) throw new Error(`probe-node: w game2.js nie ma ${what} (zmienił się układ pliku, popraw scripts/probe-node.js)`);
+    return i;
   };
-  for (let n = 18; n <= 21; n++) expect(n, /^import /, 'import');
-  expect(135, /^!function \(e, n, t\) \{/, 'początek IIFE Modernizra');
-  expect(408, /^\}\(window, document\);/, 'koniec IIFE Modernizra');
+  const modernizrStart = find(/^!function \(e, n, t\) \{/, 'początku IIFE Modernizra');
+  const modernizrEnd = find(/^\}\(window, document\);/, 'końca IIFE Modernizra');
+  if (modernizrEnd < modernizrStart) throw new Error('probe-node: koniec IIFE Modernizra przed początkiem');
   if (lines.some((l) => /^u\.qp\(\)/.test(l))) {
     throw new Error('probe-node: game2.js znowu startuje UI przy imporcie (u.qp() na najwyższym poziomie)');
   }
   let src = lines.map((l, i) => {
-    const n = i + 1;
-    if (n >= 18 && n <= 21) return '';
-    if (n >= 135 && n <= 408) return '';
+    if (/^import /.test(l)) return '';
+    if (i >= modernizrStart && i <= modernizrEnd) return '';
     return l.replace(/^export function /, 'function ');
   }).join('\n');
   src += '\n;kc.fj();globalThis.__hbra = { Jb, fa, F, V, O, m, parseTime, getMatch: () => match, getPlayerList: () => playerList, getPlayerPos: () => playerPos, getGoals: () => goals, getLoading: () => loading };';
@@ -58,15 +57,13 @@ const noop = () => {};
 const fakeEl = () => new Proxy(function () {}, { get: (t, k) => (k === Symbol.toPrimitive ? () => '' : fakeEl()), apply: () => fakeEl(), construct: () => fakeEl(), set: () => true });
 
 // Świeża piaskownica na każdą powtórkę: stan statystyk w game2.js to zmienne modułu.
-function loadDecoder({ game2Path = DEFAULT_GAME2, pakoPath = DEFAULT_PAKO, log = noop } = {}) {
+function loadDecoder({ game2Path = DEFAULT_GAME2, log = noop } = {}) {
   const sandbox = {
     console, Math, Date, JSON, Error, TypeError, RangeError, Promise, Map, Set, WeakMap, Symbol, Proxy,
     ArrayBuffer, DataView, Uint8Array, Int8Array, Uint16Array, Int32Array, Uint32Array, Float32Array, Float64Array,
     TextEncoder, TextDecoder, setTimeout, clearTimeout, setInterval, clearInterval,
     performance,
-    // eksporty z Home.js / Modal.js, które game2.js importuje
-    showStats: noop, setGameStats: (m) => { sandbox.__stats = m; }, dispatchPlayerList: noop, dispatchPlayerPos: noop,
-    dispatchClearStats: noop, sendSocketMessage: () => { throw new Error('sendSocketMessage wywołane w próbie!'); }, openModal: noop,
+    pako: require('pako'), // w game2.js: import pako from 'pako'
     $: fakeEl(),
     document: fakeEl(),
     navigator: { userAgent: 'node' },
@@ -77,12 +74,9 @@ function loadDecoder({ game2Path = DEFAULT_GAME2, pakoPath = DEFAULT_PAKO, log =
   sandbox.globalThis = sandbox;
   vm.createContext(sandbox);
 
-  // pako z vendor/pako-jszip.min.js (paczka browserify, ustawia window.pako)
-  vm.runInContext(fs.readFileSync(pakoPath, 'utf8').replace(/^﻿/, ''), sandbox, { filename: 'pako-jszip.min.js' });
-  log('pako loaded:', typeof sandbox.pako, typeof (sandbox.pako && sandbox.pako.inflateRaw));
-
   const t0 = performance.now();
   vm.runInContext(prepareGame2Source(fs.readFileSync(game2Path, 'utf8')), sandbox, { filename: 'game2.js' });
+  vm.runInContext("configureReplayer({ onUpload: function () { throw new Error('onUpload (wysyłka na serwer) wywołane w próbie!'); } });", sandbox);
   log('game2.js evaluated in', Math.round(performance.now() - t0), 'ms');
   return { sandbox, H: sandbox.__hbra };
 }
@@ -97,12 +91,12 @@ function discPos(d) {
 //   positionsEvery: co ile ticków zapisać pozycje piłki i dysków graczy (0 = wcale; wymaga simulate)
 // Zwraca: header, totalFrames, markers, initialState, events, eventsByClass,
 // a przy simulate także ticks, simulateMs, matches (obiekt `match` z game2.js), goalTimes, positions.
-function analyzeReplay(buffer, { simulate = false, positionsEvery = 0, game2Path, pakoPath, log = noop } = {}) {
+function analyzeReplay(buffer, { simulate = false, positionsEvery = 0, game2Path, log = noop } = {}) {
   const buf = Buffer.isBuffer(buffer) ? buffer : Buffer.from(buffer.buffer, buffer.byteOffset, buffer.byteLength);
   const header = readHeader(buf);
   log('HEADER', header);
 
-  const { sandbox, H } = loadDecoder({ game2Path, pakoPath, log });
+  const { sandbox, H } = loadDecoder({ game2Path, log });
 
   // Odczyt powtórki klasą Jb (konstruktor: magic, wersja, inflate, znaczniki, stan początkowy)
   const rep = new H.Jb(new Uint8Array(buf), new H.fa, 3);
@@ -193,12 +187,12 @@ function analyzeReplay(buffer, { simulate = false, positionsEvery = 0, game2Path
 module.exports = { analyzeReplay, readHeader };
 
 if (require.main === module) {
-  const [game2Path, pakoPath, replayPath] = process.argv.slice(2);
+  const [game2Path, , replayPath] = process.argv.slice(2);
   const simulate = process.argv.includes('--simulate');
   // --positions=<N>: co N ticków zapisz pozycje dysków graczy [id, x, y] (próba JSON-a dla wyścigów)
   const posArg = process.argv.find((a) => a.startsWith('--positions='));
   const every = posArg ? +posArg.split('=')[1] : 0;
-  const r = analyzeReplay(fs.readFileSync(replayPath), { simulate, positionsEvery: simulate ? every : 0, game2Path, pakoPath, log: console.log });
+  const r = analyzeReplay(fs.readFileSync(replayPath), { simulate, positionsEvery: simulate ? every : 0, game2Path, log: console.log });
   if (simulate) {
     if (every) {
       const out = replayPath + '.positions-' + every + '.json';

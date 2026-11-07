@@ -16,9 +16,25 @@
 /* eslint-disable no-unused-expressions */
 
 import $ from 'jquery';
-import './vendor/pako-jszip.min.js';
-import { showStats, setGameStats, dispatchPlayerList, dispatchPlayerPos, dispatchClearStats, sendSocketMessage } from './components/Home';
-import { openModal } from './components/Modal.js';
+import './vendor/pako-jszip.min.js'; // tylko JSZip (window.JSZip) dla UI; pako niżej z npm
+import pako from 'pako';
+
+// Wywołania zwrotne do aplikacji (Redux, serwer, komunikaty). Ustawia je Home.js przez
+// configureReplayer(); dawniej game2.js importował puste funkcje z Home.js i Modal.js,
+// które tamte nadpisywały (import cykliczny, TD-005).
+var replayerHooks = {
+  onClearStats: function () { },
+  onStats: function (match) { },
+  onPlayerList: function (playerList) { },
+  onPlayerPos: function (playerPos) { },
+  onShowStats: function (element) { },
+  onUpload: function (bytes, name, lastModified) { },
+  onMessage: function (message, color, seconds) { }
+};
+
+export function configureReplayer(hooks) {
+  Object.assign(replayerHooks, hooks);
+}
 
 var loading = {};
 
@@ -27,7 +43,7 @@ function resetReplay() {
 }
 
 function newReplay() {
-  dispatchClearStats();
+  replayerHooks.onClearStats();
   keepUpdating = true;
   loading = {
     recLength: 1,
@@ -817,8 +833,8 @@ export function handleFile(e) {
       b = new FileReader;
     // console.log(a);
     b.onload = function () {
-      if (b.result.byteLength < 3000000) sendSocketMessage(b.result, a.name.slice(0, -5), a.lastModified);
-      else openModal('This file is too big to be sent to server. But don\'t worry, you can still watch it offline.', 'darkgoldenrod', 7)
+      if (b.result.byteLength < 3000000) replayerHooks.onUpload(b.result, a.name.slice(0, -5), a.lastModified);
+      else replayerHooks.onMessage('This file is too big to be sent to server. But don\'t worry, you can still watch it offline.', 'darkgoldenrod', 7)
       // console.log(b.result);
       if (b.result.byteLength > 50_000) {
         ///////////////////////////////////////
@@ -1363,8 +1379,8 @@ function ja(a) {
   };
   a.get('staty').onclick = function (el) {
 
-    if (match.length > 0) showStats(el.target);
-    else openModal('Error: this replay doesn\'t contain any started match.', 'darkred', 4)
+    if (match.length > 0) replayerHooks.onShowStats(el.target);
+    else replayerHooks.onMessage('Error: this replay doesn\'t contain any started match.', 'darkred', 4)
 
   };
   this.Jh.appendChild(this.Fb.g);
@@ -4618,9 +4634,9 @@ xa.prototype = C(V.prototype, {
         // console.log('koniec analizy', a);
         loading.done = true;
         keepUpdating = false;
-        dispatchPlayerList(playerList);
-        dispatchPlayerPos(playerPos);
-        setGameStats(match);
+        replayerHooks.onPlayerList(playerList);
+        replayerHooks.onPlayerPos(playerPos);
+        replayerHooks.onStats(match);
         bringReplayer();
       } else if (progress !== loading.progress) {
         loading.progress = progress;
