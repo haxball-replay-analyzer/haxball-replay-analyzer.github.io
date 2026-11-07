@@ -36,21 +36,12 @@ export function configureReplayer(hooks) {
   Object.assign(replayerHooks, hooks);
 }
 
-var loading = {};
-
 function resetReplay() {
 
 }
 
 function newReplay() {
   replayerHooks.onClearStats();
-  loading = {
-    recLength: 1,
-    progress: 0,
-    analyzed: 0,
-    changed: false,
-    done: false
-  }
 }
 
 function bringReplayer() {
@@ -72,8 +63,7 @@ function bringReplayer() {
 }
 
 function leaveReplayer() {
-  if (analysisStats) analysisStats.detach();
-  analysisStats = null;
+  lastAnalysis = null;
   players = [];
   playSounds = false;
 
@@ -423,7 +413,7 @@ function removePopups() {
 }(window, document);
 
 var players = [], playSounds = false, autoClick = false, autoClickValue;
-var analysisStats = null; // createFootballStats() bieżącej powtórki
+var lastAnalysis = null; // wynik analyzeReplay() wczytanej powtórki
 var playerToFollow = 0, mainCanvas, mousepos = { clientX: 0, clientY: 0 };
 var globalPlayerHovered = false;
 
@@ -961,15 +951,116 @@ function createFootballStats() {
   return api
 }
 
-// Koniec analizy w odtwarzaczu (Jb.Dl): statystyki do aplikacji, lista graczy dla kamery.
-function finishAnalysis() {
-  var st = analysisStats;
-  if (null == st) return;
-  st.detach();
-  players = st.players;
-  replayerHooks.onPlayerList(st.playerList);
-  replayerHooks.onPlayerPos(st.playerPos);
-  replayerHooks.onStats(st.match);
+// Nagłówek pliku .hbr2 (big endian): "HBR2", wersja, długość w tickach.
+function readReplayHeader(data) {
+  var dv = new DataView(data.buffer, data.byteOffset, data.byteLength),
+    magic = dv.getUint32(0);
+  return {
+    magic: '0x' + magic.toString(16) + ' (' + String.fromCharCode(data[0], data[1], data[2], data[3]) + ')',
+    version: dv.getUint32(4),
+    totalFrames: dv.getUint32(8),
+    bytes: data.length
+  }
+}
+
+function discPos(d) {
+  return d && d.a ? [d.a.x, d.a.y] : null
+}
+
+// Analiza powtórki bez odtwarzacza i bez DOM: dekodowanie, symulacja tick po ticku (pętla z Jb.C bez
+// czasu rzeczywistego) i statystyki piłkarskie (createFootballStats).
+//   bytes: ArrayBuffer / Uint8Array z plikiem .hbr2
+//   options.simulate (domyślnie true): false = tylko nagłówek, znaczniki i zdarzenia
+//   options.positionsEvery: co ile ticków zapisać pozycje piłki i graczy (0 = wcale)
+//   options.collectors: dodatkowi słuchacze pokoju ({ attach(room), detach() }), np. inne statystyki
+//   options.onProgress(ułamek), options.progressEvery (ticki, domyślnie 6000)
+// Rzuca błąd HaxBalla (q z Kb) przy wersji pliku innej niż 3.
+export function analyzeReplay(bytes, options) {
+  options = options || {};
+  var simulate = false !== options.simulate,
+    positionsEvery = options.positionsEvery || 0,
+    collectors = options.collectors || [],
+    onProgress = options.onProgress,
+    progressEvery = options.progressEvery || 6000;
+  kc.fj();
+  var data = new Uint8Array(bytes); // Jb czyta data.buffer od początku, więc kopia albo widok całego bufora
+  var header = readReplayHeader(data);
+  // konstruktor: magic, wersja, inflate, znaczniki, stan początkowy
+  var rep = new Jb(data, new fa, 3);
+  var st = rep.T;
+  // zdarzenia: kopia czytnika, żeby nie przesunąć rep
+  var L = rep.Lc,
+    L2 = new F(new DataView(L.o.buffer, L.o.byteOffset, L.o.byteLength), !1);
+  L2.a = L.a;
+  var events = 0,
+    eventsByClass = {};
+  while (0 < L2.o.byteLength - L2.a) {
+    L2.Ab();
+    L2.Ob();
+    var ev = m.fh(L2),
+      name = ev.f && ev.f.name || '?'; // nazwa klasy po minifikacji (np. Ga); w buildzie strony inna
+    eventsByClass[name] = (eventsByClass[name] || 0) + 1;
+    events++
+  }
+  var result = {
+    header: header,
+    totalFrames: rep.mf,
+    markers: rep.Vk.map(function (k) { return { mj: k.mj, kind: k.kind } }),
+    initialState: { stadium: st.S ? st.S.w : null, players: st.I ? st.I.length : null },
+    events: events,
+    eventsByClass: eventsByClass
+  };
+  if (!simulate) return result;
+
+  var t1 = performance.now(),
+    steps = 0,
+    target = rep.mf,
+    stats = createFootballStats();
+  stats.attach(rep.T);
+  for (var i = 0; i < collectors.length; i++) collectors[i].attach(rep.T);
+  // czas gola: statystyki go nie zapisują, więc sprawdzamy, kiedy przybywa goli w bieżącym meczu
+  var goalTimes = [],
+    seenMatches = 0,
+    seenGoals = 0;
+  function watchGoals() {
+    var match = stats.match;
+    match.length !== seenMatches && (seenMatches = match.length, seenGoals = 0);
+    for (var cur = match[match.length - 1]; cur.goals.length > seenGoals;) goalTimes.push({ match: match.length - 1, goal: seenGoals, replayTick: rep.Y, gameTicks: cur.gameTicks, time: parseTime(cur.gameTicks) }), seenGoals++
+  }
+  var positions = [];
+  while (rep.Y < target) {
+    for (; null != rep.gg && rep.hg == rep.Y;) {
+      var e = rep.gg;
+      e.apply(rep.T);
+      null != rep.fc && rep.fc(e);
+      rep.Dl();
+      watchGoals()
+    }
+    rep.Y++;
+    rep.T.C(1);
+    steps++;
+    watchGoals();
+    if (positionsEvery && 0 === rep.Y % positionsEvery) {
+      var game = rep.T.K, // trwająca gra (null poza meczem); piłka to pierwszy dysk
+        players = [];
+      for (var j = 0, ps = rep.T.I; j < ps.length; j++) ps[j].H && players.push([ps[j].V, ps[j].H.a.x, ps[j].H.a.y]);
+      positions.push({ tick: rep.Y, ball: game && game.ta && game.ta.F ? discPos(game.ta.F[0]) : null, players: players })
+    }
+    onProgress && 0 === steps % progressEvery && onProgress(rep.Y / target)
+  }
+  stats.detach();
+  for (i = 0; i < collectors.length; i++) collectors[i].detach && collectors[i].detach();
+  result.ticks = steps;
+  result.simulateMs = performance.now() - t1;
+  result.matches = stats.match;
+  result.goalTimes = goalTimes;
+  result.positions = positionsEvery ? positions : void 0;
+  result.playersAtEnd = rep.T.I.map(function (p) { return { id: p.V, team: p.ea && p.ea.$ } });
+  result.playerList = stats.playerList; // nicki w kolejności, w jakiej indeksują player[] i playerPos
+  result.playerPos = stats.playerPos; // [mecz][indeks w playerList] = [{x, y}] co tick meczu (heatmapy)
+  // wejścia graczy w kolejności (z powtórzeniami): lista "Player To Follow" i kamera w odtwarzaczu
+  result.playerEntries = stats.players.map(function (p) { return { id: p.V, name: p.w } });
+  return result
 }
 
 export function watchGoal(par) {
@@ -1494,8 +1585,8 @@ function ha(a) {
     a.ui();
     c.el()
   };
-  var e = !0,
-    f = 8,
+  var e = !1, // pauza (dawniej start w 10000x do analizy, potem kliknięcia)
+    f = 2, // 1x
     g = [
       0.1,
       0.5,
@@ -1509,6 +1600,7 @@ function ha(a) {
     ];
   b();
   var k = d.get('playicon');
+  k.innerHTML = '⏵';
   //k.classList.add('icon-pause');
   d.get('play').onclick = function () {
     e = !e;
@@ -1874,7 +1966,7 @@ function ja(a) {
   };
   a.get('staty').onclick = function (el) {
 
-    if (analysisStats && analysisStats.match.length > 0) replayerHooks.onShowStats(el.target);
+    if (lastAnalysis && lastAnalysis.matches.length > 0) replayerHooks.onShowStats(el.target);
     else replayerHooks.onMessage('Error: this replay doesn\'t contain any started match.', 'darkred', 4)
 
   };
@@ -5116,29 +5208,6 @@ xa.prototype = C(V.prototype, {
   },
   Dl: function () {
     var a = this.Lc;
-    // CHECKPOINT WAŻNY tu leci nagranie, całe byteLength
-    if (loading.recLength == 1) {
-      loading.recLength = a.o.byteLength - a.a;
-    }
-    else if (!loading.done) {
-      loading.analyzed = loading.recLength - a.o.byteLength + a.a;
-      const progress = Math.floor(loading.analyzed / loading.recLength * 100);
-      if (progress < loading.progress) {
-        // console.log('koniec analizy', a);
-        loading.done = true;
-        finishAnalysis();
-        bringReplayer();
-      } else if (progress !== loading.progress) {
-        loading.progress = progress;
-        loading.changed = true;
-        // document.getElementById('loading-progress').style.width = '' + progress + '%'
-        // setLoadingProgress2(progress + '%')
-        // $('#loading-progress').css('width', progress + '%')
-        // document.getElementById('progress').innerHTML = '' + progress;
-        // console.log(progress + '%')
-        // console.log(loading.analyzed, loading.recLength, a.o.byteLength - a.a)
-      }
-    }
     0 < a.o.byteLength - a.a ? (a = this.Lc.Ab(), this.hg += a, a = this.Lc.Ob(), this.gg = m.fh(this.Lc), this.gg.P = a) : this.gg = null
   },
   Go: function () {
@@ -6110,26 +6179,22 @@ u.Dh = function (a) {
 };
 u.po = function (a) {
   try {
+    // statystyki bez odtwarzacza (dawniej odtwarzacz grał w 10000x i wynik zbierał się po drodze)
+    var result = analyzeReplay(a);
+    lastAnalysis = result;
+    players = result.playerEntries.map(function (p) { return { V: p.id, w: p.name } });
+    replayerHooks.onPlayerList(result.playerList);
+    replayerHooks.onPlayerPos(result.playerPos);
+    replayerHooks.onStats(result.matches);
+    // odtwarzacz tylko do oglądania: start na początku, pauza, 1x (ha)
     var b = new Vb(new Jb(new Uint8Array(a), new fa, 3));
     b.je.de = function () {
       b.ia();
       u.xb()
     };
-    // console.log(b.ya.Lc.o); TUTAJ SIE POKAZUJE PRZROBIONY BUFFER POWTORKI
-    setTimeout(function () {
-      document.getElementById("spddown").click();
-      document.getElementById("spddown").click();
-      document.getElementById("spddown").click();
-      document.getElementById("spddown").click();
-      document.getElementById("spddown").click();
-      document.getElementById("spddown").click();
-      document.getElementById("reset_button").click();
-      document.getElementById("play_button").click();
-      //document.getElementById("spddown").click();
-    }, 1000);
-    analysisStats = createFootballStats();
-    analysisStats.attach(b.ya.T);
-    x.La(b.j.g)
+    playSounds = true; // dawniej włączało je programowe kliknięcie "spddown" po analizie
+    x.La(b.j.g);
+    bringReplayer()
   } catch (e) {
     var c = e instanceof q ? e.Ta : e;
     if (c instanceof Kb) a = new P('Incompatible replay version', 'The replay file is of a different version. You can open simple player, without stats', [

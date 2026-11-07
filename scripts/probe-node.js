@@ -18,18 +18,6 @@ const vm = require('vm');
 
 const DEFAULT_GAME2 = path.join(__dirname, '..', 'src', 'game2.js');
 
-// Nagłówek bez game2.js (big endian, wg wiki).
-function readHeader(buf) {
-  const dv = new DataView(buf.buffer, buf.byteOffset, buf.byteLength);
-  const magic = dv.getUint32(0);
-  return {
-    magic: '0x' + magic.toString(16) + ' (' + Buffer.from(buf.subarray(0, 4)).toString('latin1') + ')',
-    version: dv.getUint32(4),
-    totalFrames: dv.getUint32(8),
-    bytes: buf.length,
-  };
-}
-
 // Tekst game2.js gotowy do vm: bez importów i Modernizra, eksporty jako zwykłe funkcje.
 function prepareGame2Source(text) {
   const lines = text.split('\n');
@@ -49,7 +37,7 @@ function prepareGame2Source(text) {
     if (i >= modernizrStart && i <= modernizrEnd) return '';
     return l.replace(/^export function /, 'function ');
   }).join('\n');
-  src += '\n;kc.fj();globalThis.__hbra = { Jb, fa, F, V, O, m, parseTime, createFootballStats, getLoading: () => loading };';
+  src += '\n;kc.fj();globalThis.__hbra = { analyzeReplay, parseTime };';
   return src;
 }
 
@@ -81,109 +69,25 @@ function loadDecoder({ game2Path = DEFAULT_GAME2, log = noop } = {}) {
   return { sandbox, H: sandbox.__hbra };
 }
 
-function discPos(d) {
-  return d && d.a ? [d.a.x, d.a.y] : null;
-}
-
-// Analiza jednej powtórki.
+// Analiza jednej powtórki: analyzeReplay() z game2.js w świeżej piaskownicy vm.
 //   buffer: Buffer / Uint8Array z plikiem .hbr2
-//   simulate: odtwórz powtórkę do końca i policz statystyki (match)
-//   positionsEvery: co ile ticków zapisać pozycje piłki i dysków graczy (0 = wcale; wymaga simulate)
-// Zwraca: header, totalFrames, markers, initialState, events, eventsByClass,
-// a przy simulate także ticks, simulateMs, matches (obiekt `match` z game2.js), goalTimes, positions.
+//   simulate: odtwórz powtórkę do końca i policz statystyki (domyślnie false, jak dawniej)
+//   positionsEvery: co ile ticków zapisać pozycje piłki i graczy (0 = wcale; wymaga simulate)
+// Zwraca wynik analyzeReplay (header, totalFrames, markers, initialState, events, eventsByClass,
+// przy simulate także ticks, simulateMs, matches, goalTimes, positions, playersAtEnd, playerList,
+// playerPos, playerEntries) i parseTime (funkcja z game2.js, ticki -> m:ss).
 function analyzeReplay(buffer, { simulate = false, positionsEvery = 0, game2Path, log = noop } = {}) {
-  const buf = Buffer.isBuffer(buffer) ? buffer : Buffer.from(buffer.buffer, buffer.byteOffset, buffer.byteLength);
-  const header = readHeader(buf);
-  log('HEADER', header);
-
-  const { sandbox, H } = loadDecoder({ game2Path, log });
-
-  // Odczyt powtórki klasą Jb (konstruktor: magic, wersja, inflate, znaczniki, stan początkowy)
-  const rep = new H.Jb(new Uint8Array(buf), new H.fa, 3);
-  log('Jb ok: totalFrames (mf) =', rep.mf, ', markers (Vk) =', rep.Vk.length, rep.Vk.slice(0, 5));
-  const st = rep.T; // stan pokoju
-  const initialState = { stadium: st.S ? st.S.w : null, players: st.I ? st.I.length : null };
-  log('initial state: stadium =', initialState.stadium, ', players =', initialState.players);
-
-  // Zdarzenia: liczymy, czytając strumień tak jak Dl(), kopią czytnika, żeby nie psuć stanu rep
-  const L = rep.Lc;
-  const L2 = new H.F(new DataView(L.o.buffer, L.o.byteOffset, L.o.byteLength), false);
-  L2.a = L.a;
-  let events = 0; const eventsByClass = {};
-  while (L2.o.byteLength - L2.a > 0) {
-    L2.Ab(); L2.Ob();
-    const ev = H.m.fh(L2);
-    const name = (ev.f && ev.f.name) || '?';
-    eventsByClass[name] = (eventsByClass[name] || 0) + 1;
-    events++;
+  const { H } = loadDecoder({ game2Path, log });
+  const r = H.analyzeReplay(buffer, { simulate, positionsEvery });
+  log('HEADER', r.header, 'events', r.events, r.eventsByClass);
+  if (simulate) {
+    log('simulated', r.ticks, 'ticks in', Math.round(r.simulateMs), 'ms');
+    log('matches:', r.matches.length, r.matches.map((x) => ({ stadium: x.stadium && x.stadium.name, ticks: x.gameTicks, score: x.scoreRed + ':' + x.scoreBlue, goals: x.goals.length, kicks: x.kicks.length, passes: x.passes.length, red: x.redTeam.length, blue: x.blueTeam.length })));
   }
-  log('events =', events, 'by class (minified names):', eventsByClass);
-
-  const result = {
-    header,
-    totalFrames: rep.mf,
-    markers: rep.Vk.map((k) => ({ mj: k.mj, kind: k.kind })),
-    initialState,
-    events,
-    eventsByClass,
-  };
-  if (!simulate) return result;
-
-  // Symulacja do końca bez requestAnimationFrame: krok po kroku jak Jb.C()
-  const t1 = performance.now();
-  let steps = 0;
-  const target = rep.mf;
-  // Dl() sprawdza loading.recLength; poprawne wartości ustawia newReplay() -> tu ręcznie
-  Object.assign(H.getLoading(), { recLength: 1, progress: 0, analyzed: 0, changed: false, done: false });
-  // Statystyki piłkarskie: słuchacz pokoju i pętli fizyki (bez widoku Gb)
-  const stats = H.createFootballStats();
-  stats.attach(rep.T);
-
-  // Czas gola: game2.js go nie zapisuje, więc patrzymy, kiedy przybywa goli w bieżącym meczu.
-  const goalTimes = [];
-  let seenMatches = 0; let seenGoals = 0;
-  const watchGoals = () => {
-    const match = stats.match;
-    if (match.length !== seenMatches) { seenMatches = match.length; seenGoals = 0; }
-    const cur = match[match.length - 1];
-    while (cur.goals.length > seenGoals) {
-      goalTimes.push({ match: match.length - 1, goal: seenGoals, replayTick: rep.Y, gameTicks: cur.gameTicks, time: H.parseTime(cur.gameTicks) });
-      seenGoals++;
-    }
-  };
-
-  const positions = [];
-  while (rep.Y < target) {
-    // fragment pętli z Jb.prototype.C (bez zależności od czasu rzeczywistego)
-    for (; null != rep.gg && rep.hg == rep.Y;) { const e = rep.gg; e.apply(rep.T); null != rep.fc && rep.fc(e); rep.Dl(); watchGoals(); }
-    rep.Y++; rep.T.C(1); steps++;
-    watchGoals();
-    if (positionsEvery && rep.Y % positionsEvery === 0) {
-      const game = rep.T.K; // trwająca gra (null poza meczem); piłka to pierwszy dysk
-      const players = [];
-      for (const p of rep.T.I) if (p.H) players.push([p.V, p.H.a.x, p.H.a.y]);
-      positions.push({ tick: rep.Y, ball: game && game.ta && game.ta.F ? discPos(game.ta.F[0]) : null, players });
-    }
-  }
-  const simulateMs = performance.now() - t1;
-  const matches = stats.match;
-  log('simulated', steps, 'ticks in', Math.round(simulateMs), 'ms');
-  log('matches:', matches.length, matches.map((x) => ({ stadium: x.stadium && x.stadium.name, ticks: x.gameTicks, score: x.scoreRed + ':' + x.scoreBlue, goals: x.goals.length, kicks: x.kicks.length, passes: x.passes.length, red: x.redTeam.length, blue: x.blueTeam.length })));
-
-  return Object.assign(result, {
-    ticks: steps,
-    simulateMs,
-    matches,
-    goalTimes,
-    positions: positionsEvery ? positions : undefined,
-    playerList: stats.playerList, // nicki w kolejności, w jakiej indeksują player[] i playerPos (Redux)
-    playerPos: stats.playerPos, // [mecz][indeks w playerList] = [{x, y}] co tick meczu (heatmapy)
-    playersAtEnd: rep.T.I.map((p) => ({ id: p.V, team: p.ea && p.ea.$ })),
-    parseTime: H.parseTime,
-  });
+  return Object.assign(r, { parseTime: H.parseTime });
 }
 
-module.exports = { analyzeReplay, readHeader };
+module.exports = { analyzeReplay };
 
 if (require.main === module) {
   const [game2Path, , replayPath] = process.argv.slice(2);
