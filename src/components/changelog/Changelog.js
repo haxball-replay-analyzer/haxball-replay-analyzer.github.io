@@ -8,7 +8,7 @@ const changelog = [
     version: '3.2.1',
     date: '07.11.2026',
     changes: [
-      'Fixed Player To Follow: the camera now stays on the selected player instead of following someone else or the ball'
+      'Fixed an issue where Player To Follow could track the wrong player, or the ball, instead of the selected player'
     ]
   },
   {
