@@ -8729,6 +8729,9 @@ da.prototype = C(m.prototype, {
   },
   f: na
 }); kc.b = !0; kc.fj = function () {
+  // rejestr klas zdarzeń: drugie wywołanie nadałoby klasom nowe numery, więc tylko raz
+  if (kc.ready) return;
+  kc.ready = !0;
   m.Ha(rb);
   m.Ha(na);
   m.Ha(Ua);
@@ -11955,4 +11958,9 @@ Xa.N = '<div class=\'stats-view\'><div data-hook=\'graph\'></div></div>';
 Wa.N = '<div class=\'unsupported-browser-view\'><div class=\'dialog\'><h1>Firefox issue</h1><p>Sorry! It seems that the newest version of Firefox has some major bug, that doesn\'t allow </p><p>The missing features are: <span data-hook=\'features\'></span></p><h2>Recommended browsers:</h2><div><a href="https://www.mozilla.org/firefox/new/"><img src="images/firefox-icon.png"/>Firefox</a></div><div><a href="https://www.google.com/chrome/"><img src="images/chrome-icon.png"/>Chrome</a></div><div><a href="http://www.opera.com/"><img src="images/opera-icon.png"/>Opera</a></div></div></div>';
 r.sn = {
 }.toString;
-u.qp()
+
+// Start interfejsu odtwarzacza (DOM, zasoby, IndexedDB). Dawniej u.qp() przy imporcie
+// modułu; teraz woła go src/index.js przed pierwszym renderem Reacta.
+export function startApp() {
+  u.qp()
+}

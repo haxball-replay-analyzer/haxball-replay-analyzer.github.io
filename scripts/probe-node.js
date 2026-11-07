@@ -1,6 +1,7 @@
 // Dekoder .hbr2 z src/game2.js uruchamiany w Node bez DOM (vm + atrapy), bez zmian w src/.
-// To nie jest kod produkcyjny: tnie game2.js po numerach linii (importy 18-21, Modernizr 135-408,
-// ostatnie u.qp()) i sprawdza, że te zakresy dalej tam są; po zmianie game2.js trzeba je poprawić.
+// To nie jest kod produkcyjny: tnie game2.js po numerach linii (importy 18-21, Modernizr 135-408)
+// i sprawdza, że te zakresy dalej tam są; po zmianie game2.js trzeba je poprawić.
+// Start UI (u.qp) siedzi w eksporcie startApp(), którego tu nikt nie woła.
 //
 // Jako moduł (testy w test/decoder.test.js):
 //   const { analyzeReplay } = require('./scripts/probe-node.js');
@@ -29,7 +30,7 @@ function readHeader(buf) {
   };
 }
 
-// Tekst game2.js gotowy do vm: bez importów, Modernizra i startu UI, eksporty jako zwykłe funkcje.
+// Tekst game2.js gotowy do vm: bez importów i Modernizra, eksporty jako zwykłe funkcje.
 function prepareGame2Source(text) {
   const lines = text.split('\n');
   const expect = (n, re, what) => {
@@ -40,11 +41,13 @@ function prepareGame2Source(text) {
   for (let n = 18; n <= 21; n++) expect(n, /^import /, 'import');
   expect(135, /^!function \(e, n, t\) \{/, 'początek IIFE Modernizra');
   expect(408, /^\}\(window, document\);/, 'koniec IIFE Modernizra');
+  if (lines.some((l) => /^u\.qp\(\)/.test(l))) {
+    throw new Error('probe-node: game2.js znowu startuje UI przy imporcie (u.qp() na najwyższym poziomie)');
+  }
   let src = lines.map((l, i) => {
     const n = i + 1;
     if (n >= 18 && n <= 21) return '';
     if (n >= 135 && n <= 408) return '';
-    if (/^u\.qp\(\)\s*$/.test(l)) return '';
     return l.replace(/^export function /, 'function ');
   }).join('\n');
   src += '\n;kc.fj();globalThis.__hbra = { Jb, fa, F, V, O, m, parseTime, getMatch: () => match, getPlayerList: () => playerList, getPlayerPos: () => playerPos, getGoals: () => goals, getLoading: () => loading };';
