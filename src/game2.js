@@ -4589,6 +4589,22 @@ u.po = function (a) {
     replayerHooks.onPlayerList(result.playerList);
     replayerHooks.onPlayerPos(result.playerPos);
     replayerHooks.onStats(result.matches);
+  } catch (e) {
+    u.replayError(e);
+    return
+  }
+  // odtwarzacz potrzebuje zasobów gry (res.dat): bez nich renderer rzuca wyjątek (TD-033)
+  if (gameResources.ready) u.openPlayer(a);
+  else if (null != gameResources.error) u.resourcesFailed();
+  else gameResources.pending = a // otworzy go x.fj po wczytaniu zasobów
+};
+// komunikat i powrót z ekranu „Analyzing...” do listy
+u.resourcesFailed = function () {
+  replayerHooks.onMessage(RESOURCES_ERROR_MESSAGE, 'darkred', 10);
+  leaveReplayer()
+};
+u.openPlayer = function (a) {
+  try {
     // odtwarzacz tylko do oglądania: start na początku, pauza, 1x (ha)
     var b = new Vb(new Jb(new Uint8Array(a), new fa, 3));
     b.je.de = function () {
@@ -4599,30 +4615,34 @@ u.po = function (a) {
     x.La(b.j.g);
     bringReplayer()
   } catch (e) {
-    var c = e instanceof q ? e.Ta : e;
-    if (c instanceof Kb) a = new P('Incompatible replay version', 'The replay file is of a different version. You can open simple player, without stats', [
-      'Open player',
-      'Cancel'
-    ]),
-      x.La(a.g),
-      a.Va = function (a) {
-        console.log(c);
-        window.top.open('https://www.haxball.com' + '/replay?v=' + c.Id, '_self')
-        //0 == a ? (/*a = window.top.location,*/window.top.open('https://www.haxball.com'+'/replay?v=' + c.Id, '_self'))  : u.xb()
-      };
-    else {
-      var d = new P('Replay error', 'Couldn\'t load the file.', [
-        'Ok'
-      ]);
-      x.La(d.g);
-      d.Va = function () {
-        d.Va = null;
-        // u.xb()
-        $('.simple-dialog-view').animate({
-          left: '150%',
-        }, { duration: 700, easing: 'swing', queue: false });
-        leaveReplayer();
-      }
+    u.replayError(e)
+  }
+};
+u.replayError = function (e) {
+  var a;
+  var c = e instanceof q ? e.Ta : e;
+  if (c instanceof Kb) a = new P('Incompatible replay version', 'The replay file is of a different version. You can open simple player, without stats', [
+    'Open player',
+    'Cancel'
+  ]),
+    x.La(a.g),
+    a.Va = function (a) {
+      console.log(c);
+      window.top.open('https://www.haxball.com' + '/replay?v=' + c.Id, '_self')
+      //0 == a ? (/*a = window.top.location,*/window.top.open('https://www.haxball.com'+'/replay?v=' + c.Id, '_self'))  : u.xb()
+    };
+  else {
+    var d = new P('Replay error', 'Couldn\'t load the file.', [
+      'Ok'
+    ]);
+    x.La(d.g);
+    d.Va = function () {
+      d.Va = null;
+      // u.xb()
+      $('.simple-dialog-view').animate({
+        left: '150%',
+      }, { duration: 700, easing: 'swing', queue: false });
+      leaveReplayer();
     }
   }
 };
@@ -4799,9 +4819,31 @@ x.fj = function (a) {
       })])
     }),
       b]).then(function () {
-        x.us(a)
+        gameResources.ready = true;
+        x.us(a);
+        // powtórka wczytana, zanim doszły zasoby: odtwarzacz teraz
+        var pending = gameResources.pending;
+        gameResources.pending = null;
+        null != pending && u.openPlayer(pending)
+      }, function (err) {
+        // dawniej nieobsłużone: x.us się nie wykonywało, a wczytanie powtórki kończyło się TypeError (TD-033)
+        console.error('HBRA: game resources (res.dat) failed to load', err);
+        gameResources.error = err;
+        if (null != gameResources.pending) {
+          // powtórka czekała na zasoby: komunikat i powrót z ekranu „Analyzing...”
+          gameResources.pending = null;
+          u.resourcesFailed()
+        } else replayerHooks.onMessage(RESOURCES_ERROR_MESSAGE, 'darkred', 10)
       })
   })
+};
+// zasoby gry z res.dat (dźwięki, obrazki boiska); bez nich odtwarzacz nie ruszy, statystyki tak
+var gameResources = { ready: false, error: null, pending: null };
+var RESOURCES_ERROR_MESSAGE = 'Error: game resources didn\'t load, so the replay player can\'t start. Check your connection and refresh the page.';
+// kontener okien (x.La); tworzony przy pierwszym użyciu, żeby komunikat błędu działał także przed x.us
+x.kontener = function () {
+  null == x.Pg && (x.Pg = window.document.createElement('div'), window.document.body.appendChild(x.Pg));
+  return x.Pg
 };
 x.es = function (a) {
   for (var b = Modernizr, c = 'canvas dataview es6collections peerconnection promises websockets'.split(' '), d = [
@@ -4816,8 +4858,7 @@ x.us = function (a) {
   // CHECKPOINT return
   // return;
   // window.document.body.innerHTML = '';
-  x.Pg = window.document.createElement('div');
-  window.document.body.appendChild(x.Pg);
+  x.kontener();
   var b = null,
     b = function () {
       n.Na.Tl();
@@ -4829,7 +4870,7 @@ x.us = function (a) {
 x.La = function (a) {
   null !=
     x.Vm && x.Vm.remove();
-  null != a && (x.Pg.appendChild(a), x.Vm = a)
+  null != a && (x.kontener().appendChild(a), x.Vm = a)
 };
 Vb.b = !0;
 Vb.prototype = {
