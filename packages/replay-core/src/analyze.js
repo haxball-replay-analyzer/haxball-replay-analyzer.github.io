@@ -111,7 +111,8 @@ export function analyzeReplay(bytes, options) {
   result.playersAtEnd = rep.T.I.map(function (p) { return { id: p.V, team: p.ea && p.ea.$ } });
   result.playerList = stats.playerList; // nicki w kolejności, w jakiej indeksują player[] i playerPos
   result.playerPos = stats.playerPos; // [mecz][indeks w playerList] = [{x, y}] co tick meczu (heatmapy)
-  // wejścia graczy w kolejności (z powtórzeniami): lista "Player To Follow" i kamera w odtwarzaczu
+  // wejścia graczy w kolejności (z powtórzeniami): lista "Player To Follow" w odtwarzaczu
+  // (kamera szuka gracza po id w bieżącym pokoju; indeks z tej listy nie pasuje do pokoju, TD-034)
   result.playerEntries = stats.players.map(function (p) { return { id: p.V, name: p.w } });
   return result
 }
