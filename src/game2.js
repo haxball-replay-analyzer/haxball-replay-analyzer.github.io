@@ -18,7 +18,7 @@
 import $ from 'jquery';
 import './vendor/pako-jszip.min.js'; // tylko JSZip (window.JSZip) dla UI; pako niżej z npm
 import pako from 'pako';
-import { analyzeReplay } from '@hbra/replay-core';
+import { analyzeInWorker, cancelAnalysis } from './analysis/client.js';
 // klasy klienta HaxBall wydzielone do rdzenia (nazwy po minifikacji)
 import {
   Ab, Bb, C, Cb, D, F, Ga, H, Ia, J, Jb, K, Kb, La, Ma, Na, Oa, Pa, Qa, S, U, Ua, V, Y,
@@ -34,6 +34,7 @@ var replayerHooks = {
   onStats: function (match) { },
   onPlayerList: function (playerList) { },
   onPlayerPos: function (playerPos) { },
+  onProgress: function (fraction) { }, // postęp analizy 0..1 (ekran „Analyzing...”)
   onShowStats: function (element) { },
   onUpload: function (bytes, name, lastModified) { },
   onMessage: function (message, color, seconds) { }
@@ -70,6 +71,7 @@ function bringReplayer() {
 }
 
 function leaveReplayer() {
+  cancelAnalysis();
   lastAnalysis = null;
   players = [];
   playSounds = false;
@@ -4580,12 +4582,28 @@ u.Dh = function (a) {
     null == b ? u.xb() : u.Pf(a, b)
   }
 };
+var analysisSeq = 0; // numer wczytania: wynik starszej analizy (przerwanej nową powtórką) pomijamy
 u.po = function (a) {
+  var seq = ++analysisSeq;
+  replayerHooks.onProgress(0);
+  // statystyki bez odtwarzacza, w Web Workerze (TD-019); odtwarzacz otwiera się po nich
+  analyzeInWorker(a, {
+    progressEvery: 2000,
+    onProgress: function (v) { seq === analysisSeq && replayerHooks.onProgress(v) }
+  }).then(function (result) {
+    seq === analysisSeq && u.analysisDone(a, result)
+  }, function (e) {
+    if (seq !== analysisSeq || e && e.cancelled) return;
+    // błąd wersji z Workera: ten sam obiekt błędu HaxBalla co przy analizie na głównym wątku
+    null != e && null != e.replayVersion && (e = new Kb(e.replayVersion));
+    u.replayError(e)
+  })
+};
+u.analysisDone = function (a, result) {
   try {
-    // statystyki bez odtwarzacza (dawniej odtwarzacz grał w 10000x i wynik zbierał się po drodze)
-    var result = analyzeReplay(a);
     lastAnalysis = result;
     players = result.playerEntries.map(function (p) { return { V: p.id, w: p.name } });
+    replayerHooks.onProgress(1);
     replayerHooks.onPlayerList(result.playerList);
     replayerHooks.onPlayerPos(result.playerPos);
     replayerHooks.onStats(result.matches);

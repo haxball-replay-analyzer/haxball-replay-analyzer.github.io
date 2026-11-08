@@ -196,6 +196,23 @@ table {
     border-bottom-color: #c13535;
     border-bottom-style: solid
   }
+
+  // pasek postępu analizy (Web Worker, TD-019)
+  .loading-progress {
+    margin-top: 10px;
+    padding: 0;
+    height: 6px;
+    border-radius: 3px;
+    background-color: #2c373d;
+    overflow: hidden;
+
+    &>div {
+      padding: 0;
+      height: 100%;
+      background-color: #c13535;
+      transition: width 0.2s linear;
+    }
+  }
 }
 
 #game-stats {

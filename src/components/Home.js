@@ -62,6 +62,7 @@ function Home() {
   const [replayLastModified, setLastModified] = useState(null);
   const [paramsChecked, setParamsChecked] = useState(false);
   const [IP, setIP] = useState(null);
+  const [analysisProgress, setAnalysisProgress] = useState(null); // 0..1, analiza w Web Workerze
   const filterPlayer = useSelector(state => state.replays.filters.player)
   const filterTeam = useSelector(state => state.replays.filters.team)
   const filterReplay = useSelector(state => state.replays.filters.replay)
@@ -398,7 +399,8 @@ function Home() {
     onPlayerPos: setPlayerPosExp,
     onClearStats: dispatchClearStatsExp,
     onUpload: uploadReplay,
-    onMessage: (message, color, seconds) => openModal(message, color, seconds)
+    onMessage: (message, color, seconds) => openModal(message, color, seconds),
+    onProgress: setAnalysisProgress
   });
   checkParamsExp = function () {
     checkParams();
@@ -459,7 +461,7 @@ function Home() {
         </div>
       </div>
       <Downloading />
-      <LoadingScreen />
+      <LoadingScreen progress={analysisProgress} />
       {mainMode === 'stats' && <GameStats replayId={replayId} />}
       {mainMode === 'replays' && <ReplaysList />}
     </>
