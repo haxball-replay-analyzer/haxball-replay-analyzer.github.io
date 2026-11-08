@@ -149,3 +149,23 @@ describe('powtórka wyścigu (lokalnie)', () => {
     assert.equal(parseTime(longest.gameTicks), '26:45');
   });
 });
+
+// Pasek „Analyzing...” (TD-041): raporty rosną, ostatni to dokładnie 1, także gdy liczba ticków
+// nie dzieli się przez progressEvery; przy podzielnej 1 nie przychodzi dwa razy.
+describe('postęp analizy (onProgress)', () => {
+  for (const name of SAMPLES) {
+    it(`${name}: raporty rosnące, ostatni = 1`, async () => {
+      const { analyzeReplay } = await loadCore();
+      const bytes = fs.readFileSync(path.join(FIXTURES, `${name}.hbr2`));
+      const seen = [];
+      const r = analyzeReplay(bytes, { progressEvery: 1000, onProgress: (v) => seen.push(v) });
+      assert.ok(seen.length >= 2);
+      for (let i = 1; i < seen.length; i++) assert.ok(seen[i] > seen[i - 1], `raport ${i}: ${seen[i]} po ${seen[i - 1]}`);
+      assert.equal(seen[seen.length - 1], 1);
+      // podzielna liczba ticków: 1 tylko raz
+      const once = [];
+      analyzeReplay(bytes, { progressEvery: r.ticks, onProgress: (v) => once.push(v) });
+      assert.deepEqual(once, [1]);
+    });
+  }
+});

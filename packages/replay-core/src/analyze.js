@@ -26,7 +26,7 @@ function discPos(d) {
 //   options.simulate (domyślnie true): false = tylko nagłówek, znaczniki i zdarzenia
 //   options.positionsEvery: co ile ticków zapisać pozycje piłki i graczy (0 = wcale)
 //   options.collectors: dodatkowi słuchacze pokoju ({ attach(room), detach() }), np. inne statystyki
-//   options.onProgress(ułamek), options.progressEvery (ticki, domyślnie 6000)
+//   options.onProgress(ułamek), options.progressEvery (ticki, domyślnie 6000); ostatni raport to 1
 // Rzuca błąd HaxBalla (q z Kb) przy wersji pliku innej niż 3.
 export function analyzeReplay(bytes, options) {
   options = options || {};
@@ -101,6 +101,8 @@ export function analyzeReplay(bytes, options) {
     }
     onProgress && 0 === steps % progressEvery && onProgress(rep.Y / target)
   }
+  // koniec symulacji = 1; raport co progressEvery ticków zwykle kończy się niżej (wyścig: 98%, TD-041)
+  onProgress && 0 !== steps % progressEvery && onProgress(1);
   stats.detach();
   for (i = 0; i < collectors.length; i++) collectors[i].detach && collectors[i].detach();
   result.ticks = steps;

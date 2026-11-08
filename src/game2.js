@@ -71,6 +71,8 @@ function bringReplayer() {
 }
 
 function leaveReplayer() {
+  // bez paska do startu następnej analizy (inaczej ekran wjeżdża z „100%” poprzedniej, TD-041)
+  replayerHooks.onProgress(null);
   cancelAnalysis();
   lastAnalysis = null;
   players = [];
