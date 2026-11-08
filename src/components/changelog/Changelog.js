@@ -5,6 +5,14 @@ import { useEffect } from 'react';
 
 const changelog = [
   {
+    version: '3.3.0',
+    date: '08.11.2026',
+    changes: [
+      'Replays are now analyzed in the background, so the page stays responsive while a replay is loading',
+      'The loading screen now shows the analysis progress'
+    ]
+  },
+  {
     version: '3.2.1',
     date: '07.11.2026',
     changes: [
