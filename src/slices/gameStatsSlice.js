@@ -56,7 +56,10 @@ export const gameStatsSlice = createSlice({
       for (var i = 0; i < x.length; i++) {
         if (x[i].length === 0) x.splice(i, 1);
       }
-      state.playerPos = x;
+      // Zamrożenie z wierzchu: Immer pomija zamrożone wartości, więc nie przechodzi po wszystkich punktach
+      // (wyścig 24 aut: 2,2 mln obiektów {x, y}, ok. 0,9 s blokady strony przy głębokim zamrażaniu).
+      // Nikt nie zmienia playerPos poza tym reduktorem, a głęboko zamrożone było i tak tylko do odczytu.
+      state.playerPos = Object.freeze(x);
     },
     setPlayerList: (state, action) => {
       state.playerList = action.payload
