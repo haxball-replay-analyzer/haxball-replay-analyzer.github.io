@@ -31,6 +31,9 @@ export default defineConfig({
   plugins: [jsxInJs(), react()],
   // Stare hacki CSS dla IE (np. *vertical-align) Lightning CSS odrzuca; przeglądarki i tak je pomijają.
   css: { lightningcss: { errorRecovery: true } },
+  // Serwer deweloperski przed startem skanuje źródła w poszukiwaniu zależności.
+  // Skaner nie używa pluginów z `plugins`, więc JSX w .js trzeba mu wskazać osobno.
+  optimizeDeps: { rolldownOptions: { moduleTypes: { '.js': 'jsx' } } },
   build: { outDir: 'build' },
   server: { port: 3005, strictPort: true },
   preview: { port: 3005, strictPort: true },
