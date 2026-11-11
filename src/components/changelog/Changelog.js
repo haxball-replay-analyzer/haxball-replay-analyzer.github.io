@@ -5,6 +5,13 @@ import { useEffect } from 'react';
 
 const changelog = [
   {
+    version: '3.3.1',
+    date: '11.11.2026',
+    changes: [
+      'Fixed an issue where Player To Follow could not be changed again after reopening the settings'
+    ]
+  },
+  {
     version: '3.3.0',
     date: '08.11.2026',
     changes: [
