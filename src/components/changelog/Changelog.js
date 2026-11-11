@@ -17,7 +17,9 @@ const changelog = [
       'Player To Follow goes back to the ball when you open another replay',
       'With Player To Follow, the arrows to players outside the view now show their direction from the followed player, not from the ball',
       'Shots on goal now use the ball physics of the map (damping and gravity) and count shots at every opponent goal, also on maps with goals at the top and bottom',
-      'Fixed the player breaking on maps whose room script hides a disc (negative radius) or moves it to an invalid position, as the HaxBall client does'
+      'Fixed the player breaking on maps whose room script hides a disc (negative radius) or moves it to an invalid position, as the HaxBall client does',
+      'New "Download PNG" button next to the heatmap: saves it at the full size of the map (1 px per map unit), also on big race tracks',
+      'Heatmap and thirds now keep the proportions of the map and are sharp on high-DPI screens'
     ]
   },
   {

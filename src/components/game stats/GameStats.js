@@ -6,7 +6,7 @@ import ThirdStats from "./ThirdStats";
 import { watchGoal } from "../../game2";
 import $ from 'jquery'
 import { selectMatch, showNextMatch, showPreviousMatch, setStats, setConnectHalves, setRedTeamName, setBlueTeamName, setConnectedHalves, splitHalves } from "../../slices/gameStatsSlice";
-import HeatMap from "./HeatMap";
+import HeatMap, { HeatMapDownload } from "./HeatMap";
 import { changeTeamNames, sendMessageExp } from "../Home";
 import { openModal } from "../Modal";
 
@@ -408,7 +408,7 @@ function GameStats(props) {
             <ThirdStats />
           </div>
           <div style={{ height: '50%', overflow: 'hidden' }}>
-            <p style={{ textAlign: 'center', fontSize: 18 }}>{selectedHeatmap.split(' ')[0]} of {selectedPlayer == -1 ? match[mtc].redTeam[0] : selectedPlayer}:</p>
+            <p style={{ textAlign: 'center', fontSize: 18 }}>{selectedHeatmap.split(' ')[0]} of {selectedPlayer == -1 ? match[mtc].redTeam[0] : selectedPlayer}:{match[mtc].stadium ? <HeatMapDownload /> : null}</p>
             {match[mtc].stadium ? (
               <StatsErrorBoundary key={mtc + '|' + selectedPlayer + '|' + selectedHeatmap} fallback={() => <p style={{ textAlign: 'center' }}>This heatmap could not be drawn.</p>}>
                 <HeatMap />

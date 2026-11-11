@@ -19,6 +19,8 @@ var haxball = {
 
 function load_tile(name) {
   var tile = new Image(128, 128);
+  // bez CORS kafelek „skaża” płótno i canvas.toBlob (Download PNG) rzuca SecurityError
+  tile.crossOrigin = 'anonymous';
   tile.onload = function () {
     var canvas = document.createElement('canvas');
     var ctx = canvas.getContext('2d');
@@ -98,10 +100,24 @@ function calculate_arc(a, b, curve) {
   return arc;
 }
 
-export function drawStadium(ctx, stadium) {
+// Rozmiar mapy w jednostkach gry (1 jednostka = 1 px przy zoomie 1).
+export function stadiumSize(stadium) {
+  if (stadium == false) stadium = classic;
+  return { width: 2 * stadium.width, height: 2 * stadium.height };
+}
+
+// Wymiary CSS mieszczące mapę w ramce maxW×maxH bez zmiany proporcji.
+export function fitSize(stadium, maxW, maxH) {
+  const { width, height } = stadiumSize(stadium);
+  const k = Math.min(maxW / width, maxH / height);
+  return { width: width * k, height: height * k };
+}
+
+// Rysuje mapę w skali `scale` (piksele płótna na jednostkę gry), środek mapy na środku płótna.
+export function drawStadium(ctx, stadium, scale) {
   if (stadium == false) stadium = classic;
   ctx.setTransform(1, 0, 0, 1, 0, 0);
-  ctx.scale(500 / stadium.width / 2, 250 / stadium.height / 2)
+  ctx.scale(scale, scale);
   ctx.translate(stadium.width, stadium.height);
   ctx.beginPath();
 
