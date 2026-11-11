@@ -5,12 +5,18 @@ import { useEffect } from 'react';
 
 const changelog = [
   {
+    version: '3.3.4',
+    date: '11.11.2026',
+    changes: [
+      'Fixed stats and heatmaps on maps without two goals (e.g. race tracks): they were calculated from a game that drifted away from the real one after a few seconds'
+    ]
+  },
+  {
     version: '3.3.3',
     date: '11.11.2026',
     changes: [
       'New "Download PNG" button next to the heatmap: saves it at the full size of the map (1 px per map unit), also on big race tracks',
-      'Heatmap and thirds now keep the proportions of the map and are sharp on high-DPI screens',
-      'Fixed stats and heatmaps on maps without two goals (e.g. race tracks): they were calculated from a game that drifted away from the real one after a few seconds'
+      'Heatmap and thirds now keep the proportions of the map and are sharp on high-DPI screens'
     ]
   },
   {
