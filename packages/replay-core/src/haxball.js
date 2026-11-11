@@ -2,7 +2,8 @@
 // To jest przerobiony kod HaxBalla (nazwy po minifikacji), NIE jest objęty licencją MIT repozytorium
 // (patrz README i decyzje właściciela): nie publikować jako osobnej paczki.
 // Dopiski HBRA: lista słuchaczy pokoju (roomDispatch, addRoomListener, removeRoomListener),
-// wywołania słuchacza statystyk w O.prototype.C (this.Ma.statsListener), kc.fj() raz.
+// wywołania słuchacza statystyk w O.prototype.C (this.Ma.statsListener; tylko czyta stan, nie
+// zmienia przebiegu ticku, TD-053), kc.fj() raz.
 // Bez DOM: tylko ES, performance i console (sprawdza ESLint no-undef, patrz package.json).
 /* eslint-disable no-useless-concat, no-extend-native, no-self-compare, no-cond-assign, no-use-before-define, no-mixed-operators, default-case, no-loop-func, new-parens, no-sequences, no-array-constructor, no-redeclare, eqeqeq, no-unused-vars, no-unused-expressions */
 /* global JSON5, qc -- wolne odwołania z klienta HaxBall: JSON5 (parser stadionu z pliku .hbs, tylko UI), qc (rejestr klas Haxe, nieużywany) */
@@ -1245,7 +1246,9 @@ O.prototype = {
       } else if (1 == this.Bb) {
         this.Hc +=
           0.016666666666666666;
-        if (null != footballStats && !1 === footballStats.onPlayingTick(this, d, b)) return;
+        // słuchacz tylko czyta stan: jego wynik nie może przerwać ticku (dawniej `return` przy false
+        // pomijał zdjęcie barier KO graczom i sprawdzenie goli, więc analiza liczyła inną grę, TD-053)
+        null != footballStats && footballStats.onPlayingTick(this, d, b);
         for (a = 0; a < b.length;) d = b[a],
           ++a,
           null != d.H && (d.H.h = 39);

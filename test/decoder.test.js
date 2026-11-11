@@ -204,6 +204,69 @@ describe('powtórka wyścigu (lokalnie)', () => {
     assert.equal(parseTime(longest.gameTicks), '26:45');
     assert.deepEqual(invariantErrors(r), []);
   });
+
+  it('statystyki nie zmieniają fizyki: pozycje jak w symulacji bez statystyk (TD-053)', { skip: race ? false : 'brak zmiennej HBRA_RACE_REPLAY ze ścieżką do pliku' }, async () => {
+    const { analyzeReplay } = await loadCore();
+    const bytes = fs.readFileSync(race);
+    const r = analyzeReplay(bytes, { positionsEvery: POSITIONS_EVERY });
+    assert.equal(firstPositionDifference(r.positions, await simulatePositions(bytes, POSITIONS_EVERY)), null);
+  });
+});
+
+// Symulacja powtórki bez statystyk (pętla jak w analyzeReplay i w odtwarzaczu), pozycje piłki i graczy
+// co `every` ticków w postaci r.positions. `listener`: słuchacz statystyk podpięty do pokoju (opcjonalnie).
+async function simulatePositions(bytes, every, listener) {
+  const { Jb, fa, kc } = await import('@hbra/replay-core/haxball');
+  kc.fj();
+  const rep = new Jb(new Uint8Array(bytes), new fa(), 3);
+  if (listener) rep.T.statsListener = listener;
+  const positions = [];
+  while (rep.Y < rep.mf) {
+    while (rep.gg != null && rep.hg === rep.Y) {
+      rep.gg.apply(rep.T);
+      rep.Dl();
+    }
+    rep.Y++;
+    rep.T.C(1);
+    if (rep.Y % every === 0) {
+      const game = rep.T.K;
+      const ball = game && game.ta && game.ta.F && game.ta.F[0] && game.ta.F[0].a ? [game.ta.F[0].a.x, game.ta.F[0].a.y] : null;
+      const players = rep.T.I.filter((p) => p.H).map((p) => [p.V, p.H.a.x, p.H.a.y]);
+      positions.push({ tick: rep.Y, ball, players });
+    }
+  }
+  return positions;
+}
+
+// Pierwsza różnica dwóch list pozycji (null = równe). assert.deepEqual na tak dużych listach przy
+// różnicy buduje ogromny opis i kończy się brakiem pamięci, więc porównujemy próbka po próbce.
+function firstPositionDifference(a, b) {
+  if (a.length !== b.length) return `liczba próbek ${a.length} zamiast ${b.length}`;
+  for (let i = 0; i < a.length; i++) {
+    if (JSON.stringify(a[i]) !== JSON.stringify(b[i])) return `tick ${b[i].tick}: ${JSON.stringify(a[i]).slice(0, 300)} zamiast ${JSON.stringify(b[i]).slice(0, 300)}`;
+  }
+  return null;
+}
+
+// TD-053: wynik słuchacza statystyk nie może zmienić przebiegu gry. Dawniej `false` z onPlayingTick
+// (mapa bez dwóch bramek, np. wyścig) przerywał tick w O.C i analiza liczyła inną grę niż odtwarzacz.
+describe('statystyki nie zmieniają fizyki (TD-053)', () => {
+  for (const name of SAMPLES) {
+    it(`${name}: pozycje z analizy jak bez statystyk`, async () => {
+      const { analyzeReplay } = await loadCore();
+      const bytes = fs.readFileSync(path.join(FIXTURES, name + '.hbr2'));
+      const r = analyzeReplay(bytes, { positionsEvery: 60 });
+      assert.equal(firstPositionDifference(r.positions, await simulatePositions(bytes, 60)), null);
+    });
+  }
+
+  it('słuchacz zwracający false nie przerywa ticku', async () => {
+    const bytes = fs.readFileSync(path.join(FIXTURES, SAMPLES[0] + '.hbr2'));
+    // false tylko w pierwszym ticku gry, jak dawny football.js na mapie bez dwóch bramek
+    let first = true;
+    const hostile = { beforeTick() {}, onKick() {}, onPlayingTick: () => (first ? ((first = false), false) : undefined) };
+    assert.equal(firstPositionDifference(await simulatePositions(bytes, 60, hostile), await simulatePositions(bytes, 60)), null);
+  });
 });
 
 // Przypadki, których nie ma w próbkach (TD-046, TD-047): słuchacz statystyk na atrapie pokoju.

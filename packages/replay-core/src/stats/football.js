@@ -354,8 +354,10 @@ function createFootballStats() {
         }
         // console.log('out', segments[i])
       }
+      // mapa bez dwóch bramek (np. wyścig): statystyki pomijają ten jeden tick jak dawniej, ale
+      // silnik liczy go dalej (wynik onPlayingTick nie przerywa ticku, TD-053)
       if (game.S.tc.length < 2) {
-        return !1;
+        return;
       }
       var std = game.S.tc[0];
       ballRadius = game.S.F[0].Z;
