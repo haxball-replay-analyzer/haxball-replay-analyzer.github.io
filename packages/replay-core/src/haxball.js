@@ -1185,6 +1185,7 @@ O.prototype = {
                 if (4 > h - l.Z - d.H.Z) {
                   //console.log("pileczka",l.a.x,l.a.y); TU KORDY PILKI
                   let ball = { x: l.a.x, y: l.a.y };
+                  let ballDisc = l; // kopnięty dysk: tłumienie i grawitacja do celnego strzału (TD-048)
                   var f = m / h,
                     m = t / h,
                     t = e.Re,
@@ -1204,7 +1205,7 @@ O.prototype = {
                   //console.log(t.x,t.y);
                   //console.log("kopnięcie chyba",d);//,d.w,d.ea.w);
                   //console.log(ball);
-                  null != footballStats && footballStats.onKick(d, ball);
+                  null != footballStats && footballStats.onKick(d, ball, ballDisc);
                   //console.log("chyba pozycja piłki (jednak nie)",h,l,d,f,t,n);
                   f = !0
                 }

@@ -1,8 +1,72 @@
 // Statystyki piłkarskie HBRA (kod właściciela, MIT): słuchacz pokoju i pętli fizyki.
-// Przeniesione z src/game2.js (dawniej zmienne modułu); od 2026-11 z poprawkami TD-044, TD-046, TD-047.
+// Przeniesione z src/game2.js (dawniej zmienne modułu); od 2026-11 z poprawkami TD-044, TD-046–TD-048.
 /* eslint-disable eqeqeq, no-mixed-operators, no-redeclare, no-unused-vars, no-loop-func */
 
 import { addRoomListener, p, removeRoomListener } from '../haxball.js';
+
+// Wersja definicji statystyk (TD-049). Podnieś o 1 przy każdej zmianie, która zmienia liczby dla tej
+// samej powtórki (podanie, asysta, posiadanie, strzał, gol, klucz gracza). Wynik analizy niesie ją
+// w polu statsVersion, a pliki oczekiwane testów razem z liczbami.
+//   1: wersja strony 3.3.2: akcja od startu meczu i od wznowienia po golu (TD-044), gol bez kopiącego
+//      (TD-046), gracz to wejście do pokoju, nie nick (TD-047)
+//   2: celny strzał z lotu piłki z tłumieniem i grawitacją piłki, na każdą bramkę rywala (TD-048)
+var STATS_VERSION = 2;
+
+// Ile ticków lotu piłki sprawdza celny strzał: 20 s gry. Piłka bez grawitacji kończy wcześniej,
+// gdy jej prędkość spadnie poniżej SHOT_MIN_SPEED (dalej przy tłumieniu 0,99 przeleci < 1 px).
+var SHOT_MAX_TICKS = 1200;
+var SHOT_MIN_SPEED = 0.01;
+
+// Celny strzał (TD-048): piłka po kopnięciu, lecąc swobodnie, przetnie linię bramki rywala.
+// Lot jak w kroku fizyki HaxBalla (ta.C): pozycja += prędkość, potem prędkość = (prędkość +
+// grawitacja) * tłumienie; przecięcie jak przy wykrywaniu gola (S.Kn): odcinek ruchu środka piłki
+// w jednym ticku przecina odcinek między słupkami. Lot pomija odbicia od ścian, słupków i graczy:
+// strzał zablokowany albo obroniony też jest celny, odbity od ściany do bramki nie jest.
+//   ball: { x, y, vx, vy } tuż po kopnięciu
+//   phys: { damping, gx, gy } kopniętego dysku (Ca, oa)
+//   goals: [{ x0, y0, x1, y1, team }], team = drużyna, której to bramka ("Red" albo "Blue")
+//   team: drużyna kopiącego
+// Zwraca punkt przecięcia linii bramki { x, y } albo null.
+function shotTarget(ball, phys, goals, team) {
+  var targets = goals.filter(function (g) { return g.team != team });
+  if (targets.length == 0) return null;
+  var x = ball.x, y = ball.y, vx = ball.vx, vy = ball.vy,
+    damping = phys.damping, gx = phys.gx || 0, gy = phys.gy || 0,
+    still = gx == 0 && gy == 0;
+  for (var t = 0; t < SHOT_MAX_TICKS; t++) {
+    var nx = x + vx, ny = y + vy;
+    for (var i = 0; i < targets.length; i++) {
+      var hit = crossing(x, y, nx, ny, targets[i]);
+      if (hit) return hit;
+    }
+    x = nx;
+    y = ny;
+    vx = (vx + gx) * damping;
+    vy = (vy + gy) * damping;
+    if (still && vx * vx + vy * vy < SHOT_MIN_SPEED * SHOT_MIN_SPEED) break;
+  }
+  return null;
+}
+
+// Odcinek (ax, ay)–(bx, by) przecina linię bramki: te same nierówności co S.Kn w haxball.js.
+// Zwraca punkt przecięcia albo null.
+function crossing(ax, ay, bx, by, g) {
+  var kx = bx - ax, ky = by - ay;
+  if (0 < -(g.y0 - ay) * kx + (g.x0 - ax) * ky == 0 < -(g.y1 - ay) * kx + (g.x1 - ax) * ky) return null;
+  var ex = g.x1 - g.x0, ey = g.y1 - g.y0;
+  if (0 < -(ay - g.y0) * ex + (ax - g.x0) * ey == 0 < -(by - g.y0) * ex + (bx - g.x0) * ey) return null;
+  // punkt przecięcia: a + s * (b - a), s z iloczynów wektorowych
+  var den = kx * ey - ky * ex;
+  var s = den == 0 ? 0 : ((g.x0 - ax) * ey - (g.y0 - ay) * ex) / den;
+  return { x: ax + s * kx, y: ay + s * ky };
+}
+
+// Bramki stadionu (S.tc) w postaci dla shotTarget.
+function goalLines(stadium) {
+  return stadium.tc.map(function (g) {
+    return { x0: g.W.x, y0: g.W.y, x1: g.ca.x, y1: g.ca.y, team: g.qe.w };
+  });
+}
 
 function parseTime(par) {
   var gt = (par / 60).toFixed();
@@ -26,6 +90,7 @@ function createFootballStats() {
   var goalParsed = 0, playerPos = [], ballRadius = 10;
   var room = null;
   var labels = {};
+  var goals = [], goalsStadium = null; // bramki stadionu bieżącej gry (shotTarget)
 
   // Nazwa gracza w statystykach (TD-047): gracz to wejście do pokoju (id V), nie nick. Zwykle nazwa
   // to nick. Gdy w pokoju jest już inny gracz (inne id) z tą nazwą, kolejny dostaje "nick (2)",
@@ -55,6 +120,12 @@ function createFootballStats() {
 
   // pierwszy tick gry (O.C, przed pętlą po graczach): gracze obecni od początku
   function beforeTick(game) {
+    // bramki czytane z gry przed kopnięciami tego ticku: pierwsze kopnięcie meczu (przy rozpoczęciu)
+    // jest przed onPlayingTick, który zapisuje stadion
+    if (game.S && game.S !== goalsStadium) {
+      goalsStadium = game.S;
+      goals = goalLines(game.S);
+    }
     if (updatePlayers) {
       let li = game.Ma.I;
       // console.log("chyba lista graczy", li);
@@ -77,45 +148,22 @@ function createFootballStats() {
     }
   }
 
-  // kopnięcie (O.C, pętla po graczach, po zmianie prędkości piłki i gracza); ball = { x, y, vx, vy }
-  function onKick(d, ball) {
-    let rA = ball.vy / ball.vx;
-    let rB = 1;
-    let rC = ball.y - (ball.vy / ball.vx) * ball.x;
-    if (d.ea.w == "Red" && ball.vx > 0 && 99.762 * ball.vx + ball.x > blueGoalCord[0] && ball.x < blueGoalCord[0]) {
-      let poz = rA * blueGoalCord[0] + rC;
-      if (poz > blueGoalCord[1] && poz < blueGoalCord[2]) {
-        //console.log("Celny strzał "+label(d));
-        match[match.length - 1].shots.push({
-          player: label(d),
-          from: {
-            x: ball.x,
-            y: ball.y
-          },
-          to: {
-            x: blueGoalCord[0],
-            y: poz
-          }
-        });
-        match[match.length - 1].shotsRed++;
-      }
-    } else if (d.ea.w == "Blue" && ball.vx < 0 && 99.762 * ball.vx + ball.x < redGoalCord[0] && ball.x > redGoalCord[0]) {
-      let poz = rA * redGoalCord[0] + rC;
-      if (poz > redGoalCord[1] && poz < redGoalCord[2]) {
-        //console.log("Celny strzał"+label(d));
-        match[match.length - 1].shots.push({
-          player: label(d),
-          from: {
-            x: ball.x,
-            y: ball.y
-          },
-          to: {
-            x: redGoalCord[0],
-            y: poz
-          }
-        });
-        match[match.length - 1].shotsBlue++;
-      }
+  // kopnięcie (O.C, pętla po graczach, po zmianie prędkości piłki i gracza); ball = { x, y, vx, vy },
+  // disc = kopnięty dysk (tłumienie Ca, grawitacja oa)
+  function onKick(d, ball, disc) {
+    var phys = disc ? { damping: disc.Ca, gx: disc.oa.x, gy: disc.oa.y } : { damping: 0.99, gx: 0, gy: 0 };
+    var to = shotTarget(ball, phys, goals, d.ea.w);
+    if (to) {
+      match[match.length - 1].shots.push({
+        player: label(d),
+        from: {
+          x: ball.x,
+          y: ball.y
+        },
+        to: to
+      });
+      if (d.ea.w == "Red") match[match.length - 1].shotsRed++;
+      else match[match.length - 1].shotsBlue++;
     }
     if (d.ea.w == "Red") match[match.length - 1].kicksRed++;
     else match[match.length - 1].kicksBlue++;
@@ -508,4 +556,4 @@ function createFootballStats() {
   return api
 }
 
-export { createFootballStats, parseTime, distanceBetween };
+export { createFootballStats, parseTime, distanceBetween, shotTarget, STATS_VERSION };

@@ -2,7 +2,7 @@
 /* eslint-disable eqeqeq, no-sequences, no-unused-expressions */
 
 import { F, Jb, fa, kc, m } from './haxball.js';
-import { createFootballStats, parseTime } from './stats/football.js';
+import { createFootballStats, parseTime, STATS_VERSION } from './stats/football.js';
 
 // Nagłówek pliku .hbr2 (big endian): "HBR2", wersja, długość w tickach.
 function readReplayHeader(data) {
@@ -106,6 +106,7 @@ export function analyzeReplay(bytes, options) {
   stats.detach();
   for (i = 0; i < collectors.length; i++) collectors[i].detach && collectors[i].detach();
   result.ticks = steps;
+  result.statsVersion = STATS_VERSION; // wersja definicji statystyk (football.js, TD-049)
   result.simulateMs = performance.now() - t1;
   result.matches = stats.match;
   result.goalTimes = goalTimes;

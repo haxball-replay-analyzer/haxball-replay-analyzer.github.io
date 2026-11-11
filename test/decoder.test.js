@@ -48,6 +48,7 @@ function summarize(r) {
   });
   // przez JSON, żeby porównywać dokładnie to, co jest w pliku (bez undefined, -0 itp.)
   return JSON.parse(JSON.stringify({
+    statsVersion: r.statsVersion,
     header: r.header,
     totalFrames: r.totalFrames,
     markers: r.markers,
@@ -92,6 +93,16 @@ function invariantErrors(r) {
     });
     if (m.passesRed + m.passesBlue !== m.passes.length) errors.push(`${at}: passesRed + passesBlue != passes.length`);
     if (m.passes.length > m.kicks.length) errors.push(`${at}: więcej podań niż kopnięć`);
+    if (m.shotsRed + m.shotsBlue !== m.shots.length) errors.push(`${at}: shotsRed + shotsBlue != shots.length`);
+    if (m.shots.length > m.kicks.length) errors.push(`${at}: więcej strzałów niż kopnięć`);
+    if (m.stadium) {
+      // TD-048: celny strzał kończy się na linii bramki drużyny przeciwnej do strzelca
+      m.shots.forEach((s, j) => {
+        const shooter = m.redTeam.includes(s.player) ? 'red' : m.blueTeam.includes(s.player) ? 'blue' : null;
+        const onLine = m.stadium.goals.some((g) => g.team !== shooter && distanceToSegment(s.to, g.p0, g.p1) < 1e-6);
+        if (shooter && !onLine) errors.push(`${at}, strzał ${j + 1}: koniec poza linią bramki rywala`);
+      });
+    }
     if (!m.spaceMode) {
       m.passes.forEach((p, j) => {
         // TD-044: podanie ma oba końce i zaczyna się kopnięciem podającego w tym samym meczu
@@ -103,6 +114,12 @@ function invariantErrors(r) {
     if (m.possRed + m.possBlue > m.gameTicks + 1) errors.push(`${at}: posiadanie dłuższe niż mecz`);
   });
   return errors;
+}
+
+function distanceToSegment(pt, [x0, y0], [x1, y1]) {
+  const ex = x1 - x0, ey = y1 - y0;
+  const t = Math.max(0, Math.min(1, ((pt.x - x0) * ex + (pt.y - y0) * ey) / (ex * ex + ey * ey)));
+  return Math.hypot(pt.x - (x0 + t * ex), pt.y - (y0 + t * ey));
 }
 
 function pick(obj, keys) {
@@ -260,6 +277,61 @@ describe('statystyki na atrapie pokoju', () => {
     assert.deepEqual(m1.goals.map((g) => [g.scorer, g.assist]), [['a', false], ['b', false]]);
     assert.equal(m1.passes.length, 0);
     assert.equal(m2.passes.length, 0);
+  });
+});
+
+// Celny strzał (TD-048): lot swobodny piłki z jej tłumieniem i grawitacją, na każdą bramkę rywala.
+// Obie próbki mają tłumienie 0,99 i bramki po bokach, więc te przypadki są tylko tutaj.
+describe('celny strzał (shotTarget)', () => {
+  const free = { damping: 0.99, gx: 0, gy: 0 };
+  const right = { x0: 450, y0: -80, x1: 450, y1: 80, team: 'Blue' }; // bramka Blue po prawej
+  const left = { x0: -450, y0: -80, x1: -450, y1: 80, team: 'Red' };
+
+  it('zasięg zależy od tłumienia piłki (dawniej stała 99.762 dla każdego stadionu)', async () => {
+    const { shotTarget } = await loadCore();
+    const ball = { x: 0, y: 0, vx: 5, vy: 0 }; // zasięg 5 / (1 - tłumienie): 500 px przy 0,99, 250 px przy 0,98
+    assert.deepEqual(shotTarget(ball, free, [left, right], 'Red'), { x: 450, y: 0 });
+    assert.equal(shotTarget(ball, { damping: 0.98, gx: 0, gy: 0 }, [left, right], 'Red'), null);
+  });
+
+  it('tylko bramka rywala: kopnięcie we własną bramkę nie jest strzałem', async () => {
+    const { shotTarget } = await loadCore();
+    const ball = { x: 0, y: 0, vx: 10, vy: 0 };
+    assert.equal(shotTarget(ball, free, [left, right], 'Blue'), null);
+    assert.deepEqual(shotTarget({ ...ball, vx: -10 }, free, [left, right], 'Blue'), { x: -450, y: 0 });
+  });
+
+  it('bramki u góry i u dołu, kilka bramek jednej drużyny', async () => {
+    const { shotTarget } = await loadCore();
+    const top = { x0: -50, y0: -300, x1: 50, y1: -300, team: 'Blue' };
+    const bottom = { x0: -50, y0: 300, x1: 50, y1: 300, team: 'Blue' };
+    assert.deepEqual(shotTarget({ x: 0, y: 0, vx: 0, vy: -10 }, free, [top, bottom], 'Red'), { x: 0, y: -300 });
+    assert.deepEqual(shotTarget({ x: 0, y: 0, vx: 0, vy: 10 }, free, [top, bottom], 'Red'), { x: 0, y: 300 });
+    assert.equal(shotTarget({ x: 0, y: 0, vx: 10, vy: 0 }, free, [top, bottom], 'Red'), null);
+  });
+
+  it('grawitacja piłki zakrzywia tor', async () => {
+    const { shotTarget } = await loadCore();
+    const ball = { x: 0, y: 0, vx: 10, vy: 0 };
+    assert.deepEqual(shotTarget(ball, free, [right], 'Red'), { x: 450, y: 0 });
+    assert.equal(shotTarget(ball, { damping: 0.99, gx: 0, gy: 0.5 }, [right], 'Red'), null);
+  });
+
+  it('statystyki biorą tłumienie z kopniętego dysku i bramki ze stadionu gry', async () => {
+    const { createFootballStats } = await loadCore();
+    const stats = createFootballStats();
+    const a = { V: 1, w: 'a', ea: { w: 'Red' } };
+    const room = { I: [a] };
+    const stadium = { tc: [{ W: { x: 450, y: -80 }, ca: { x: 450, y: 80 }, qe: { w: 'Blue' } }] };
+    stats.attach(room);
+    stats.beforeTick({ Ma: room, S: stadium });
+    const ball = { x: 0, y: 10, vx: 5, vy: 0 };
+    stats.onKick(a, ball, { Ca: 0.98, oa: { x: 0, y: 0 } });
+    stats.onKick(a, ball, { Ca: 0.99, oa: { x: 0, y: 0 } });
+    stats.detach();
+    const [m] = stats.match;
+    assert.equal(m.shotsRed, 1);
+    assert.deepEqual(m.shots, [{ player: 'a', from: { x: 0, y: 10 }, to: { x: 450, y: 10 } }]);
   });
 });
 
