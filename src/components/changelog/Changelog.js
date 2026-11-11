@@ -5,6 +5,16 @@ import { useEffect } from 'react';
 
 const changelog = [
   {
+    version: '3.3.2',
+    date: '11.11.2026',
+    changes: [
+      'Fixed an issue where the Passes heatmap could close the whole page; a heatmap that cannot be drawn now shows a message instead',
+      'Passes, assists and possession no longer carry over across a goal or into the next match',
+      'A goal scored before anyone kicked the ball no longer stops the analysis; the scorer is shown as "unknown"',
+      'Two players with the same nick in the room at the same time are now counted separately ("nick (2)")'
+    ]
+  },
+  {
     version: '3.3.1',
     date: '11.11.2026',
     changes: [
