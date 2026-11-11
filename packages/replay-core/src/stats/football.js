@@ -1,5 +1,5 @@
 // Statystyki piłkarskie HBRA (kod właściciela, MIT): słuchacz pokoju i pętli fizyki.
-// Przeniesione z src/game2.js (dawniej zmienne modułu) bez zmiany kolejności działań na liczbach.
+// Przeniesione z src/game2.js (dawniej zmienne modułu); od 2026-11 z poprawkami TD-044, TD-046, TD-047.
 /* eslint-disable eqeqeq, no-mixed-operators, no-redeclare, no-unused-vars, no-loop-func */
 
 import { addRoomListener, p, removeRoomListener } from '../haxball.js';
@@ -25,6 +25,33 @@ function createFootballStats() {
   var redGoalCord = [], blueGoalCord = [], checkTeams = true;
   var goalParsed = 0, playerPos = [], ballRadius = 10;
   var room = null;
+  var labels = {};
+
+  // Nazwa gracza w statystykach (TD-047): gracz to wejście do pokoju (id V), nie nick. Zwykle nazwa
+  // to nick. Gdy w pokoju jest już inny gracz (inne id) z tą nazwą, kolejny dostaje "nick (2)",
+  // "nick (3)"... Ponowne wejście tej samej osoby (nowe id, nikt obecny nie ma tej nazwy) dostaje
+  // z powrotem sam nick i łączy się z dawnym wpisem. Nazwa nie zmienia się przez całą powtórkę.
+  function label(pl) {
+    var l = labels[pl.V];
+    if (l !== undefined) return l;
+    var taken = [];
+    for (var i = 0, li = room ? room.I : []; i < li.length; i++) {
+      if (li[i].V != pl.V && labels[li[i].V] !== undefined) taken.push(labels[li[i].V]);
+    }
+    l = pl.w;
+    for (var n = 2; taken.includes(l); n++) l = pl.w + " (" + n + ")";
+    labels[pl.V] = l;
+    return l;
+  }
+
+  // Ostatni kopiący i dotykający liczą się tylko w jednej akcji: od startu meczu albo od wznowienia
+  // po golu (TD-044). Bez tego podanie, asysta i posiadanie przechodzą przez gol i z meczu na mecz.
+  function resetPlay() {
+    kicker = undefined;
+    lastKicker = undefined;
+    toucher = { name: "", team: "0" };
+    lastToucher = "";
+  }
 
   // pierwszy tick gry (O.C, przed pętlą po graczach): gracze obecni od początku
   function beforeTick(game) {
@@ -33,12 +60,12 @@ function createFootballStats() {
       // console.log("chyba lista graczy", li);
       players = players.concat(li);
       for (var i = 0; i < li.length; i++) {
-        if (!playerList.includes(li[i].w)) {
-          playerList.push(li[i].w);
+        if (!playerList.includes(label(li[i]))) {
+          playerList.push(label(li[i]));
           // console.log('dodałem', li[i].w);
           match[match.length - 1].player.push({
             id: li[i].V,
-            nick: li[i].w,
+            nick: label(li[i]),
             nation: li[i].Kd,
             goals: 0,
             assists: 0,
@@ -58,9 +85,9 @@ function createFootballStats() {
     if (d.ea.w == "Red" && ball.vx > 0 && 99.762 * ball.vx + ball.x > blueGoalCord[0] && ball.x < blueGoalCord[0]) {
       let poz = rA * blueGoalCord[0] + rC;
       if (poz > blueGoalCord[1] && poz < blueGoalCord[2]) {
-        //console.log("Celny strzał "+d.w);
+        //console.log("Celny strzał "+label(d));
         match[match.length - 1].shots.push({
-          player: d.w,
+          player: label(d),
           from: {
             x: ball.x,
             y: ball.y
@@ -75,9 +102,9 @@ function createFootballStats() {
     } else if (d.ea.w == "Blue" && ball.vx < 0 && 99.762 * ball.vx + ball.x < redGoalCord[0] && ball.x > redGoalCord[0]) {
       let poz = rA * redGoalCord[0] + rC;
       if (poz > redGoalCord[1] && poz < redGoalCord[2]) {
-        //console.log("Celny strzał"+d.w);
+        //console.log("Celny strzał"+label(d));
         match[match.length - 1].shots.push({
-          player: d.w,
+          player: label(d),
           from: {
             x: ball.x,
             y: ball.y
@@ -95,32 +122,32 @@ function createFootballStats() {
     //console.log("sprawdzenie czasu po kopnięciu",this.Hc)
     //console.log("UWAGA",match,playerList)
     match[match.length - 1].kicks.push({
-      player: d.w,
+      player: label(d),
       x: ball.x,
       y: ball.y
     });
     //console.log("sprawdzenie czegoś tam",k[0].D,k[0].a);
     if (match[match.length - 1].spaceMode) {
-      match[match.length - 1].touches.push(d.w);
-      if (toucher.name != undefined && d.w != toucher.name) {
+      match[match.length - 1].touches.push(label(d));
+      if (toucher.name != undefined && label(d) != toucher.name) {
         lastToucher = toucher;
         if (lastToucher.team == d.ea.w) {
-          //console.log("Podanie ",lastKicker.name+" do "+d.w);
+          //console.log("Podanie ",lastKicker.name+" do "+label(d));
           match[match.length - 1].passes.push(lastToucher.name);
           if (lastToucher.team == "Red") match[match.length - 1].passesRed++;
           else match[match.length - 1].passesBlue++;
         }
-        //console.log("tacz",d.w);
+        //console.log("tacz",label(d));
       }
       toucher = {
-        name: d.w,
+        name: label(d),
         team: d.ea.w
       };
     } else {
-      if (kicker != undefined && d.w != kicker.name) {
+      if (kicker != undefined && label(d) != kicker.name) {
         lastKicker = kicker;
         if (lastKicker.team == d.ea.w) {
-          //console.log("Podanie ",lastKicker.name+" do "+d.w);
+          //console.log("Podanie ",lastKicker.name+" do "+label(d));
           match[match.length - 1].passes.push({
             player: lastKicker.name,
             shot: ball,
@@ -131,7 +158,7 @@ function createFootballStats() {
         }
       }
       kicker = {
-        name: d.w,
+        name: label(d),
         team: d.ea.w
       };
     }
@@ -316,32 +343,33 @@ function createFootballStats() {
     else match[match.length - 1].thirds[2]++;
     if (match.length > playerPos.length) playerPos.push([]);
     for (var i = 0; i < b.length; i++) {
-      if (playerPos[match.length - 1][playerList.indexOf(b[i].w)] == undefined) playerPos[match.length - 1][playerList.indexOf(b[i].w)] = [];
-      if (b[i].H != null) playerPos[match.length - 1][playerList.indexOf(b[i].w)].push({ x: b[i].H.a.x, y: b[i].H.a.y });
+      var pi = playerList.indexOf(label(b[i]));
+      if (playerPos[match.length - 1][pi] == undefined) playerPos[match.length - 1][pi] = [];
+      if (b[i].H != null) playerPos[match.length - 1][pi].push({ x: b[i].H.a.x, y: b[i].H.a.y });
     }
     if (match[match.length - 1].spaceMode) {
       for (var i = 0; i < b.length; i++) {
         if (b[i].H == null) continue;
         if (distanceBetween(b[i].H.a, d[0].a) < (15 + ballRadius + 0.0001)) {
           //console.log("touch",b[i]);// checkpoint teraz
-          if (toucher.name != b[i].w) {
+          if (toucher.name != label(b[i])) {
             lastToucher = toucher;
-            toucher = { name: b[i].w, team: b[i].ea.w };
-            match[match.length - 1].touches.push(b[i].w);
+            toucher = { name: label(b[i]), team: b[i].ea.w };
+            match[match.length - 1].touches.push(label(b[i]));
           }
         }
         for (var j = i + 1; j < b.length; j++) {
           if (b[j].H == null) continue;
           //if (Math.random()<0.01) console.log(distanceBetween(b[i].H.a,b[j].H.a));
-          if (distanceBetween(b[i].H.a, b[j].H.a) < 30.0001) match[match.length - 1].bumps.push(b[i].w, b[j].w);
-          //if (distanceBetween(b[i].H.a,b[j].H.a) < 30.0001) console.log("bump ",b[i].w, b[j].w, distanceBetween(b[i].H.a,b[j].H.a));
+          if (distanceBetween(b[i].H.a, b[j].H.a) < 30.0001) match[match.length - 1].bumps.push(label(b[i]), label(b[j]));
+          //if (distanceBetween(b[i].H.a,b[j].H.a) < 30.0001) console.log("bump ",label(b[i]), label(b[j]), distanceBetween(b[i].H.a,b[j].H.a));
         }
       }
     }
     if (checkTeams) {
       for (var i = 0; i < b.length; i++) {
-        if (b[i].ea.w == "Red" && !match[match.length - 1].redTeam.includes(b[i].w)) match[match.length - 1].redTeam.push(b[i].w);
-        else if (b[i].ea.w == "Blue" && !match[match.length - 1].blueTeam.includes(b[i].w)) match[match.length - 1].blueTeam.push(b[i].w);
+        if (b[i].ea.w == "Red" && !match[match.length - 1].redTeam.includes(label(b[i]))) match[match.length - 1].redTeam.push(label(b[i]));
+        else if (b[i].ea.w == "Blue" && !match[match.length - 1].blueTeam.includes(label(b[i]))) match[match.length - 1].blueTeam.push(label(b[i]));
       }
       checkTeams = false;
     }
@@ -357,11 +385,11 @@ function createFootballStats() {
   var roomHandlers = {
     tl: function (b) {
       players.push(b);
-      if (!playerList.includes(b.w)) {
-        playerList.push(b.w);
+      if (!playerList.includes(label(b))) {
+        playerList.push(label(b));
         match[match.length - 1].player.push({
           id: b.V,
-          nick: b.w,
+          nick: label(b),
           nation: b.Kd,
           goals: 0,
           assists: 0,
@@ -372,7 +400,12 @@ function createFootballStats() {
     Ni: function (a) {
       if (a.w == "Red") match[match.length - 1].scoreRed++;//aktualny wynik red lub blue = a.$
       else match[match.length - 1].scoreBlue++;
-      if (match[match.length - 1].spaceMode) {
+      if (match[match.length - 1].spaceMode ? toucher.name === "" : kicker == undefined) {
+        // gol, zanim ktokolwiek kopnął (dotknął) piłkę w tej akcji (TD-046): strzelec nieznany
+        var unknown = { scorer: null, assist: false, currentScore: [match[match.length - 1].scoreRed, match[match.length - 1].scoreBlue] };
+        if (!match[match.length - 1].spaceMode) unknown.ballCoord = { x: this.K.Ma.K.ta.F[0].a.x, y: this.K.Ma.K.ta.F[0].a.y };
+        match[match.length - 1].goals.push(unknown);
+      } else if (match[match.length - 1].spaceMode) {
         if (a.w == toucher.team) {
           match[match.length - 1].goals.push({
             scorer: toucher.name,
@@ -423,7 +456,12 @@ function createFootballStats() {
     Pi: function () {
       match[match.length - 1].stopped = true;
     },
+    // wznowienie po golu (Gk, ustawienie do rozpoczęcia): nowa akcja (TD-044)
+    lq: function () {
+      resetPlay();
+    },
     Ki: function (a) {
+      resetPlay(); // start meczu: nowa akcja (TD-044)
       if (match[match.length - 1].stopped) {
         match.push({ started: true, stopped: false, spaceMode: false, realSoccerMode: false, touches: [], thirds: [0, 0, 0], changes: [], gameTicks: -1, kicks: [], shots: [], redTeam: [], blueTeam: [], shotsRed: 0, shotsBlue: 0, passes: [], passesRed: 0, passesBlue: 0, kicksRed: 0, kicksBlue: 0, possRed: 0, possBlue: 0, scoreRed: 0, scoreBlue: 0, goals: [], player: match[match.length - 1].player });
         playerPos.push([]);
@@ -442,7 +480,7 @@ function createFootballStats() {
     xl: function (d, e, f) {
       checkTeams = true;
       if (match[match.length - 1].started && !match[match.length - 1].stopped && match[match.length - 1].gameTicks > 0) {
-        match[match.length - 1].changes.push([e.w, f.w, parseTime(match[match.length - 1].gameTicks)]);
+        match[match.length - 1].changes.push([label(e), f.w, parseTime(match[match.length - 1].gameTicks)]);
       }
     }
   };

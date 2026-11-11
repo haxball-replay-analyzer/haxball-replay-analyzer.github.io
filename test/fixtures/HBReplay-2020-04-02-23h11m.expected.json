@@ -2265,20 +2265,6 @@
      }
     },
     {
-     "player": "ElSiete",
-     "shot": {
-      "x": -60.485507637360215,
-      "y": -21.53636372373044,
-      "vx": -3.7999138454116497,
-      "vy": -4.4264132837544565
-     },
-     "lastShot": {
-      "player": "ElSiete",
-      "x": 558.568197449734,
-      "y": -63.92930616541185
-     }
-    },
-    {
      "player": "kasia",
      "shot": {
       "x": -413.5406345901937,
@@ -2896,11 +2882,11 @@
     }
    ],
    "passesRed": 17,
-   "passesBlue": 34,
+   "passesBlue": 33,
    "kicksRed": 157,
    "kicksBlue": 196,
    "possRed": 7755,
-   "possBlue": 10621
+   "possBlue": 10542
   }
  ],
  "positionsEvery": 3600,

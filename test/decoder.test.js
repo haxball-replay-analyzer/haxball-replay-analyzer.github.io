@@ -73,6 +73,38 @@ function summarizePlayerPos(playerPos) {
   };
 }
 
+// Reguły prawdziwe dla każdej powtórki (B-18), niezależne od plików oczekiwanych. Zwraca listę
+// naruszeń; pusta = w porządku. Działa też na prywatnych powtórkach (HBRA_RACE_REPLAY).
+function invariantErrors(r) {
+  const errors = [];
+  const names = new Set(r.playerList);
+  if (names.size !== r.playerList.length) errors.push('playerList ma powtórzone nazwy');
+  r.matches.forEach((m, i) => {
+    const at = `mecz ${i + 1}`;
+    const team = { Red: m.redTeam, Blue: m.blueTeam };
+    if (m.goals.length !== m.scoreRed + m.scoreBlue) errors.push(`${at}: goli ${m.goals.length}, wynik ${m.scoreRed}:${m.scoreBlue}`);
+    if (m.goals.filter((g) => g.for === 'Red').length !== m.scoreRed) errors.push(`${at}: gole Red nie zgadzają się z wynikiem`);
+    for (const p of m.player) if (!names.has(p.nick)) errors.push(`${at}: gracz ${p.nick} spoza playerList`);
+    m.goals.forEach((g, j) => {
+      if (g.scorer === null || g.scorer.endsWith(' (own goal)')) return;
+      if (!team[g.for].includes(g.scorer)) errors.push(`${at}, gol ${j + 1}: strzelec spoza drużyny ${g.for}`);
+      if (g.assist && !m.spaceMode && !team[g.for].includes(g.assist.player)) errors.push(`${at}, gol ${j + 1}: asystent spoza drużyny ${g.for}`);
+    });
+    if (m.passesRed + m.passesBlue !== m.passes.length) errors.push(`${at}: passesRed + passesBlue != passes.length`);
+    if (m.passes.length > m.kicks.length) errors.push(`${at}: więcej podań niż kopnięć`);
+    if (!m.spaceMode) {
+      m.passes.forEach((p, j) => {
+        // TD-044: podanie ma oba końce i zaczyna się kopnięciem podającego w tym samym meczu
+        if (!p.lastShot || !p.shot) errors.push(`${at}, podanie ${j + 1}: brak początku albo końca`);
+        else if (p.lastShot.player !== p.player) errors.push(`${at}, podanie ${j + 1}: początek od innego gracza`);
+      });
+      if (m.kicks.length === 0 && m.possRed + m.possBlue > 0) errors.push(`${at}: posiadanie bez kopnięcia`);
+    }
+    if (m.possRed + m.possBlue > m.gameTicks + 1) errors.push(`${at}: posiadanie dłuższe niż mecz`);
+  });
+  return errors;
+}
+
 function pick(obj, keys) {
   return Object.fromEntries(keys.map((k) => [k, obj[k]]));
 }
@@ -81,12 +113,14 @@ for (const name of SAMPLES) {
   describe(name, () => {
     const replayFile = path.join(FIXTURES, name + '.hbr2');
     const expectedFile = path.join(FIXTURES, name + '.expected.json');
+    let raw;
     let actual;
     let expected;
 
     before(async () => {
       const { analyzeReplay } = await loadCore();
-      actual = summarize(analyzeReplay(fs.readFileSync(replayFile), { positionsEvery: POSITIONS_EVERY }));
+      raw = analyzeReplay(fs.readFileSync(replayFile), { positionsEvery: POSITIONS_EVERY });
+      actual = summarize(raw);
       if (UPDATE) fs.writeFileSync(expectedFile, JSON.stringify(actual, null, 1) + '\n');
       expected = JSON.parse(fs.readFileSync(expectedFile, 'utf8'));
     });
@@ -134,6 +168,10 @@ for (const name of SAMPLES) {
     it('cały wynik (pozostałe pola: stadion, flagi, touches, changes)', () => {
       assert.deepEqual(actual, expected);
     });
+
+    it('niezmienniki statystyk', () => {
+      assert.deepEqual(invariantErrors(raw), []);
+    });
   });
 }
 
@@ -147,6 +185,81 @@ describe('powtórka wyścigu (lokalnie)', () => {
     const longest = r.matches.reduce((a, b) => (b.gameTicks > a.gameTicks ? b : a));
     t.diagnostic(`czas analizy: ${seconds.toFixed(1)} s (symulacja ${(r.simulateMs / 1000).toFixed(1)} s), ticki: ${r.ticks}, zdarzenia: ${r.events}, mecze: ${r.matches.length}`);
     assert.equal(parseTime(longest.gameTicks), '26:45');
+    assert.deepEqual(invariantErrors(r), []);
+  });
+});
+
+// Przypadki, których nie ma w próbkach (TD-046, TD-047): słuchacz statystyk na atrapie pokoju.
+// Atrapa ma tylko pola, które czyta football.js: I (gracze: V id, w nick, ea.w drużyna), K (gra).
+describe('statystyki na atrapie pokoju', () => {
+  function fakeRoom(players) {
+    const room = { I: players };
+    room.K = { Ma: room, ta: { F: [{ a: { x: 12, y: -3 } }] } };
+    return room;
+  }
+  const red = { w: 'Red' };
+  const blue = { w: 'Blue' };
+  const kick = { x: 0, y: 0, vx: 1, vy: 0 };
+
+  it('TD-046: gol przed pierwszym kopnięciem nie przerywa analizy, strzelec nieznany', async () => {
+    const { createFootballStats } = await loadCore();
+    const stats = createFootballStats();
+    const room = fakeRoom([{ V: 1, w: 'a', ea: red }]);
+    stats.attach(room);
+    stats.beforeTick({ Ma: room });
+    room.Ni(red);
+    stats.detach();
+    const [goal] = stats.match[0].goals;
+    assert.equal(goal.scorer, null);
+    assert.equal(goal.assist, false);
+    assert.equal(goal.for, 'Red');
+    assert.deepEqual(goal.ballCoord, { x: 12, y: -3 });
+    assert.equal(stats.match[0].scoreRed, 1);
+  });
+
+  it('TD-047: ten sam nick naraz = dwa wpisy, ponowne wejście łączy się po nicku', async () => {
+    const { createFootballStats } = await loadCore();
+    const stats = createFootballStats();
+    const p1 = { V: 1, w: 'same', ea: red };
+    const p2 = { V: 2, w: 'same', ea: blue };
+    const room = fakeRoom([p1, p2]);
+    stats.attach(room);
+    stats.beforeTick({ Ma: room });
+    assert.deepEqual(stats.playerList, ['same', 'same (2)']);
+    stats.onKick(p1, kick);
+    stats.onKick(p2, kick);
+    // p1 wychodzi, wraca z nowym id, gdy p2 ("same (2)") jest w pokoju
+    const p3 = { V: 3, w: 'same', ea: red };
+    room.I = [p2, p3];
+    room.tl(p3);
+    stats.onKick(p3, kick);
+    stats.detach();
+    assert.deepEqual(stats.playerList, ['same', 'same (2)']);
+    assert.deepEqual(stats.match[0].kicks.map((k) => k.player), ['same', 'same (2)', 'same']);
+    assert.deepEqual(stats.match[0].player.map((p) => p.nick), ['same', 'same (2)']);
+  });
+
+  it('TD-044: podanie i asysta nie przechodzą przez gola ani na nowy mecz', async () => {
+    const { createFootballStats } = await loadCore();
+    const stats = createFootballStats();
+    const a = { V: 1, w: 'a', ea: red };
+    const b = { V: 2, w: 'b', ea: red };
+    const room = fakeRoom([a, b]);
+    stats.attach(room);
+    stats.beforeTick({ Ma: room });
+    stats.onKick(a, kick);
+    room.Ni(red); // a strzela
+    room.lq(); // wznowienie po golu
+    stats.onKick(b, kick);
+    room.Ni(red); // b strzela bez asysty a
+    room.vf(null); // koniec gry
+    room.Ki(); // nowy mecz
+    stats.onKick(a, kick);
+    stats.detach();
+    const [m1, m2] = stats.match;
+    assert.deepEqual(m1.goals.map((g) => [g.scorer, g.assist]), [['a', false], ['b', false]]);
+    assert.equal(m1.passes.length, 0);
+    assert.equal(m2.passes.length, 0);
   });
 });
 

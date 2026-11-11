@@ -328,6 +328,14 @@
      "goals": 0,
      "assists": 0,
      "kicks": 0
+    },
+    {
+     "id": 604,
+     "nick": "Tymek (2)",
+     "nation": "pl",
+     "goals": 0,
+     "assists": 0,
+     "kicks": 0
     }
    ],
    "started": true,
@@ -3192,20 +3200,6 @@
      }
     },
     {
-     "player": "arbanasi",
-     "shot": {
-      "x": 0,
-      "y": 0,
-      "vx": -0.26418219267079623,
-      "vy": -6.079512754454559
-     },
-     "lastShot": {
-      "player": "arbanasi",
-      "x": -657.6787767144097,
-      "y": -8.34820431818477
-     }
-    },
-    {
      "player": "Marco Asensio",
      "shot": {
       "x": -17.67283499632404,
@@ -3371,20 +3365,6 @@
       "player": "sarah walker",
       "x": 306.0211240965305,
       "y": 199.02207273227282
-     }
-    },
-    {
-     "player": "Gregor™🍺💘",
-     "shot": {
-      "x": 0.39422188031043165,
-      "y": -0.7666203424424567,
-      "vx": 3.6896465246636763,
-      "vy": -5.272975525378353
-     },
-     "lastShot": {
-      "player": "Gregor™🍺💘",
-      "x": 523.8610759086563,
-      "y": 5.897203450269907
      }
     },
     {
@@ -4116,20 +4096,6 @@
      }
     },
     {
-     "player": "arbanasi",
-     "shot": {
-      "x": 0,
-      "y": 0,
-      "vx": -5.297475383182242,
-      "vy": -2.9944986436928236
-     },
-     "lastShot": {
-      "player": "arbanasi",
-      "x": -658.7917663886514,
-      "y": 17.652272984413596
-     }
-    },
-    {
      "player": "Neymar",
      "shot": {
       "x": -231.01956157628095,
@@ -4690,20 +4656,6 @@
      }
     },
     {
-     "player": "arbanasi",
-     "shot": {
-      "x": -0.17979675111172755,
-      "y": -0.9608923254677604,
-      "vx": -0.9868363746669538,
-      "vy": -6.350679623286803
-     },
-     "lastShot": {
-      "player": "arbanasi",
-      "x": -658.6904157857876,
-      "y": -88.08804526771485
-     }
-    },
-    {
      "player": "Neymar",
      "shot": {
       "x": -27.628797731411904,
@@ -4942,12 +4894,12 @@
      }
     }
    ],
-   "passesRed": 80,
-   "passesBlue": 70,
+   "passesRed": 77,
+   "passesBlue": 69,
    "kicksRed": 245,
    "kicksBlue": 203,
-   "possRed": 17348,
-   "possBlue": 18649
+   "possRed": 17346,
+   "possBlue": 18647
   },
   {
    "stadium": {
@@ -5115,6 +5067,14 @@
     {
      "id": 603,
      "nick": "Tymek",
+     "nation": "pl",
+     "goals": 0,
+     "assists": 0,
+     "kicks": 0
+    },
+    {
+     "id": 604,
+     "nick": "Tymek (2)",
      "nation": "pl",
      "goals": 0,
      "assists": 0,
@@ -7445,15 +7405,6 @@
    "shotsBlue": 19,
    "passes": [
     {
-     "player": "sarah walker",
-     "shot": {
-      "x": 22.102575385025904,
-      "y": 3.3806276924410907,
-      "vx": 7.257908675832717,
-      "vy": 1.0653942947804764
-     }
-    },
-    {
      "player": "Gregor™🍺💘",
      "shot": {
       "x": 57.67354247448219,
@@ -9680,12 +9631,12 @@
      }
     }
    ],
-   "passesRed": 47,
+   "passesRed": 46,
    "passesBlue": 113,
    "kicksRed": 167,
    "kicksBlue": 247,
-   "possRed": 16124,
-   "possBlue": 19877
+   "possRed": 16104,
+   "possBlue": 19863
   }
  ],
  "positionsEvery": 3600,
@@ -10813,7 +10764,8 @@
   "insane",
   "Lewus",
   "Alvaro",
-  "Tymek"
+  "Tymek",
+  "Tymek (2)"
  ],
  "playerPos": {
   "matches": 2,
@@ -10847,9 +10799,10 @@
     36001,
     36001,
     36001,
+    0,
     0
    ]
   ],
-  "sha256": "8e472134b74a6534e29afba90da865468dcc3aebe3e1cc413c61031ad2f49e08"
+  "sha256": "b60d88cf1d8fdf9f38e40a72ac0e582e325190c0b08e5573fbe905902769c492"
  }
 }
