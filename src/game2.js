@@ -5355,7 +5355,8 @@ Tb.prototype = {
         // gracz po id w bieżącym pokoju (a.na); indeks z listy wejść `players` nie pasuje do a.I
         // po wejściach przed grą, wyjściach i zmianie kolejności graczy (TD-034)
         var followedPlayer = a.na(Number(playerToFollow));
-        if (null != followedPlayer && null != followedPlayer.H) {
+        // pozycja NaN (TD-052): zostaje kamera piłki
+        if (null != followedPlayer && null != followedPlayer.H && followedPlayer.H.a.x == followedPlayer.H.a.x && followedPlayer.H.a.y == followedPlayer.H.a.y) {
           translatetoDisc.x = followedPlayer.H.a.x;
           translatetoDisc.y = followedPlayer.H.a.y;
         }
@@ -5387,10 +5388,15 @@ Tb.prototype = {
         null != m && this.Ll(m, this.dd.get(n.V));
       /////////////////////////////////////////// dotąd
       f = 0;
-      for (e = e.F; f < e.length;) g = e[f],
-        ++f,
-        null ==
-        this.Jg.get(g) && this.Ll(g, null);
+      for (e = e.F; f < e.length;) {
+        g = e[f];
+        ++f;
+        if (null == this.Jg.get(g)) {
+          // jak klient HaxBalla z 2026: pierwszy dysk spoza graczy z ujemnym promieniem kończy rysowanie (TD-052)
+          if (0 > g.Z) break;
+          this.Ll(g, null)
+        }
+      }
       this.c.lineWidth = 3;
       this.c.resetTransform();
       this.c.translate(this.sa.width / 2, this.sa.height / 2);
@@ -5432,12 +5438,15 @@ Tb.prototype = {
     }
     n = 60 * e;
     1 < n && (n = 1);
-    b = e = this.Ya;
-    n *= 0.04;
-    h = b.x;
-    b = b.y;
-    e.x = h + (f - h) * n;
-    e.y = b + (g - b) * n;
+    // cel kamery NaN (pozycja dysku ustawiona skryptem): kamera stoi, zamiast zostać NaN na stałe (TD-052)
+    if (f == f && g == g) {
+      b = e = this.Ya;
+      n *= 0.04;
+      h = b.x;
+      b = b.y;
+      e.x = h + (f - h) * n;
+      e.y = b + (g - b) * n
+    }
     this.Xn(c, d, a.S)
   },
   Xn: function (a, b, c) {
@@ -5553,6 +5562,9 @@ Tb.prototype = {
     }
   },
   Ll: function (a, b) {
+    // dysk z ujemnym promieniem (skrypt pokoju, zdarzenie ob) jest niewidoczny: arc() rzuciłby
+    // IndexSizeError i przerwał klatkę; tak samo robi klient HaxBalla z 2026 (TD-052)
+    if (0 > a.Z) return;
     this.c.beginPath();
     null == b ? (this.c.fillStyle = N.lc(a.R), this.c.strokeStyle = 'black') : (this.c.fillStyle = b.Ij, this.c.strokeStyle = b.lo);
     this.c.beginPath();
