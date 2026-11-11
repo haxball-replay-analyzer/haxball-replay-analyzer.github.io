@@ -1650,6 +1650,7 @@ function N() {
   this.jf = 0;
   this.kf = 1.5;
   this.Ya = new H(0, 0);
+  this.viewCenter = this.Ya;
   this.Dk = !1;
   this.td = new Sb;
   this.sa = window.document.createElement('canvas');
@@ -5360,6 +5361,9 @@ Tb.prototype = {
         }
       }
       this.c.translate(- translatetoDisc.x, - translatetoDisc.y);
+      // środek widoku dla tła (Sq) i strzałek graczy poza kadrem (nk): przy Player To Follow
+      // to śledzony gracz, nie kamera piłki this.Ya (TD-051)
+      this.viewCenter = translatetoDisc;
       // wybór gracza kliknięciem (TD-038): odwrotność pełnego przekształcenia działa przy każdym
       // powiększeniu, skalowaniu rozdzielczości i devicePixelRatio
       followView.toWorld = this.c.getTransform().inverse();
@@ -5497,7 +5501,7 @@ Tb.prototype = {
       this.c.strokeStyle = '#E9CC6E';
       this.c.save();
       this.c.beginPath();
-      this.c.rect(this.Ya.x - 10000, this.Ya.y - 10000, 20000, 20000);
+      this.c.rect(this.viewCenter.x - 10000, this.viewCenter.y - 10000, 20000, 20000);
       this.c.scale(2, 2);
       this.c.fillStyle = this.Un;
       this.c.fill();
@@ -5609,12 +5613,12 @@ Tb.prototype = {
   nk: function (a, b, c, d) {
     c = 0.5 * c - 25;
     d = 0.5 * d - 25;
-    var e = this.Ya,
+    var e = this.viewCenter,
       f = a.x - e.x,
       e = a.y - e.y,
       g = - c,
       h = - d,
-      l = this.Ya;
+      l = this.viewCenter;
     c = l.x + (f > c ? c : f < g ? g : f);
     d = l.y + (e > d ? d : e < h ? h : e);
     f = a.x - c;
