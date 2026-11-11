@@ -14,7 +14,8 @@ const changelog = [
       'Two players with the same nick in the room at the same time are now counted separately ("nick (2)")',
       'Click a player on the field to follow them with the camera; click the ball to follow the ball again',
       'Player To Follow lists each player only once, sorted by nick',
-      'Player To Follow goes back to the ball when you open another replay'
+      'Player To Follow goes back to the ball when you open another replay',
+      'Shots on goal now use the ball physics of the map (damping and gravity) and count shots at every opponent goal, also on maps with goals at the top and bottom'
     ]
   },
   {
