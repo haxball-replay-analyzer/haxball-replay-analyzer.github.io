@@ -1,6 +1,6 @@
 import { useSelector, useDispatch } from "react-redux";
 import { setMainMode } from "../../slices/mainModeSlice";
-import { useEffect } from "react";
+import { Component, useEffect } from "react";
 import PlayerStats from "./PlayerStats";
 import ThirdStats from "./ThirdStats";
 import { watchGoal } from "../../game2";
@@ -9,6 +9,26 @@ import { selectMatch, showNextMatch, showPreviousMatch, setStats, setConnectHalv
 import HeatMap from "./HeatMap";
 import { changeTeamNames, sendMessageExp } from "../Home";
 import { openModal } from "../Modal";
+
+// Granica błędów (TD-045): wyjątek w widoku statystyk albo w heatmapie nie zdejmuje całej aplikacji.
+class StatsErrorBoundary extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { error: null };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { error };
+  }
+
+  componentDidCatch(error, info) {
+    console.error('Game stats:', error, info.componentStack);
+  }
+
+  render() {
+    return this.state.error ? this.props.fallback(this.state.error) : this.props.children;
+  }
+}
 
 function GameStats(props) {
 
@@ -320,13 +340,13 @@ function GameStats(props) {
               return (
                 <tr key={index}>
                   <td className="Red" onClick={watchGoal_} goalindex={index} onMouseOverCapture={handleMouseOver} onMouseOutCapture={handleMouseOut} style={{ width: '45%', textAlign: 'right' }}>
-                    {goal.for === 'Red' && goal.scorer + (goal.assist ? ' (' + goal.assist.player + ')' : '')}
+                    {goal.for === 'Red' && (goal.scorer ?? 'unknown') + (goal.assist ? ' (' + goal.assist.player + ')' : '')}
                   </td>
                   <td style={{ width: '10%', textAlign: 'center', padding: 2 }}>
                     {goal.currentScore[0] + ':' + goal.currentScore[1]}
                   </td>
                   <td className="Blue" onClick={watchGoal_} goalindex={index} onMouseOverCapture={handleMouseOver} onMouseOutCapture={handleMouseOut} style={{ width: '45%', textAlign: 'left' }}>
-                    {goal.for === 'Blue' && goal.scorer + (goal.assist ? ' (' + goal.assist.player + ')' : '')}
+                    {goal.for === 'Blue' && (goal.scorer ?? 'unknown') + (goal.assist ? ' (' + goal.assist.player + ')' : '')}
                   </td>
                 </tr>
               )
@@ -389,7 +409,11 @@ function GameStats(props) {
           </div>
           <div style={{ height: '50%', overflow: 'hidden' }}>
             <p style={{ textAlign: 'center', fontSize: 18 }}>{selectedHeatmap.split(' ')[0]} of {selectedPlayer == -1 ? match[mtc].redTeam[0] : selectedPlayer}:</p>
-            {match[mtc].stadium ? <HeatMap /> : null}
+            {match[mtc].stadium ? (
+              <StatsErrorBoundary key={mtc + '|' + selectedPlayer + '|' + selectedHeatmap} fallback={() => <p style={{ textAlign: 'center' }}>This heatmap could not be drawn.</p>}>
+                <HeatMap />
+              </StatsErrorBoundary>
+            ) : null}
           </div>
         </div >
       </div>
@@ -398,4 +422,18 @@ function GameStats(props) {
   );
 }
 
-export default GameStats;
+function SafeGameStats(props) {
+  const dispatch = useDispatch();
+  return (
+    <StatsErrorBoundary fallback={(error) => (
+      <div className="dialog" style={{ position: 'fixed', zIndex: 2, top: '40%', left: '50%', transform: 'translate(-50%, -50%)', padding: 20 }}>
+        <p>Game stats could not be displayed: {String(error && error.message)}</p>
+        <button onClick={() => dispatch(setMainMode('home'))}>Close ❌</button>
+      </div>
+    )}>
+      <GameStats {...props} />
+    </StatsErrorBoundary>
+  );
+}
+
+export default SafeGameStats;

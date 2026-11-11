@@ -48,7 +48,8 @@ function HeatMap() {
       const stat = selectedHeatmap.split(' ')[0];
       if (stat === 'Goals') {
         for (let goal of match[mtc].goals) {
-          if (goal.scorer == player) {
+          // w trybie „space” gol nie ma współrzędnych strzału
+          if (goal.scorer === player && goal.shot && goal.ballCoord) {
             ctx.beginPath();
             ctx.strokeStyle = 'red';
             ctx.lineWidth = 5;
@@ -59,7 +60,7 @@ function HeatMap() {
         }
       } else if (stat === 'Assists') {
         for (let goal of match[mtc].goals) {
-          if (goal.assist?.player === player) {
+          if (goal.assist?.player === player && goal.assist.shot && goal.shot && goal.ballCoord) {
             ctx.beginPath();
             ctx.strokeStyle = 'red';
             ctx.lineWidth = 5;
@@ -84,7 +85,8 @@ function HeatMap() {
         }
       } else if (stat === 'Passes') {
         for (let pass of match[mtc].passes) {
-          if (pass.player === player) {
+          // podanie bez początku (dawniej TD-044) pomijamy, zamiast rzucać wyjątek (TD-045)
+          if (pass.player === player && pass.lastShot && pass.shot) {
             ctx.beginPath();
             ctx.strokeStyle = 'red';
             ctx.lineWidth = 5;
