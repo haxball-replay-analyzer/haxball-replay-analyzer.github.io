@@ -76,6 +76,10 @@ function leaveReplayer() {
   cancelAnalysis();
   lastAnalysis = null;
   players = [];
+  // id gracza z poprzedniej powtórki to w nowej zwykle inny człowiek albo nikt (TD-036)
+  playerToFollow = 0;
+  followView.room = null;
+  followView.toWorld = null;
   playSounds = false;
 
   $('.roomlist-view').animate({
@@ -425,36 +429,73 @@ function removePopups() {
 
 var players = [], playSounds = false, autoClick = false, autoClickValue;
 var lastAnalysis = null; // wynik analyzeReplay() wczytanej powtórki
-var playerToFollow = 0, mainCanvas, mousepos = { clientX: 0, clientY: 0 };
-var globalPlayerHovered = false;
+var playerToFollow = 0, mainCanvas;
+// ostatnia narysowana klatka, dla wyboru gracza kliknięciem na boisku (TD-038):
+// odwrotność przekształcenia canvasu (piksele → współrzędne boiska) i pokój z tej klatki
+var followView = { toWorld: null, room: null };
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', '\'': '&#39;' }[c]
+  });
+}
 
 function playersToFollowList() {
-  var a = [
-    {
-      id: 0,
-      name: 'ball'
-    }
-  ];
-  var b = '<option value=0>[0] ball</option>';
+  // jeden wpis na id: lista wejść `players` ma powtórzenia (TD-037); kolejność według nicku
+  var byId = new Map();
   for (var i = 0; i < players.length; i++) {
-    if (players[i].V == 0) continue;
-    a.push({
-      id: players[i].V,
-      name: players[i].w
-    });
-    b = b + '<option value=' + a[a.length - 1].id + (playerToFollow == a[a.length - 1].id ? ' selected=true> [' : ' > [') + a[a.length - 1].id + '] ' + a[a.length - 1].name + '</option > ';
+    if (players[i].V != 0) byId.set(players[i].V, String(players[i].w));
   }
-  return b;
+  var list = Array.from(byId, function (p) { return { id: p[0], name: p[1] } });
+  list.sort(function (x, y) {
+    return x.name.localeCompare(y.name, undefined, { sensitivity: 'base' }) || x.id - y.id
+  });
+  list.unshift({ id: 0, name: 'ball' });
+  // nick z powtórki to tekst gracza: bez escapowania wchodziłby do HTML ustawień
+  return list.map(function (p) {
+    return '<option value=' + p.id + (playerToFollow == p.id ? ' selected' : '') + '>[' + p.id + '] ' + escapeHtml(p.name) + '</option>'
+  }).join('');
+}
+
+// id gracza pod kursorem w ostatniej klatce: 0 = piłka, null = nic
+function discUnderCursor(e) {
+  var room = followView.room, toWorld = followView.toWorld;
+  if (null == mainCanvas || null == room || null == toWorld || null == room.K) return null;
+  var rect = mainCanvas.getBoundingClientRect();
+  if (0 == rect.width || 0 == rect.height) return null;
+  var p = toWorld.transformPoint({
+    x: (e.clientX - rect.left) * mainCanvas.width / rect.width,
+    y: (e.clientY - rect.top) * mainCanvas.height / rect.height
+  });
+  function hit(d) {
+    if (null == d) return false;
+    var dx = d.a.x - p.x, dy = d.a.y - p.y;
+    return dx * dx + dy * dy <= d.Z * d.Z
+  }
+  for (var i = 0; i < room.I.length; i++) {
+    if (null != room.I[i].H && hit(room.I[i].H)) return room.I[i].V
+  }
+  return hit(room.K.ta.F[0]) ? 0 : null
+}
+
+function setPlayerToFollow(id) {
+  playerToFollow = id;
+  // ustawienia otwarte: lista pokazuje nowy wybór (zamknięte budują listę od nowa)
+  var select = document.getElementById('selectPlayerToFollow');
+  if (null != select) select.value = '' + id;
 }
 
 function getCanvas(a) {
   mainCanvas = a;
   mainCanvas.onmousemove = function (e) {
-    mousepos = e;
+    var id = discUnderCursor(e);
+    mainCanvas.style.cursor = null != id && id != playerToFollow ? 'pointer' : '';
   }
   mainCanvas.onclick = function (e) {
-    if (globalPlayerHovered) {
-      playerToFollow = globalPlayerHovered;
+    var id = discUnderCursor(e);
+    if (null != id) {
+      setPlayerToFollow(id);
+      mainCanvas.style.cursor = '';
     }
   }
 }
@@ -5319,35 +5360,10 @@ Tb.prototype = {
         }
       }
       this.c.translate(- translatetoDisc.x, - translatetoDisc.y);
-
-      var mouseTranslated = {
-        x: (mousepos.clientX + translatetoDisc.x) - (this.sa.width / 2) / k,
-        y: (mousepos.clientY + translatetoDisc.y) - ((this.sa.height + h) / 2) / k
-      }
-
-      if (k == 1.5625) {
-        mouseTranslated.x = ((mousepos.clientX + translatetoDisc.x) - (this.sa.width / 2) / k) // 1.25;
-        mouseTranslated.x = ((mousepos.clientX + translatetoDisc.x) * k - (this.sa.width / 2)) / k;
-        mouseTranslated.y = ((mousepos.clientY + translatetoDisc.y) - ((this.sa.height + h) / 2) / k) / 1.25
-      } else if (k == 1.875) {
-        mouseTranslated.x = ((mousepos.clientX + translatetoDisc.x) - (this.sa.width / 2) / k) // 1.5;
-        mouseTranslated.y = ((mousepos.clientY + translatetoDisc.y) - ((this.sa.height + h) / 2) / k) // 1.5
-      }
-
-      // console.log(k, a.I[1].H.a, mouseTranslated)
-      // var playerHovered = false
-      // for (var i = 0; i < a.I.length; i++) {
-      //   if (a.I[i].H != null) {
-      //     if (distanceBetween(a.I[i].H.a, mouseTranslated) < a.I[i].H.Z) {
-      //       playerHovered = a.I[i].V; // CHECKPOINT - na razie działa tylko na powiększeniu 1 (k) i promień gracza 15
-      //       globalPlayerHovered = playerHovered;
-      //     }
-      //   }
-      // }
-      // if (playerHovered) mainCanvas.style.cursor = 'pointer'
-      // else mainCanvas.style.cursor = 'default'
-
-      // console.log(a.I[1].H.a.x, (mousepos.clientX + this.Ya.x) - (this.sa.width / 2) / k) - przełożenie myszki na mapę
+      // wybór gracza kliknięciem (TD-038): odwrotność pełnego przekształcenia działa przy każdym
+      // powiększeniu, skalowaniu rozdzielczości i devicePixelRatio
+      followView.toWorld = this.c.getTransform().inverse();
+      followView.room = a;
       // CHECKPOINT moment, w którym widok centruje się na piłce
       this.c.lineWidth = 3;
       this.Sq(c.S);
