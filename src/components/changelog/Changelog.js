@@ -11,7 +11,10 @@ const changelog = [
       'Fixed an issue where the Passes heatmap could close the whole page; a heatmap that cannot be drawn now shows a message instead',
       'Passes, assists and possession no longer carry over across a goal or into the next match',
       'A goal scored before anyone kicked the ball no longer stops the analysis; the scorer is shown as "unknown"',
-      'Two players with the same nick in the room at the same time are now counted separately ("nick (2)")'
+      'Two players with the same nick in the room at the same time are now counted separately ("nick (2)")',
+      'Click a player on the field to follow them with the camera; click the ball to follow the ball again',
+      'Player To Follow lists each player only once, sorted by nick',
+      'Player To Follow goes back to the ball when you open another replay'
     ]
   },
   {
