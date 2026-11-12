@@ -4691,7 +4691,11 @@ u.replayError = function (e) {
       //0 == a ? (/*a = window.top.location,*/window.top.open('https://www.haxball.com'+'/replay?v=' + c.Id, '_self'))  : u.xb()
     };
   else {
-    var d = new P('Replay error', 'Couldn\'t load the file.', [
+    // przekroczony limit analizy (@hbra/replay-core, TD-042, TD-043): powiedz który
+    var why = 'Couldn\'t load the file.';
+    c && 'replay_too_long' === c.code && (why = 'The replay is too long to analyze (limit: ' + Math.round(c.limit / 216000) + ' h of game time).');
+    c && 'replay_too_large' === c.code && (why = 'The replay is too large to analyze (over ' + Math.round(c.limit / 1048576) + ' MB after decompression).');
+    var d = new P('Replay error', why, [
       'Ok'
     ]);
     x.La(d.g);

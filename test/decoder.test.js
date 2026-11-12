@@ -417,3 +417,71 @@ describe('postęp analizy (onProgress)', () => {
     });
   }
 });
+
+// Plik .hbr2: "HBR2", wersja 3, długość w tickach, reszta to strumień deflate (raw).
+function replayWith(totalFrames, compressed) {
+  const head = Buffer.alloc(12);
+  head.write('HBR2', 0, 'latin1');
+  head.writeUInt32BE(3, 4);
+  head.writeUInt32BE(totalFrames, 8);
+  return Buffer.concat([head, Buffer.from(compressed)]);
+}
+
+describe('limity analizy (TD-042, TD-043)', () => {
+  const name = '2020-05-07';
+  let bytes;
+  before(() => { bytes = fs.readFileSync(path.join(FIXTURES, `${name}.hbr2`)); });
+
+  it('domyślne limity mają zapas: 12 h gry, 128 MiB po rozpakowaniu', async () => {
+    const { DEFAULT_LIMITS } = await loadCore();
+    assert.equal(DEFAULT_LIMITS.maxTicks, 2592000);
+    assert.equal(DEFAULT_LIMITS.maxInflatedBytes, 128 * 1024 * 1024);
+  });
+
+  it('maxTicks: za długi nagłówek = replay_too_long przed rozpakowaniem', async () => {
+    const { analyzeReplay } = await loadCore();
+    const ticks = bytes.readUInt32BE(8);
+    assert.throws(() => analyzeReplay(bytes, { maxTicks: ticks - 1 }),
+      (e) => e.code === 'replay_too_long' && e.limit === ticks - 1 && e.value === ticks);
+    // równo limit przechodzi; bez symulacji długość nie ma znaczenia
+    assert.equal(analyzeReplay(bytes, { maxTicks: ticks }).ticks, ticks);
+    assert.equal(analyzeReplay(bytes, { maxTicks: 1, simulate: false }).totalFrames, ticks);
+  });
+
+  it('maxTicks: nagłówek 2^32 − 1 odrzucony od razu z domyślnym limitem', async () => {
+    const { analyzeReplay } = await loadCore();
+    const evil = Buffer.from(bytes);
+    evil.writeUInt32BE(0xffffffff, 8);
+    const t0 = performance.now();
+    assert.throws(() => analyzeReplay(evil), (e) => e.code === 'replay_too_long' && e.value === 0xffffffff);
+    assert.ok(performance.now() - t0 < 1000);
+  });
+
+  it('maxInflatedBytes: za mało = replay_too_large z wartością limitu', async () => {
+    const { analyzeReplay } = await loadCore();
+    assert.throws(() => analyzeReplay(bytes, { maxInflatedBytes: 1000 }),
+      (e) => e.code === 'replay_too_large' && e.limit === 1000);
+    // limit sprawdzany też bez symulacji (rozpakowanie jest w konstruktorze Jb)
+    assert.throws(() => analyzeReplay(bytes, { maxInflatedBytes: 1000, simulate: false }), (e) => e.code === 'replay_too_large');
+  });
+
+  it('maxInflatedBytes: bomba (16 MiB zer w ok. 16 KB) przerwana po limicie', async () => {
+    const { analyzeReplay } = await loadCore();
+    const pako = require('pako');
+    const bomb = replayWith(100, pako.deflateRaw(new Uint8Array(16 * 1024 * 1024)));
+    assert.ok(bomb.length < 64 * 1024, `bomba ma ${bomb.length} B`);
+    assert.throws(() => analyzeReplay(bomb, { maxInflatedBytes: 1024 * 1024 }),
+      (e) => e.code === 'replay_too_large' && e.limit === 1024 * 1024);
+  });
+
+  it('limit nie zmienia wyniku i nie zostaje po analizie (odtwarzacz rozpakowuje bez limitu)', async () => {
+    const { analyzeReplay } = await loadCore();
+    const { setInflateBudget } = await import('@hbra/replay-core/haxball');
+    const free = analyzeReplay(bytes, { maxTicks: Infinity, maxInflatedBytes: Infinity });
+    const limited = analyzeReplay(bytes);
+    assert.deepEqual(summarize(limited), summarize(free));
+    assert.throws(() => analyzeReplay(bytes, { maxInflatedBytes: 1000 }));
+    const left = setInflateBudget(Infinity);
+    assert.equal(left, Infinity);
+  });
+});

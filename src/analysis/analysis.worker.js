@@ -4,7 +4,8 @@
 // Wyjście:  { type: 'progress', value }                ułamek 0..1 co progressEvery ticków
 //           { type: 'result', result }                 wynik analyzeReplay() spakowany przez packAnalysis()
 //           { type: 'error', kind: 'version', version }  plik w innej wersji niż 3 (błąd HaxBalla Kb)
-//           { type: 'error', kind: 'other', message }
+//           { type: 'error', kind: 'other', message, code, limit }  code i limit przy przekroczonym
+//                                                      limicie analizy ('replay_too_long', 'replay_too_large')
 // Strona tworzy nowy Worker na każdą analizę i kończy go po wyniku (src/analysis/client.js).
 import { analyzeReplay, packAnalysis } from '@hbra/replay-core';
 import { Kb, q } from '@hbra/replay-core/haxball';
@@ -23,6 +24,6 @@ self.onmessage = function (ev) {
   } catch (e) {
     var c = e instanceof q ? e.Ta : e;
     if (c instanceof Kb) self.postMessage({ type: 'error', kind: 'version', version: c.Id });
-    else self.postMessage({ type: 'error', kind: 'other', message: String(c && c.message || c) })
+    else self.postMessage({ type: 'error', kind: 'other', message: String(c && c.message || c), code: c && c.code, limit: c && c.limit })
   }
 };

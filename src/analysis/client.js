@@ -68,6 +68,7 @@ export function analyzeInWorker(bytes, options) {
         finish();
         var e = new Error('version' === m.kind ? 'Incompatible replay version' : m.message);
         'version' === m.kind && (e.replayVersion = m.version);
+        null != m.code && (e.code = m.code, e.limit = m.limit);
         reject(e)
       }
     };

@@ -1,7 +1,7 @@
 // Analiza powtórki bez odtwarzacza i bez DOM (kod HBRA, MIT).
 /* eslint-disable eqeqeq, no-sequences, no-unused-expressions */
 
-import { F, Jb, fa, kc, m } from './haxball.js';
+import { F, Jb, fa, kc, m, setInflateBudget } from './haxball.js';
 import { createFootballStats, parseTime, STATS_VERSION } from './stats/football.js';
 
 // Nagłówek pliku .hbr2 (big endian): "HBR2", wersja, długość w tickach.
@@ -16,6 +16,14 @@ function readReplayHeader(data) {
   }
 }
 
+// Domyślne limity (TD-042, TD-043) z dużym zapasem dla strony: prawdziwe powtórki mają do ok.
+// 300 tys. ticków (1 h 22 min) i do ok. 5 MB po rozpakowaniu (stopień kompresji do 5,4).
+// Serwer API poda ostrzejsze (plan API: 500 tys. ticków, 50 MB). Infinity = bez limitu.
+var DEFAULT_LIMITS = {
+  maxTicks: 12 * 60 * 60 * 60, // 12 h gry przy 60 tickach na sekundę = 2 592 000
+  maxInflatedBytes: 128 * 1024 * 1024 // suma wszystkich rozpakowań w jednej analizie
+};
+
 function discPos(d) {
   return d && d.a ? [d.a.x, d.a.y] : null
 }
@@ -27,9 +35,28 @@ function discPos(d) {
 //   options.positionsEvery: co ile ticków zapisać pozycje piłki i graczy (0 = wcale)
 //   options.collectors: dodatkowi słuchacze pokoju ({ attach(room), detach() }), np. inne statystyki
 //   options.onProgress(ułamek), options.progressEvery (ticki, domyślnie 6000); ostatni raport to 1
+//   options.maxTicks: limit długości z nagłówka (domyślnie 12 h gry); przy simulate przekroczony
+//     limit = Error z code 'replay_too_long' jeszcze przed rozpakowaniem (TD-042)
+//   options.maxInflatedBytes: limit bajtów po rozpakowaniu, suma zdarzeń i stadionów (domyślnie
+//     128 MiB); przekroczony = Error z code 'replay_too_large' (TD-043)
+//   Błąd limitu ma pola code, limit i (przy 'replay_too_long') value.
 // Rzuca błąd HaxBalla (q z Kb) przy wersji pliku innej niż 3.
 export function analyzeReplay(bytes, options) {
   options = options || {};
+  var maxInflatedBytes = null != options.maxInflatedBytes ? options.maxInflatedBytes : DEFAULT_LIMITS.maxInflatedBytes,
+    oldBudget = setInflateBudget(maxInflatedBytes);
+  try {
+    return analyze(bytes, options)
+  } catch (e) {
+    // limit rozpakowania rzuca kod HaxBalla (haxball.js), który nie zna wartości limitu
+    e && 'replay_too_large' === e.code && (e.limit = maxInflatedBytes);
+    throw e
+  } finally {
+    setInflateBudget(oldBudget) // odtwarzacz (src/game2.js) rozpakowuje bez limitu
+  }
+}
+
+function analyze(bytes, options) {
   var simulate = false !== options.simulate,
     positionsEvery = options.positionsEvery || 0,
     collectors = options.collectors || [],
@@ -37,7 +64,15 @@ export function analyzeReplay(bytes, options) {
     progressEvery = options.progressEvery || 6000;
   kc.fj();
   var data = new Uint8Array(bytes); // Jb czyta data.buffer od początku, więc kopia albo widok całego bufora
-  var header = readReplayHeader(data);
+  var header = readReplayHeader(data),
+    maxTicks = null != options.maxTicks ? options.maxTicks : DEFAULT_LIMITS.maxTicks;
+  if (simulate && header.totalFrames > maxTicks) {
+    var e = new Error('Replay too long: ' + header.totalFrames + ' ticks, limit ' + maxTicks);
+    e.code = 'replay_too_long';
+    e.limit = maxTicks;
+    e.value = header.totalFrames;
+    throw e
+  }
   // konstruktor: magic, wersja, inflate, znaczniki, stan początkowy
   var rep = new Jb(data, new fa, 3);
   var st = rep.T;
@@ -120,4 +155,4 @@ export function analyzeReplay(bytes, options) {
   return result
 }
 
-export { readReplayHeader };
+export { readReplayHeader, DEFAULT_LIMITS };

@@ -3,12 +3,40 @@
 // (patrz README i decyzje właściciela): nie publikować jako osobnej paczki.
 // Dopiski HBRA: lista słuchaczy pokoju (roomDispatch, addRoomListener, removeRoomListener),
 // wywołania słuchacza statystyk w O.prototype.C (this.Ma.statsListener; tylko czyta stan, nie
-// zmienia przebiegu ticku, TD-053), kc.fj() raz.
+// zmienia przebiegu ticku, TD-053), kc.fj() raz, limit rozpakowania (inflateRawLimited, TD-043).
 // Bez DOM: tylko ES, performance i console (sprawdza ESLint no-undef, patrz package.json).
 /* eslint-disable no-useless-concat, no-extend-native, no-self-compare, no-cond-assign, no-use-before-define, no-mixed-operators, default-case, no-loop-func, new-parens, no-sequences, no-array-constructor, no-redeclare, eqeqeq, no-unused-vars, no-unused-expressions */
 /* global JSON5, qc -- wolne odwołania z klienta HaxBall: JSON5 (parser stadionu z pliku .hbs, tylko UI), qc (rejestr klas Haxe, nieużywany) */
 
 import pako from 'pako';
+
+// Limit bajtów po rozpakowaniu (TD-043, dopisek HBRA): wspólny budżet dla każdego inflateRaw
+// (zdarzenia w Jb i stadiony w Pa.va), ustawiany przez analyzeReplay na czas analizy.
+// Rozpakowanie strumieniowe przerywa się po przekroczeniu budżetu, więc mały plik z dużym blokiem
+// zer nie zajmie gigabajtów. Infinity (domyślnie, odtwarzacz) = zwykłe pako.inflateRaw.
+var inflateBudget = Infinity;
+function setInflateBudget(n) {
+  var old = inflateBudget;
+  inflateBudget = n;
+  return old
+}
+function inflateRawLimited(data) {
+  if (Infinity === inflateBudget) return pako.inflateRaw(data);
+  var inf = new pako.Inflate({ raw: !0, chunkSize: 65536 }),
+    collect = inf.onData;
+  inf.onData = function (chunk) {
+    inflateBudget -= chunk.length;
+    if (0 > inflateBudget) {
+      var e = new Error('Replay too large after decompression');
+      e.code = 'replay_too_large';
+      throw e
+    }
+    collect.call(this, chunk)
+  };
+  inf.push(data, !0);
+  if (inf.err) throw inf.msg || 'inflate error ' + inf.err;
+  return inf.result
+}
 
 // Wywołania zwrotne pokoju (fa: tl wejście gracza, Ni gol, Ki start meczu, vf stop...) jako lista
 // słuchaczy. Dawniej każde pole miało jedną funkcję ustawianą przez widok (Gb.ri); teraz widok
@@ -316,7 +344,7 @@ function Jb(a, b, c) {
   b = a.hb();
   if (c != b) throw new q(new Kb(b));
   this.mf = a.hb();
-  c = pako.inflateRaw(a.sb());
+  c = inflateRawLimited(a.sb());
   this.Lc = new F(new DataView(c.buffer, c.byteOffset, c.byteLength));
   this.Cq(this.Lc);
   c = this.Lc.sb();
@@ -2997,7 +3025,7 @@ da.prototype = C(m.prototype, {
     a.Vb(b)
   },
   va: function (a) {
-    a = pako.inflateRaw(a.sb(a.Ob()));
+    a = inflateRawLimited(a.sb(a.Ob()));
     this.Pd = h.ja(new F(new DataView(a.buffer, a.byteOffset, a.byteLength)))
   },
   f: qa
@@ -4066,5 +4094,5 @@ r.sn = {
 export {
   Ab, Bb, C, Cb, D, F, Ga, H, Ia, J, Jb, K, Kb, La, Ma, Na, Oa, Pa, Qa, S, U, Ua, V, Y,
   addRoomListener, da, ea, ec, fa, h, ia, ka, kc, la, m, ma, na, oa, p, pa, q, qa, r, ra,
-  removeRoomListener, sa, ta, vb, w, y
+  inflateRawLimited, removeRoomListener, sa, setInflateBudget, ta, vb, w, y
 };
