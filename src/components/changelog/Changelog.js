@@ -5,6 +5,13 @@ import { useEffect } from 'react';
 
 const changelog = [
   {
+    version: '3.3.5',
+    date: '12.11.2026',
+    changes: [
+      'Broken or malicious replay files can no longer keep the analysis running for hours or fill the memory: replays longer than 12 hours of game time or larger than 128 MB after decompression are rejected with a message'
+    ]
+  },
+  {
     version: '3.3.4',
     date: '11.11.2026',
     changes: [
