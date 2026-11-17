@@ -3,7 +3,7 @@ import $ from 'jquery'
 var timeout;
 var doHideModal = false;
 
-export function openModal(message, color) { }
+export let openModal = function () { }; // podmieniana w Modal() przy każdym renderze
 
 function Modal() {
 

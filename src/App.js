@@ -1,7 +1,7 @@
 import './App.scss';
 import Header from './components/Header';
 import Home from './components/Home';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import $ from 'jquery'
 import Modal from './components/Modal';
 

@@ -10,26 +10,26 @@ function PlayerStats() {
   const dispatch = useDispatch();
 
   var tab = [];
-  for (var i = 0; i < match[mtc].player.length; i++) {
+  for (let i = 0; i < match[mtc].player.length; i++) {
     var pr = match[mtc].player[i], prGoals = 0, prAssists = 0, prKicks = 0, prPasses = 0, prShots = 0, prBumps = 0, prTouches = 0;
-    for (var j = 0; j < match[mtc].goals.length; j++) {
+    for (let j = 0; j < match[mtc].goals.length; j++) {
       if (match[mtc].goals[j].scorer === pr.nick) prGoals++;
       else if (match[mtc].goals[j].assist.player === pr.nick) prAssists++;
     }
-    for (var j = 0; j < match[mtc].kicks.length; j++) if (match[mtc].kicks[j].player === pr.nick) prKicks++;
-    for (var j = 0; j < match[mtc].passes.length; j++) if (match[mtc].passes[j].player === pr.nick) prPasses++;
-    for (var j = 0; j < match[mtc].shots.length; j++) if (match[mtc].shots[j].player === pr.nick) prShots++;
+    for (let j = 0; j < match[mtc].kicks.length; j++) if (match[mtc].kicks[j].player === pr.nick) prKicks++;
+    for (let j = 0; j < match[mtc].passes.length; j++) if (match[mtc].passes[j].player === pr.nick) prPasses++;
+    for (let j = 0; j < match[mtc].shots.length; j++) if (match[mtc].shots[j].player === pr.nick) prShots++;
     if (match[mtc].spaceMode) {
-      for (var j = 0; j < match[mtc].bumps.length; j++) if (match[mtc].bumps[j] === pr.nick) prBumps++;
-      for (var j = 0; j < match[mtc].touches.length; j++) if (match[mtc].touches[j] === pr.nick) prTouches++;
+      for (let j = 0; j < match[mtc].bumps.length; j++) if (match[mtc].bumps[j] === pr.nick) prBumps++;
+      for (let j = 0; j < match[mtc].touches.length; j++) if (match[mtc].touches[j] === pr.nick) prTouches++;
       tab.push([pr.nick, pr.nation, prGoals, prAssists, prKicks, prPasses, prShots, prBumps, prTouches]);
     } else tab.push([pr.nick, pr.nation, prGoals, prAssists, prKicks, prPasses, prShots]);
   }
   if (par > 0) {
-    var tab2 = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]];
-    for (var i = 0; i < tab.length; i++) {
+    let tab2 = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]];
+    for (let i = 0; i < tab.length; i++) {
       if (!match[mtc].redTeam.includes(tab[i][0]) && !match[mtc].blueTeam.includes(tab[i][0])) continue;
-      for (var j = 0; j < tab2.length; j++) {
+      for (let j = 0; j < tab2.length; j++) {
         if (tab[i][par] >= tab2[j][par]) {
           tab2.splice(j, 0, tab[i]);
           break;
@@ -39,8 +39,8 @@ function PlayerStats() {
     tab2.splice(tab2.length - 1, 1);
     tab = tab2;
   } else {
-    var tab2 = [];
-    for (var i = 0; i < tab.length; i++) {
+    let tab2 = [];
+    for (let i = 0; i < tab.length; i++) {
       if (match[mtc].redTeam.includes(tab[i][0])) tab2.splice(0, 0, tab[i]);
       else if (match[mtc].blueTeam.includes(tab[i][0])) tab2.push(tab[i])
     }

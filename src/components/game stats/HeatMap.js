@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import { useSelector } from 'react-redux';
 import { useRef, useEffect } from 'react';
 import { drawStadium, stadiumSize, fitSize } from './StadiumCanvas';
@@ -146,7 +145,9 @@ export function HeatMapDownload() {
     canvas.width = Math.ceil(size.width * scale);
     canvas.height = Math.ceil(size.height * scale);
     const player = selectedPlayer === -1 ? match[mtc].redTeam[0] : selectedPlayer;
+    // Znaki zabronione w nazwach plików, także sterujące \x00-\x1f.
     const name = [match[mtc].stadium ? match[mtc].stadium.name : 'Classic', selectedHeatmap.split(' ')[0], player]
+      // eslint-disable-next-line no-control-regex
       .filter(Boolean).join(' - ').replace(/[\\/:*?"<>|\x00-\x1f]/g, '_') + '.png';
     try {
       drawHeatmap(canvas.getContext('2d'), scale, data);

@@ -1,6 +1,6 @@
 // Statystyki piłkarskie HBRA (kod właściciela, MIT): słuchacz pokoju i pętli fizyki.
 // Przeniesione z src/game2.js (dawniej zmienne modułu); od 2026-11 z poprawkami TD-044, TD-046–TD-048.
-/* eslint-disable eqeqeq, no-mixed-operators, no-redeclare, no-unused-vars, no-loop-func */
+/* eslint-disable no-redeclare, no-unused-vars */
 
 import { addRoomListener, p, removeRoomListener } from '../haxball.js';
 

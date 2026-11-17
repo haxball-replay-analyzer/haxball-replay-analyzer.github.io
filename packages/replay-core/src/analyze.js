@@ -1,6 +1,4 @@
 // Analiza powtórki bez odtwarzacza i bez DOM (kod HBRA, MIT).
-/* eslint-disable eqeqeq, no-sequences, no-unused-expressions */
-
 import { F, Jb, fa, kc, m, setInflateBudget } from './haxball.js';
 import { createFootballStats, parseTime, STATS_VERSION } from './stats/football.js';
 
@@ -67,11 +65,11 @@ function analyze(bytes, options) {
   var header = readReplayHeader(data),
     maxTicks = null != options.maxTicks ? options.maxTicks : DEFAULT_LIMITS.maxTicks;
   if (simulate && header.totalFrames > maxTicks) {
-    var e = new Error('Replay too long: ' + header.totalFrames + ' ticks, limit ' + maxTicks);
-    e.code = 'replay_too_long';
-    e.limit = maxTicks;
-    e.value = header.totalFrames;
-    throw e
+    var tooLong = new Error('Replay too long: ' + header.totalFrames + ' ticks, limit ' + maxTicks);
+    tooLong.code = 'replay_too_long';
+    tooLong.limit = maxTicks;
+    tooLong.value = header.totalFrames;
+    throw tooLong
   }
   // konstruktor: magic, wersja, inflate, znaczniki, stan początkowy
   var rep = new Jb(data, new fa, 3);

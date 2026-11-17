@@ -161,7 +161,7 @@ function GameStats(props) {
     }
   }
 
-  function connectHalves(e) {
+  function connectHalves() {
     dispatch(setConnectHalves(false))
     dispatch(setConnectedHalves(true))
     var newMatch = {
@@ -260,7 +260,7 @@ function GameStats(props) {
   useEffect(() => {
     $("#prevMatch").css('display', mtc === 0 ? 'none' : 'block')
     $("#nextMatch").css('display', mtc === match.length - 1 ? 'none' : 'block')
-  }, [mtc])
+  }, [mtc, match.length])
 
   useEffect(() => {
 
@@ -281,7 +281,7 @@ function GameStats(props) {
       opacity: 0.5
     }, { duration: 300, easing: 'swing', queue: false });
 
-  }, [])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps -- animacja otwarcia tylko raz
 
   return (
     <>

@@ -10,22 +10,5 @@
   },
   "dependencies": {
     "pako": "^1.0.11"
-  },
-  "eslintConfig": {
-    "root": true,
-    "parserOptions": {
-      "ecmaVersion": 2022,
-      "sourceType": "module"
-    },
-    "env": {
-      "es2022": true
-    },
-    "globals": {
-      "performance": "readonly",
-      "console": "readonly"
-    },
-    "rules": {
-      "no-undef": "error"
-    }
   }
 }

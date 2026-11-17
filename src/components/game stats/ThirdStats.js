@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import { useSelector } from 'react-redux';
 import { useRef, useEffect } from 'react';
 import { drawStadium, stadiumSize, fitSize } from './StadiumCanvas';

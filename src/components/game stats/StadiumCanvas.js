@@ -56,9 +56,9 @@ function calculate_arc(a, b, curve) {
 
   if (curve < 0) {
     curve = -curve;
-    var c = a;
+    var swap = a;
     a = b;
-    b = c;
+    b = swap;
   }
 
   var c = [b[0] - a[0], b[1] - a[1]];

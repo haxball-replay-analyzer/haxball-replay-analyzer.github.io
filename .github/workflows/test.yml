@@ -27,6 +27,9 @@ jobs:
       - name: Instalacja zależności
         run: npm ci
 
+      - name: Lint
+        run: npm run lint
+
       - name: Testy dekodera
         run: npm test
 

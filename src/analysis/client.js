@@ -54,7 +54,7 @@ export function analyzeInWorker(bytes, options) {
     if (typeof Worker === 'undefined') return runHere();
     try {
       worker = new Worker(new URL('./analysis.worker.js', import.meta.url), { type: 'module' })
-    } catch (e) {
+    } catch {
       worker = null;
       return runHere()
     }

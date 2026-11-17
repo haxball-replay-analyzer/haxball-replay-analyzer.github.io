@@ -13,11 +13,11 @@ import { setReplays, setReplaysLoaded, setReplaysType, setLoadingMore, addMoreRe
 import { openModal } from "./Modal";
 import Downloading from "./Downloading";
 
-export function sendMessageExp() { }
-export function search4Replays() { }
-export function checkParamsExp() { }
-export function changeTeamNames() { }
-export function loadMoreReplays() { }
+export let sendMessageExp = function () { }; // podmieniana w Home() przy każdym renderze
+export let search4Replays = function () { }; // podmieniana w Home() przy każdym renderze
+export let checkParamsExp = function () { }; // podmieniana w Home() przy każdym renderze
+export let changeTeamNames = function () { }; // podmieniana w Home() przy każdym renderze
+export let loadMoreReplays = function () { }; // podmieniana w Home() przy każdym renderze
 
 var queryMessage = {};
 var replayData = [];
@@ -140,7 +140,7 @@ function Home() {
       if (x?.connectHalves) dispatch(setConnectHalves(true))
       else dispatch(setConnectHalves(false))
 
-      for (var i = 0; i < x.teamNames.length; i++) {
+      for (let i = 0; i < x.teamNames.length; i++) {
         const j = Math.floor(i / 2);
         if (i % 2 === 0) {
           dispatch(setRedTeamName({ mtc: j, name: x.teamNames[i].TeamName }))
@@ -174,7 +174,7 @@ function Home() {
       setReplayId(x.id);
       openModal('This recording has already been uploaded. Redirected to this replay.', 'darkgoldenrod', 5)
     } else if (x.header === 'top10 stats') {
-      for (var i = 0; i < x.replays.replays.length; i++) {
+      for (let i = 0; i < x.replays.replays.length; i++) {
         if (x.replays.replays[i].ConnectedHalves) {
           connectHalves(x.replays, i)
         }
@@ -186,7 +186,7 @@ function Home() {
     } else if (x.header === 'invalidLink') {
       openModal('Invalid link - replay with given ID doesn\'t exist', 'darkgoldenrod', 4)
     } else if (x.header === 'next10 stats') {
-      for (var i = 0; i < x.replays.replays.length; i++) {
+      for (let i = 0; i < x.replays.replays.length; i++) {
         if (x.replays.replays[i].ConnectedHalves) {
           connectHalves(x.replays, i)
         }
@@ -317,18 +317,14 @@ function Home() {
   function showReplays(ev) {
     // console.log('showreplays');
     if (connectionStatus === 'Open') {
-      if (ev.target.textContent === 'Most viewed replays') {
-        var replaysType = 'mostViewed'
-      } else {
-        var replaysType = 'latest'
-      }
+      const type = ev.target.textContent === 'Most viewed replays' ? 'mostViewed' : 'latest';
 
-      dispatch(setReplaysType(replaysType))
+      dispatch(setReplaysType(type))
 
       const toSend = {
         header: 'top10',
         period: 'week',
-        replaysType: replaysType
+        replaysType: type
       }
       sendMessage(JSON.stringify(toSend))
     } else if (connectionStatus === 'Connecting') {
@@ -355,14 +351,14 @@ function Home() {
     dispatch(setStats(stats));
     // Nazwy drużyn: powtórka z serwera HBRA ma swoje (komunikat `replaySent`), plik z dysku i z thehax.pl nie.
     if (replaySource !== 'server') {
-      for (var i = 0; i < stats.length; i++) {
+      for (let i = 0; i < stats.length; i++) {
         dispatch(setRedTeamName({ mtc: i, name: 'RED' }))
         dispatch(setBlueTeamName({ mtc: i, name: 'BLUE' }))
       }
     }
     if (userDidUpload) {
       var message = [];
-      for (var i = 0; i < stats.length; i++) {
+      for (let i = 0; i < stats.length; i++) {
         const match = stats[i];
         dispatch(setRedTeamName({ mtc: i, name: 'RED' }))
         dispatch(setBlueTeamName({ mtc: i, name: 'BLUE' }))
@@ -415,7 +411,7 @@ function Home() {
     sendMessage(JSON.stringify(toSend))
   }
 
-  loadMoreReplays = function (a) {
+  loadMoreReplays = function () {
     const toSend = {
       header: 'next10 filtered',
       replaysType: replaysType,
@@ -518,10 +514,11 @@ function Home() {
   }
 
 
+  // Tylko raz, przy wejściu na stronę.
   useEffect(() => {
     getIP();
     checkParams();
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <>

@@ -354,7 +354,7 @@ function Changelog() {
 
   useEffect(() => {
     dispatch(setVersion(changelog[0].version))
-  }, [])
+  }, [dispatch])
 
   return (
     <div id="changelist" style={{ fontFamily: 'roboto', fontSize: '110%', overflowY: 'scroll' }}>
