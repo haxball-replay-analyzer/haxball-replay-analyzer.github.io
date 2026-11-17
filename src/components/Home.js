@@ -7,7 +7,7 @@ import { setMainMode, setUserUploaded } from "../slices/mainModeSlice";
 import { setDivStyle, setStats, setPlayerList, setPlayerPos, clearStats, setConnectHalves, setRedTeamName, setBlueTeamName, setConnectedHalves } from "../slices/gameStatsSlice";
 import GameStats from "./game stats/GameStats";
 import useWebSocket, { ReadyState } from 'react-use-websocket';
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import ReplaysList from "./replays/ReplaysList";
 import { setReplays, setReplaysLoaded, setReplaysType, setLoadingMore, addMoreReplays } from "../slices/replaysSlice";
 import { openModal } from "./Modal";
@@ -24,27 +24,71 @@ var replayData = [];
 var waitingForStats = true;
 var waitingForSocket = true;
 var replayIdToSend;
+var replaySource = null; // 'file', 'server' albo 'thehax': skąd jest wczytywana powtórka
+
+// Adres serwera powtórek (TD-012). VITE_HBRA_SOCKET_URL: adres ws:// albo wss://, albo `off` (bez serwera).
+// Bez zmiennej: build strony łączy się z produkcją, a `npm start` (tryb deweloperski) pracuje bez serwera,
+// żeby próbne powtórki nie trafiały do publicznej bazy.
+const PRODUCTION_SOCKET_URL = 'wss://haxball-replay-analyzer.com:443/';
+
+function configuredSocketUrl() {
+  const fromEnv = (import.meta.env.VITE_HBRA_SOCKET_URL || '').trim();
+  const url = fromEnv !== '' ? fromEnv : (import.meta.env.DEV ? 'off' : PRODUCTION_SOCKET_URL);
+  return url === 'off' ? null : url;
+}
+
+const SOCKET_URL = configuredSocketUrl();
+const RECONNECT_ATTEMPTS = 5;
+
+// Parametr powtórki w adresie strony (TD-013): `?replayId=<liczba>` to powtórka z serwera HBRA,
+// `?thehax=<UUID>` to plik z replay.thehax.pl. Do serwera HBRA idzie tylko poprawne id liczbowe.
+const THEHAX_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const SERVER_REPLAY_ID = /^[1-9][0-9]{0,14}$/;
+
+function readReplayParam() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.has('replayId')) {
+    const id = params.get('replayId').trim();
+    return SERVER_REPLAY_ID.test(id) ? { kind: 'server', id: Number(id) } : { kind: 'invalid' };
+  }
+  if (params.has('thehax')) {
+    const uuid = params.get('thehax').trim();
+    return THEHAX_UUID.test(uuid) ? { kind: 'thehax', uuid: uuid } : { kind: 'invalid' };
+  }
+  return null;
+}
+
+function isHbr2(buffer) {
+  const head = new Uint8Array(buffer, 0, Math.min(4, buffer.byteLength));
+  return String.fromCharCode(...head) === 'HBR2';
+}
 
 function Home() {
 
-  const socketUrl = 'wss://haxball-replay-analyzer.com:443/';
-  // const socketUrl = 'ws://haxball-replay-analyzer.com:8080/';
-  // const socketUrl = 'ws://localhost:8080/';
+  // Ponowne łączenie tylko po zerwaniu połączenia, które już działało: gdy serwer jest wyłączony,
+  // strona nie ponawia prób przy każdym wejściu.
+  const wasOpenRef = useRef(false);
+  // Powtórka z `?replayId=` czekająca na otwarcie połączenia.
+  const pendingServerReplayRef = useRef(null);
   const STATIC_OPTIONS = {
     onOpen: () => {
       // console.log('Connected with WebSocket')
+      wasOpenRef.current = true;
       getWebSocket().onmessage = ev => receiveMessage(ev);
-      if (!paramsChecked) {
-        checkParams();
-        setParamsChecked(true)
+      if (pendingServerReplayRef.current !== null) {
+        const id = pendingServerReplayRef.current;
+        pendingServerReplayRef.current = null;
+        requestServerReplay(id);
       }
     },
     onClose: (e) => {
       console.log('Connection closed', e.reason);
     },
-    shouldReconnect: (closeEvent) => false
+    shouldReconnect: () => wasOpenRef.current,
+    reconnectAttempts: RECONNECT_ATTEMPTS,
+    reconnectInterval: (attempt) => Math.min(1000 * 2 ** attempt, 16000)
   }
-  const { sendMessage, readyState, getWebSocket } = useWebSocket(socketUrl, STATIC_OPTIONS);
+  const { sendMessage, readyState, getWebSocket } = useWebSocket(SOCKET_URL, STATIC_OPTIONS);
   const connectionStatus = {
     [ReadyState.CONNECTING]: 'Connecting',
     [ReadyState.OPEN]: 'Open',
@@ -60,7 +104,6 @@ function Home() {
   const [replayId, setReplayId] = useState(null);
   const [replayName, setReplayName] = useState(null);
   const [replayLastModified, setLastModified] = useState(null);
-  const [paramsChecked, setParamsChecked] = useState(false);
   const [IP, setIP] = useState(null);
   const [analysisProgress, setAnalysisProgress] = useState(null); // 0..1, analiza w Web Workerze
   const filterPlayer = useSelector(state => state.replays.filters.player)
@@ -93,6 +136,7 @@ function Home() {
     } else if (x.header === 'replayPart') {
       replayData = replayData.concat(x.rec.data);
     } else if (x.header === 'replaySent') {
+      replaySource = 'server';
       if (x?.connectHalves) dispatch(setConnectHalves(true))
       else dispatch(setConnectHalves(false))
 
@@ -172,64 +216,102 @@ function Home() {
     }
   }
 
+  // Wołane raz przy wejściu na stronę i z listy powtórek (ReplayInfo ustawia `?replayId=`).
   function checkParams() {
-    const windowUrl = window.location.toLocaleString();
-    var params = windowUrl.split('?replayId=');
-    if (params.length === 1) params = windowUrl.split('?thehax=');
-    if (params.length > 1) {
-      const toSend = {
-        header: 'select',
-        id: params[1]
-      }
-      sendMessage(JSON.stringify(toSend))
-      // Sprawdzanie czy params[1] jest prawidłowym UUIDem
-      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-      if (!uuidRegex.test(params[1])) {
-        openModal('Invalid replay ID format', 'darkgoldenrod', 4);
-        return;
-      }
-      $(function () {
-
-        $('.roomlist-view').animate({
-          left: '-150%',
-        }, { duration: 700, easing: 'swing', queue: false });
-
-        $('#downloading-screen').animate({
-          left: '35vw',
-        }, { duration: 700, easing: 'swing', queue: false });
-
-      })
-
-      fetch(`https://replay.thehax.pl/${params[1]}/download`)
-        .then(response => {
-          if (!response.ok) {
-            openModal('Replay not found', 'darkred', 4);
-          }
-          if (response.headers.get('content-length') === '0' || response.headers.get('content-length') === null) {
-            openModal('Replay is empty', 'darkred', 4);
-          }
-          return response.arrayBuffer()
-        })
-        .then(data => {
-          dispatch(setConnectHalves(false))
-          const buffer = data; // dane są już w formacie ArrayBuffer
-          dispatch(setUserUploaded(false));
-          replayData = [];
-
-          $(function () {
-            $('#downloading-screen').animate({
-              left: '-150%',
-            }, { duration: 700, easing: 'swing', queue: false, complete: function () { $("#downloading-screen").css('left', '100%') } });
-
-            $('#loading-screen').animate({
-              left: '35vw',
-            }, { duration: 700, easing: 'swing', queue: false, complete: function () { replayFromSite(buffer); } });
-          })
-        })
-        .catch(err => {
-          console.error('Błąd podczas pobierania danych:', err);
-        });
+    const param = readReplayParam();
+    if (param === null) return;
+    if (param.kind === 'invalid') {
+      openModal('Invalid replay ID format', 'darkgoldenrod', 4);
+    } else if (param.kind === 'thehax') {
+      loadFromTheHax(param.uuid);
+    } else if (SOCKET_URL === null) {
+      openModal('Replay server is turned off in this build.', 'darkgoldenrod', 4);
+    } else {
+      const ws = getWebSocket();
+      if (ws && ws.readyState === WebSocket.OPEN) requestServerReplay(param.id);
+      else pendingServerReplayRef.current = param.id; // wyśle onOpen
     }
+  }
+
+  function showDownloadingScreen() {
+    $(function () {
+
+      $('.roomlist-view').animate({
+        left: '-150%',
+      }, { duration: 700, easing: 'swing', queue: false });
+
+      $('#downloading-screen').animate({
+        left: '35vw',
+      }, { duration: 700, easing: 'swing', queue: false });
+
+    })
+  }
+
+  function hideDownloadingScreen() {
+    $(function () {
+      $('#downloading-screen').animate({
+        left: '-150%',
+      }, { duration: 700, easing: 'swing', queue: false, complete: function () { $("#downloading-screen").css('left', '100%') } });
+
+      $('.roomlist-view').animate({
+        left: 0,
+      }, { duration: 700, easing: 'swing', queue: false });
+    })
+  }
+
+  function requestServerReplay(id) {
+    sendMessage(JSON.stringify({ header: 'select', id: id }))
+    showDownloadingScreen();
+  }
+
+  function loadFromTheHax(uuid) {
+    showDownloadingScreen();
+
+    fetch(`https://replay.thehax.pl/${uuid}/download`)
+      .then(response => {
+        if (!response.ok) {
+          openModal('Replay not found', 'darkred', 4);
+          return null;
+        }
+        if (response.headers.get('content-length') === '0') {
+          openModal('Replay is empty', 'darkred', 4);
+          return null;
+        }
+        return response.arrayBuffer()
+      })
+      .then(data => {
+        if (data === null || data.byteLength === 0) {
+          if (data !== null) openModal('Replay is empty', 'darkred', 4);
+          hideDownloadingScreen();
+          return;
+        }
+        // Dla nieistniejącej powtórki thehax.pl odpowiada stroną HTML ze statusem 200; plik .hbr2 zaczyna się od „HBR2”.
+        if (!isHbr2(data)) {
+          openModal('Replay not found', 'darkred', 4);
+          hideDownloadingScreen();
+          return;
+        }
+        replaySource = 'thehax';
+        dispatch(setConnectHalves(false))
+        const buffer = data; // dane są już w formacie ArrayBuffer
+        dispatch(setUserUploaded(false));
+        replayData = [];
+
+        $(function () {
+          $('#downloading-screen').animate({
+            left: '-150%',
+          }, { duration: 700, easing: 'swing', queue: false, complete: function () { $("#downloading-screen").css('left', '100%') } });
+
+          $('#loading-screen').animate({
+            left: '35vw',
+          }, { duration: 700, easing: 'swing', queue: false, complete: function () { replayFromSite(buffer); } });
+        })
+      })
+      .catch(err => {
+        console.error('Błąd podczas pobierania danych:', err);
+        openModal('Error: Can\'t download the replay. Try again later.', 'darkred', 4);
+        hideDownloadingScreen();
+      });
   }
 
   function showReplays(ev) {
@@ -271,7 +353,8 @@ function Home() {
 
   function setGameStatsExp(stats) {
     dispatch(setStats(stats));
-    if (1 === 1) { // na potrzeby thehaxa, może się potem zmieni
+    // Nazwy drużyn: powtórka z serwera HBRA ma swoje (komunikat `replaySent`), plik z dysku i z thehax.pl nie.
+    if (replaySource !== 'server') {
       for (var i = 0; i < stats.length; i++) {
         dispatch(setRedTeamName({ mtc: i, name: 'RED' }))
         dispatch(setBlueTeamName({ mtc: i, name: 'BLUE' }))
@@ -412,6 +495,7 @@ function Home() {
 
   function handleChange(e) {
 
+    replaySource = 'file';
     dispatch(setUserUploaded(true));
     dispatch(setConnectHalves(false))
     dispatch(setConnectedHalves(false))
