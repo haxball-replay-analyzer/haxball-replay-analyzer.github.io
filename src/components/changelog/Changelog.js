@@ -5,6 +5,14 @@ import { useEffect } from 'react';
 
 const changelog = [
   {
+    version: '3.3.6',
+    date: '17.11.2026',
+    changes: [
+      'Replay links from thehax.pl: a missing replay now shows "Replay not found" and returns to the main page instead of getting stuck',
+      'Removed the old Google Analytics script (it stopped collecting data in 2023)'
+    ]
+  },
+  {
     version: '3.3.5',
     date: '12.11.2026',
     changes: [
