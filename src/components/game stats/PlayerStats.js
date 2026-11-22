@@ -14,7 +14,7 @@ function PlayerStats() {
     var pr = match[mtc].player[i], prGoals = 0, prAssists = 0, prKicks = 0, prPasses = 0, prShots = 0, prBumps = 0, prTouches = 0;
     for (let j = 0; j < match[mtc].goals.length; j++) {
       if (match[mtc].goals[j].scorer === pr.nick) prGoals++;
-      else if (match[mtc].goals[j].assist.player === pr.nick) prAssists++;
+      else if (match[mtc].goals[j].assist?.player === pr.nick) prAssists++;
     }
     for (let j = 0; j < match[mtc].kicks.length; j++) if (match[mtc].kicks[j].player === pr.nick) prKicks++;
     for (let j = 0; j < match[mtc].passes.length; j++) if (match[mtc].passes[j].player === pr.nick) prPasses++;

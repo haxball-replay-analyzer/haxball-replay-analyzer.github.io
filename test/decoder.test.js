@@ -89,7 +89,7 @@ function invariantErrors(r) {
     m.goals.forEach((g, j) => {
       if (g.scorer === null || g.scorer.endsWith(' (own goal)')) return;
       if (!team[g.for].includes(g.scorer)) errors.push(`${at}, gol ${j + 1}: strzelec spoza drużyny ${g.for}`);
-      if (g.assist && !m.spaceMode && !team[g.for].includes(g.assist.player)) errors.push(`${at}, gol ${j + 1}: asystent spoza drużyny ${g.for}`);
+      if (g.assist && !team[g.for].includes(g.assist.player)) errors.push(`${at}, gol ${j + 1}: asystent spoza drużyny ${g.for}`);
     });
     if (m.passesRed + m.passesBlue !== m.passes.length) errors.push(`${at}: passesRed + passesBlue != passes.length`);
     if (m.passes.length > m.kicks.length) errors.push(`${at}: więcej podań niż kopnięć`);
@@ -340,6 +340,52 @@ describe('statystyki na atrapie pokoju', () => {
     assert.deepEqual(m1.goals.map((g) => [g.scorer, g.assist]), [['a', false], ['b', false]]);
     assert.equal(m1.passes.length, 0);
     assert.equal(m2.passes.length, 0);
+  });
+
+  it('TD-050: tryb „space” zapisuje asystę jako { player }, jak w trybie klasycznym', async () => {
+    const { createFootballStats } = await loadCore();
+    const stats = createFootballStats();
+    const a = { V: 1, w: 'a', ea: red, H: { a: { x: 0, y: 0 } } };
+    const b = { V: 2, w: 'b', ea: red, H: { a: { x: 100, y: 0 } } };
+    const c = { V: 3, w: 'c', ea: blue, H: { a: { x: 200, y: 0 } } };
+    const room = fakeRoom([a, b, c]);
+    const stadium = {
+      w: 'Space Test', qc: 300, $b: 500, Ye: 0, Ge: 0, kc: 100, pf: false,
+      ld: 0, Td: 400, Sd: 200, kd: 50, Uc: 0, jd: 0, Fe: 0, Lf: false,
+      Dd: [], md: [],
+      ge: { m: 1.5, aa: 0.5, Ca: 0.96, Ce: 0.1, Te: 0.07, Ue: 0.96, Re: 5, v: 63, oa: { x: 0, y: 0 }, Z: 15, Se: 0 },
+      U: [], J: [], qa: [], pb: [],
+      tc: [
+        { W: { x: -400, y: -80 }, ca: { x: -400, y: 80 }, qe: red },
+        { W: { x: 400, y: -80 }, ca: { x: 400, y: 80 }, qe: blue }
+      ],
+      F: [{ a: { x: 0, y: 0 }, D: { x: 0, y: 0 }, oa: { x: 0, y: 0 }, Z: 10, m: 0.5, aa: 1, Ca: 0.99, R: 0xffffff, h: 63, v: 1 }]
+    };
+    const ball = { a: { x: 0, y: 0 } };
+    const game = { Ma: room, S: stadium };
+    stats.attach(room);
+    stats.beforeTick(game);
+    // a dotyka piłki, potem b (ta sama drużyna) i pada gol dla Red
+    stats.onPlayingTick(game, [ball], room.I);
+    ball.a = { x: 100, y: 0 };
+    stats.onPlayingTick(game, [ball], room.I);
+    room.Ni(red);
+    // wznowienie: rywal c dotyka piłki, potem b i pada gol dla Red (bez asysty)
+    room.lq();
+    ball.a = { x: 200, y: 0 };
+    stats.onPlayingTick(game, [ball], room.I);
+    ball.a = { x: 100, y: 0 };
+    stats.onPlayingTick(game, [ball], room.I);
+    room.Ni(red);
+    stats.detach();
+    const [m] = stats.match;
+    assert.equal(m.spaceMode, true);
+    assert.deepEqual(m.goals.map((g) => [g.scorer, g.assist]), [
+      ['b', { player: 'a' }],
+      ['b', false]
+    ]);
+    assert.equal(m.player.find((p) => p.nick === 'a').assists, 1);
+    assert.deepEqual(invariantErrors({ playerList: stats.playerList, matches: stats.match }), []);
   });
 });
 

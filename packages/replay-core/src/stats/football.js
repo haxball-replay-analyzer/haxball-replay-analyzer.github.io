@@ -463,7 +463,9 @@ function createFootballStats() {
           });
           match[match.length - 1].player[playerList.indexOf(toucher.name)].goals++;
           if (lastToucher.name != undefined && a.w == lastToucher.team) {
-            match[match.length - 1].goals[match[match.length - 1].goals.length - 1].assist = lastToucher.name;
+            match[match.length - 1].goals[match[match.length - 1].goals.length - 1].assist = {
+              player: lastToucher.name
+            };
             match[match.length - 1].player[playerList.indexOf(lastToucher.name)].assists++;
           } else {
             match[match.length - 1].goals[match[match.length - 1].goals.length - 1].assist = false;

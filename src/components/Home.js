@@ -26,14 +26,12 @@ var waitingForSocket = true;
 var replayIdToSend;
 var replaySource = null; // 'file', 'server' albo 'thehax': skąd jest wczytywana powtórka
 
-// Adres serwera powtórek (TD-012). VITE_HBRA_SOCKET_URL: adres ws:// albo wss://, albo `off` (bez serwera).
-// Bez zmiennej: build strony łączy się z produkcją, a `npm start` (tryb deweloperski) pracuje bez serwera,
-// żeby próbne powtórki nie trafiały do publicznej bazy.
-const PRODUCTION_SOCKET_URL = 'wss://haxball-replay-analyzer.com:443/';
-
+// Adres serwera powtórek (TD-012, TD-021). VITE_HBRA_SOCKET_URL: adres ws:// albo wss://, albo `off` (bez serwera).
+// Domyślnie `off` także w buildzie (serwer jest wyłączony, decyzja 2); dawny adres produkcyjny:
+// wss://haxball-replay-analyzer.com:443/
 function configuredSocketUrl() {
   const fromEnv = (import.meta.env.VITE_HBRA_SOCKET_URL || '').trim();
-  const url = fromEnv !== '' ? fromEnv : (import.meta.env.DEV ? 'off' : PRODUCTION_SOCKET_URL);
+  const url = fromEnv !== '' ? fromEnv : 'off';
   return url === 'off' ? null : url;
 }
 
@@ -104,7 +102,6 @@ function Home() {
   const [replayId, setReplayId] = useState(null);
   const [replayName, setReplayName] = useState(null);
   const [replayLastModified, setLastModified] = useState(null);
-  const [IP, setIP] = useState(null);
   const [analysisProgress, setAnalysisProgress] = useState(null); // 0..1, analiza w Web Workerze
   const filterPlayer = useSelector(state => state.replays.filters.player)
   const filterTeam = useSelector(state => state.replays.filters.team)
@@ -225,7 +222,7 @@ function Home() {
     } else if (param.kind === 'thehax') {
       loadFromTheHax(param.uuid);
     } else if (SOCKET_URL === null) {
-      openModal('Replay server is turned off in this build.', 'darkgoldenrod', 4);
+      openModal('Replay server is temporarily offline.', 'darkgoldenrod', 4);
     } else {
       const ws = getWebSocket();
       if (ws && ws.readyState === WebSocket.OPEN) requestServerReplay(param.id);
@@ -316,7 +313,9 @@ function Home() {
 
   function showReplays(ev) {
     // console.log('showreplays');
-    if (connectionStatus === 'Open') {
+    if (SOCKET_URL === null) {
+      openModal('Replay server is temporarily offline.', 'darkgoldenrod', 4);
+    } else if (connectionStatus === 'Open') {
       const type = ev.target.textContent === 'Most viewed replays' ? 'mostViewed' : 'latest';
 
       dispatch(setReplaysType(type))
@@ -332,12 +331,6 @@ function Home() {
     } else {
       openModal('Error: Can\'t connect to server. Try again later.', 'darkred', 4)
     }
-  }
-
-  async function getIP() {
-    const response = await fetch('https://ipapi.co/json/')
-    const data = await response.json();
-    setIP(data.ip)
   }
 
   function showStatsExp(elStyle) {
@@ -379,7 +372,7 @@ function Home() {
         replayId: replayIdToSend,
         replayName: replayName,
         lastModified: replayLastModified,
-        IP: IP
+        IP: null // TD-008: usunięto ipapi.co; serwer zna IP z połączenia WebSocket
       }
       queryMessage = toSend;
       waitingForStats = false;
@@ -402,6 +395,7 @@ function Home() {
   }
 
   changeTeamNames = function (names, matchId) {
+    if (SOCKET_URL === null) return;
     const toSend = {
       header: 'changeTeamNames',
       names: names,
@@ -412,6 +406,7 @@ function Home() {
   }
 
   loadMoreReplays = function () {
+    if (SOCKET_URL === null) return;
     const toSend = {
       header: 'next10 filtered',
       replaysType: replaysType,
@@ -432,10 +427,12 @@ function Home() {
   }
 
   sendMessageExp = function (m) {
+    if (SOCKET_URL === null) return;
     sendMessage(JSON.stringify(m))
   }
 
   function uploadReplay(m, n, o) {
+    if (SOCKET_URL === null) return;
     setReplayName(n);
     if (m.byteLength > 50_000) {
       var replayParts = [];
@@ -470,7 +467,7 @@ function Home() {
   }
 
   // Przy każdym renderze, tak jak dawniej nadpisywane eksporty: funkcje widzą bieżące
-  // userDidUpload, IP, replayName (stan z tego renderu).
+  // userDidUpload, replayName (stan z tego renderu).
   configureReplayer({
     onShowStats: showStatsExp,
     onStats: setGameStatsExp,
@@ -516,7 +513,6 @@ function Home() {
 
   // Tylko raz, przy wejściu na stronę.
   useEffect(() => {
-    getIP();
     checkParams();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 

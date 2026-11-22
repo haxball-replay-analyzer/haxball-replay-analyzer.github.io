@@ -6,8 +6,11 @@ import { useEffect } from 'react';
 const changelog = [
   {
     version: '3.3.6',
-    date: '17.11.2026',
+    date: '22.11.2026',
     changes: [
+      'Fixed assists in Space Mode: they now show next to the scorer in the goals list and are counted in the players table',
+      'Stopped connecting to the offline replay server by default until it is back online (replay lists and ?replayId= links now immediately show that the server is temporarily offline)',
+      'Removed the external ipapi.co IP lookup on page load',
       'Replay links from thehax.pl: a missing replay now shows "Replay not found" and returns to the main page instead of getting stuck',
       'Removed the old Google Analytics script (it stopped collecting data in 2023)'
     ]
