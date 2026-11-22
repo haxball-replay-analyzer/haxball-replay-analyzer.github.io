@@ -146,69 +146,148 @@
   }
 }
 
-@media (max-height: 700px) {
-  .chatbox-view {
-    height: 130px
-  }
+body.chat-dragging {
+  cursor: ns-resize !important;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .chatbox-view {
   display: flex;
   flex-direction: column;
-  width: 800px;
-  min-width: 300px;
-  padding: 5px;
+  width: min(800px, 100%);
+  max-width: 100%;
+  min-width: 0;
+  max-height: calc(100vh - 150px);
+  box-sizing: border-box;
   position: relative;
-  height: 130px;
 
-  &>:not(:first-child) {
-    margin-top: 5px
+  &.chat-hidden {
+    height: 0 !important;
+    padding: 0;
+    overflow: hidden;
+    pointer-events: none;
   }
 
-  &>.log {
+  &.dragging {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  &>.chatbox-view-contents {
     position: relative;
-    flex-grow: 1;
-    overflow-y: scroll;
-    line-height: 1.3;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px 8px 5px 8px;
 
-    p {
-      overflow: hidden;
+    &>.drag {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 8px;
+      cursor: ns-resize;
+      z-index: 3;
 
-      &:not(:last-child) {
-        margin-bottom: 3px
+      &::after {
+        content: '';
+        position: absolute;
+        top: 2px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 48px;
+        height: 3px;
+        border-radius: 2px;
+        background-color: rgba(255, 255, 255, 0.18);
+        transition: background-color 0.15s;
       }
 
-      &.notice {
-        color: #8ed2ab
+      &:hover::after {
+        background-color: rgba(255, 255, 255, 0.55);
+      }
+    }
+
+    &>.log {
+      position: relative;
+      flex-grow: 1;
+      min-height: 0;
+      overflow-y: auto;
+      line-height: 1.3;
+
+      &.subtle-thin-scrollbar {
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255, 255, 255, 0.28) transparent;
+
+        &::-webkit-scrollbar {
+          width: 6px;
+        }
+
+        &::-webkit-scrollbar-track {
+          background: transparent;
+        }
+
+        &::-webkit-scrollbar-thumb {
+          background-color: rgba(255, 255, 255, 0.28);
+          border-radius: 3px;
+        }
+
+        &::-webkit-scrollbar-thumb:hover {
+          background-color: rgba(255, 255, 255, 0.45);
+        }
       }
 
-      &.highlight {
-        font-weight: bold
-      }
+      p {
+        overflow: hidden;
+        word-wrap: break-word;
 
-      &.announcement {
-        border-left: 3px solid #c13535;
-        padding-left: 5px;
-        min-height: 12px;
-        white-space: pre-wrap
+        &:not(:last-child) {
+          margin-bottom: 3px
+        }
+
+        &.notice {
+          color: #8ed2ab
+        }
+
+        &.highlight {
+          font-weight: bold
+        }
+
+        &.announcement {
+          border-left: 3px solid #c13535;
+          padding-left: 5px;
+          min-height: 12px;
+          white-space: pre-wrap
+        }
       }
+    }
+
+    &>.input {
+      display: none
     }
   }
 
-  &>.input {
-    display: none
+  &.dragging>.chatbox-view-contents>.drag::after {
+    background-color: rgba(255, 255, 255, 0.7);
   }
 }
 
 .game-view {
   position: absolute;
   top: 35px;
+  z-index: 0;
   width: 100vw;
   height: calc(100vh - 35px);
+  box-sizing: border-box;
+  padding-bottom: 40px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   align-items: stretch;
+  --chat-opacity: 0.8;
 
   &>.top-section {
     position: relative;
@@ -224,31 +303,190 @@
     background-color: #1A2125;
     position: relative;
     left: 100%;
-    padding-bottom: 40px;
+    width: 100%;
+    box-sizing: border-box;
 
-    &>.buttons {
-      padding: 6px;
-      white-space: nowrap;
+    .stats-view {
       margin-right: auto;
-      display: flex;
-      flex-direction: column;
-
-      &>:not(:last-child) {
-        margin-bottom: 6px
-      }
+      display: none;
     }
+  }
+
+  &>.buttons {
+    position: absolute;
+    z-index: 3;
+    white-space: nowrap;
+    display: flex;
+    gap: 6px;
+    opacity: 0;
+    pointer-events: none;
 
     button {
       @include haxball-button;
+      cursor: pointer;
+
+      &.chat-is-hidden {
+        opacity: 0.75;
+      }
+    }
+  }
+
+  &.modern-ui {
+    &>.buttons {
+      top: 5px;
+      right: 8px;
+      flex-direction: row;
+      align-items: center;
+
+      button[data-hook="settings"],
+      button[data-hook="togglechat"] {
+        padding: 5px 9px;
+
+        .btn-label {
+          display: none;
+        }
+      }
+
+      .tooltip {
+        bottom: auto;
+        top: 125%;
+        left: auto;
+        right: 0;
+      }
     }
 
-    .stats-view {
-      margin-right: auto
+    &.chat-overlay {
+      &>.bottom-section {
+        position: absolute;
+        bottom: 40px;
+        width: 100%;
+        z-index: 2;
+        background-color: transparent;
+        pointer-events: none;
+      }
+
+      .chatbox-view {
+        pointer-events: none;
+      }
+
+      .chatbox-view>.chatbox-view-contents {
+        background-color: rgba(26, 33, 37, var(--chat-opacity));
+        border-radius: 5px 5px 0 0;
+        pointer-events: none;
+      }
+
+      .chatbox-view .drag,
+      .chatbox-view .log {
+        pointer-events: auto;
+      }
+
+      &.chat-bg-full>.bottom-section {
+        background-color: rgba(26, 33, 37, var(--chat-opacity));
+      }
+
+      &.chat-bg-full .chatbox-view>.chatbox-view-contents {
+        background-color: transparent;
+        border-radius: 0;
+      }
+    }
+
+    &.chat-hidden>.bottom-section {
+      height: 0;
+      overflow: hidden;
+      background-color: transparent;
+      pointer-events: none;
+    }
+  }
+
+  &.classic-ui {
+    .chatbox-view>.chatbox-view-contents {
+      padding: 5px;
+
+      &>.drag {
+        display: none;
+      }
+    }
+
+    &>.bottom-section {
+      padding: 0 8px;
+      min-height: 130px;
+
+      &::after {
+        content: '';
+        flex: 0 0 138px;
+      }
+    }
+
+    &>.buttons {
+      bottom: 45px;
+      left: min(calc(50% + 337px), calc(100% - 140px));
+      right: auto;
+      width: 132px;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 4px;
+
+      button {
+        padding: 4px 10px;
+        font-size: 14px;
+        text-align: center;
+      }
+
+      .tooltip {
+        left: auto;
+        right: 0;
+      }
+    }
+
+    &.chat-hidden {
+      &>.bottom-section {
+        height: 0;
+        min-height: 0;
+        padding: 0;
+        overflow: hidden;
+
+        &::after {
+          display: none;
+        }
+      }
+
+      &>.buttons {
+        bottom: auto;
+        left: auto;
+        top: 5px;
+        right: 8px;
+        width: auto;
+        flex-direction: row;
+        align-items: center;
+        gap: 6px;
+
+        button {
+          padding: 5px 12px;
+          font-size: 15px;
+          text-align: center;
+        }
+
+        button[data-hook="settings"],
+        button[data-hook="togglechat"] {
+          padding: 5px 9px;
+
+          .btn-label {
+            display: none;
+          }
+        }
+
+        .tooltip {
+          bottom: auto;
+          top: 125%;
+          left: auto;
+          right: 0;
+        }
+      }
     }
   }
 
   &>[data-hook="popups"] {
-    z-index: 2;
+    z-index: 10;
     position: absolute;
     width: 100%;
     height: 100%;
@@ -257,6 +495,27 @@
     align-items: center;
     background-color: rgba(115, 136, 92, 0.5);
     opacity: 0
+  }
+}
+
+@media (max-width: 1200px) {
+  .game-view.modern-ui>.buttons,
+  .game-view.classic-ui.chat-hidden>.buttons {
+    button {
+      padding: 5px 9px;
+
+      .btn-label {
+        display: none;
+      }
+    }
+  }
+}
+
+@media (max-width: 880px) {
+  .game-view.modern-ui>.buttons,
+  .game-view.classic-ui.chat-hidden>.buttons {
+    top: 42px;
+    right: 6px;
   }
 }
 
@@ -608,9 +867,9 @@
 .settings-view {
   opacity: 0.3;
   visibility: hidden;
-  width: 400px;
+  width: 420px;
   height: 100%;
-  max-height: 400px;
+  max-height: calc(100vh - 60px);
   position: relative;
 
   [data-hook="close"] {
@@ -620,7 +879,10 @@
   }
 
   .tabcontents {
-    overflow-y: auto
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+    padding-right: 4px;
   }
 
   [data-hook="presskey"] {
@@ -699,6 +961,30 @@
       background-color: #2f5e85
     }
 
+    .option-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      line-height: 25px;
+
+      .option-label {
+        flex: 0 0 115px;
+      }
+
+      .option-value {
+        width: 38px;
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .slider {
+        flex: 1;
+        min-width: 80px;
+        accent-color: #2f5e85;
+        cursor: pointer;
+      }
+    }
+
     .loc {
       line-height: 25px
     }
@@ -767,6 +1053,7 @@
   user-select: none;
   position: absolute;
   bottom: 0;
+  z-index: 4;
   height: 40px;
   width: 100%;
   left: 100%;

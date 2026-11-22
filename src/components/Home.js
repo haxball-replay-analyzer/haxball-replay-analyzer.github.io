@@ -68,6 +68,8 @@ function Home() {
   const wasOpenRef = useRef(false);
   // Powtórka z `?replayId=` czekająca na otwarcie połączenia.
   const pendingServerReplayRef = useRef(null);
+  // Id ostatnio żądanej powtórki z serwera HBRA (do odczytu daty z listy w Reduxie).
+  const activeServerReplayIdRef = useRef(null);
   const STATIC_OPTIONS = {
     onOpen: () => {
       // console.log('Connected with WebSocket')
@@ -151,6 +153,12 @@ function Home() {
         uint8View[i] = y[i]; // zapisywanie danych z tablicy do bufora ArrayBuffer
       }
       const newBuffer = uint8View.buffer; // konwersja widoku Uint8Array na ArrayBuffer
+      const listEntry = replays.replays?.find(r => r.ReplayId === activeServerReplayIdRef.current);
+      const serverMeta = {
+        name: x.replayName || listEntry?.ReplayName || null,
+        serverLastModified: x.lastModified || null,
+        serverSentDate: x.sentDate || listEntry?.SentDate || null
+      };
       dispatch(setUserUploaded(false));
       replayData = [];
 
@@ -162,7 +170,7 @@ function Home() {
 
         $('#loading-screen').animate({
           left: '35vw',
-        }, { duration: 700, easing: 'swing', queue: false, complete: function () { replayFromSite(newBuffer); } });
+        }, { duration: 700, easing: 'swing', queue: false, complete: function () { replayFromSite(newBuffer, serverMeta); } });
 
       })
     } else if (x.header === 'alreadyUploaded') {
@@ -257,12 +265,14 @@ function Home() {
   }
 
   function requestServerReplay(id) {
+    activeServerReplayIdRef.current = id;
     sendMessage(JSON.stringify({ header: 'select', id: id }))
     showDownloadingScreen();
   }
 
   function loadFromTheHax(uuid) {
     showDownloadingScreen();
+    let httpMeta = null;
 
     fetch(`https://replay.thehax.pl/${uuid}/download`)
       .then(response => {
@@ -274,6 +284,10 @@ function Home() {
           openModal('Replay is empty', 'darkred', 4);
           return null;
         }
+        httpMeta = {
+          httpLastModified: response.headers.get('last-modified'),
+          httpContentDisposition: response.headers.get('content-disposition')
+        };
         return response.arrayBuffer()
       })
       .then(data => {
@@ -301,7 +315,7 @@ function Home() {
 
           $('#loading-screen').animate({
             left: '35vw',
-          }, { duration: 700, easing: 'swing', queue: false, complete: function () { replayFromSite(buffer); } });
+          }, { duration: 700, easing: 'swing', queue: false, complete: function () { replayFromSite(buffer, httpMeta); } });
         })
       })
       .catch(err => {
@@ -334,9 +348,14 @@ function Home() {
   }
 
   function showStatsExp(elStyle) {
-    const { offsetLeft, offsetTop, clientWidth, clientHeight } = elStyle;
-    const offsetParentTop = elStyle.offsetParent.offsetTop;
-    dispatch(setDivStyle({ offsetLeft, offsetTop, offsetParentTop, clientWidth, clientHeight }));
+    const rect = elStyle.getBoundingClientRect();
+    dispatch(setDivStyle({
+      offsetLeft: rect.left,
+      offsetTop: rect.top,
+      offsetParentTop: 0,
+      clientWidth: rect.width,
+      clientHeight: rect.height
+    }));
     dispatch(setMainMode('stats'));
   }
 

@@ -44,6 +44,133 @@ export function configureReplayer(hooks) {
   Object.assign(replayerHooks, hooks);
 }
 
+// Data wprowadzenia nowego UI w kliencie HaxBall ("UI Update", 2023-04-24).
+// Powtórki sprzed tej daty otwierają się domyślnie w stylu klasycznym, nowsze (i bez daty) w nowoczesnym.
+var REPLAY_MODERN_UI_CUTOFF = Date.UTC(2023, 3, 24);
+var currentReplayMeta = null;
+var currentReplayAutoStyle = 'modern';
+var currentReplayTimestamp = null;
+var activeChatDragCleanup = null;
+
+function clampChatHeight(a) {
+  return a != a ? 160 : 66 > a ? 66 : 400 < a ? 400 : a;
+}
+
+function buildValidatedUtcDate(y, m, d) {
+  if (1 > m || 12 < m || 1 > d || 31 < d) return null;
+  var ts = Date.UTC(y, m - 1, d);
+  var check = new Date(ts);
+  if (check.getUTCFullYear() !== y || check.getUTCMonth() !== m - 1 || check.getUTCDate() !== d) return null;
+  return ts;
+}
+
+function parseReplayDateFromName(name) {
+  if ('string' !== typeof name || '' === name) return null;
+  // YYYY-MM-DD / YYYY.MM.DD / YYYY_MM_DD (także jednocyfrowy miesiąc/dzień)
+  var ymd = /(?:^|[^\d])((?:19|20)\d{2})[-._](\d{1,2})[-._](\d{1,2})(?:[^\d]|$)/.exec(name);
+  if (ymd) {
+    var tsYmd = buildValidatedUtcDate(Number(ymd[1]), Number(ymd[2]), Number(ymd[3]));
+    if (null != tsYmd) return tsYmd;
+  }
+  // DD.MM.YYYY / DD-MM-YYYY / DD_MM_YYYY
+  var dmy = /(?:^|[^\d])(\d{1,2})[-._](\d{1,2})[-._]((?:19|20)\d{2})(?:[^\d]|$)/.exec(name);
+  if (dmy) {
+    var tsDmy = buildValidatedUtcDate(Number(dmy[3]), Number(dmy[2]), Number(dmy[1]));
+    if (null != tsDmy) return tsDmy;
+  }
+  return null;
+}
+
+function formatUtcDateShort(ts) {
+  if (null == ts || !isFinite(ts)) return null;
+  var d = new Date(ts);
+  var y = d.getUTCFullYear();
+  var m = d.getUTCMonth() + 1;
+  var day = d.getUTCDate();
+  return y + '-' + (10 > m ? '0' + m : '' + m) + '-' + (10 > day ? '0' + day : '' + day);
+}
+
+function autoUiStyleOptionLabel() {
+  var styleName = 'classic' === currentReplayAutoStyle ? 'Classic' : 'Modern';
+  var dateStr = formatUtcDateShort(currentReplayTimestamp);
+  return 'Auto (' + styleName + ' · ' + (dateStr ? dateStr : 'no date') + ')';
+}
+
+function extractFilenameFromContentDisposition(header) {
+  if ('string' !== typeof header || '' === header) return null;
+  var star = /filename\*\s*=\s*(?:UTF-8''|utf-8'')([^;\r\n]+)/i.exec(header);
+  if (star) {
+    try {
+      return decodeURIComponent(star[1].trim().replace(/^"(.*)"$/, '$1'));
+    } catch (e) {
+      return star[1].trim();
+    }
+  }
+  var plain = /filename\s*=\s*"?([^";\r\n]+)"?/i.exec(header);
+  return plain ? plain[1].trim() : null;
+}
+
+function parseReplayTimestamp(value) {
+  if (null == value || '' === value) return null;
+  if ('number' === typeof value) return isFinite(value) && 0 < value ? value : null;
+  if (value instanceof Date) {
+    var t = value.getTime();
+    return isFinite(t) && 0 < t ? t : null;
+  }
+  if ('string' === typeof value) {
+    var trimmed = value.trim();
+    if (/^\d+$/.test(trimmed)) {
+      var num = Number(trimmed);
+      return isFinite(num) && 0 < num ? num : null;
+    }
+    var parsed = Date.parse(trimmed);
+    return isFinite(parsed) && 0 < parsed ? parsed : null;
+  }
+  return null;
+}
+
+function resolveReplayTimestamp(meta) {
+  if (null == meta) return null;
+  var fromName = parseReplayDateFromName(meta.name);
+  if (null != fromName) return fromName;
+  var cdName = extractFilenameFromContentDisposition(meta.httpContentDisposition);
+  var fromCd = parseReplayDateFromName(cdName);
+  if (null != fromCd) return fromCd;
+  var fromServerMod = parseReplayTimestamp(meta.serverLastModified);
+  if (null != fromServerMod) return fromServerMod;
+  var fromServerSent = parseReplayTimestamp(meta.serverSentDate);
+  if (null != fromServerSent) return fromServerSent;
+  var fromHttpMod = parseReplayTimestamp(meta.httpLastModified);
+  if (null != fromHttpMod) return fromHttpMod;
+  return parseReplayTimestamp(meta.lastModified);
+}
+
+function setCurrentReplayMeta(meta) {
+  currentReplayMeta = meta || null;
+  var ts = resolveReplayTimestamp(currentReplayMeta);
+  currentReplayTimestamp = ts;
+  currentReplayAutoStyle = (null != ts && ts < REPLAY_MODERN_UI_CUTOFF) ? 'classic' : 'modern';
+}
+
+function isModernUiActive() {
+  var pref = null != n.A && null != n.A.uiStyle ? n.A.uiStyle.L() : 'auto';
+  if ('modern' === pref) return !0;
+  if ('classic' === pref) return !1;
+  return 'modern' === currentReplayAutoStyle;
+}
+
+function registerChatDragCleanup(fn) {
+  activeChatDragCleanup = fn;
+}
+
+function cleanupActiveChatDrag() {
+  if (null != activeChatDragCleanup) {
+    var fn = activeChatDragCleanup;
+    activeChatDragCleanup = null;
+    fn();
+  }
+}
+
 function resetReplay() {
 
 }
@@ -65,12 +192,22 @@ function bringReplayer() {
     left: 0,
   }, { duration: 700, easing: 'swing', queue: false });
 
+  $('.game-view > .buttons').css('pointer-events', 'auto').animate({
+    opacity: 1,
+  }, { duration: 700, easing: 'swing', queue: false });
+
   $('#loading-screen').animate({
     left: '-150%',
   }, { duration: 700, easing: 'swing', queue: false });
 }
 
 function leaveReplayer() {
+  // posprzątaj aktywne przeciąganie czatu (gdy wyjście następuje w trakcie drag) i zresetuj metadane stylu
+  cleanupActiveChatDrag();
+  currentReplayMeta = null;
+  currentReplayTimestamp = null;
+  currentReplayAutoStyle = 'modern';
+  removePopups();
   // bez paska do startu następnej analizy (inaczej ekran wjeżdża z „100%” poprzedniej, TD-041)
   replayerHooks.onProgress(null);
   cancelAnalysis();
@@ -94,6 +231,10 @@ function leaveReplayer() {
     left: '150%',
   }, { duration: 700, easing: 'swing', queue: false });
 
+  $('.game-view > .buttons').css('pointer-events', 'none').animate({
+    opacity: 0,
+  }, { duration: 400, easing: 'swing', queue: false });
+
   $('.replay-controls-view').animate({
     left: '150%',
   }, { duration: 700, easing: 'swing', queue: false, complete: function () { resetReplay() } });
@@ -102,54 +243,63 @@ function leaveReplayer() {
 }
 
 function bringSettings() {
-  $("#popups").click(function (e) {
+  $("#popups").off('click.settingsBackdrop').on('click.settingsBackdrop', function (e) {
     if (e.target.id == 'popups') {
       leaveSettings();
     }
-  })
+  });
 
   const parent = $("#settings_button")[0];
+  const rect = parent ? parent.getBoundingClientRect() : { left: window.innerWidth / 2, top: window.innerHeight / 2, width: 40, height: 30 };
 
   $('.settings-view').css({
     'position': 'fixed',
-    'left': parent.offsetLeft + 'px',
-    'top': parent.offsetTop + parent.offsetParent.offsetTop + 35 + 'px',
-    'width': parent.clientWidth + 'px',
-    'height': parent.clientHeight + 'px'
-  })
+    'left': rect.left + 'px',
+    'top': rect.top + 'px',
+    'width': rect.width + 'px',
+    'height': rect.height + 'px',
+    'maxHeight': 'calc(100vh - 60px)'
+  });
   $('.settings-view').css('visibility', 'visible');
   $('#popups').animate({
     opacity: 1
   }, { duration: 300, easing: 'swing', queue: false });
+
+  var targetW = Math.min(Math.max(Math.round(window.innerWidth * 0.32), 380), Math.min(460, window.innerWidth - 32));
+  var targetH = Math.min(Math.max(Math.round(window.innerHeight * 0.65), 380), Math.min(520, window.innerHeight - 60));
+  var targetL = Math.round((window.innerWidth - targetW) / 2);
+  var targetT = Math.round((window.innerHeight - targetH) / 2);
+
   $('.settings-view').animate({
     visibility: 'visible',
     opacity: 1,
-    width: '25vw',
-    height: '50vh',
-    maxHeight: '400px',
-    top: '25vh',
-    left: '37.5vw'
+    width: targetW + 'px',
+    height: targetH + 'px',
+    top: targetT + 'px',
+    left: targetL + 'px'
   }, { duration: 300, easing: 'swing', queue: false });
 }
 
 function leaveSettings() {
   const parent = $("#settings_button")[0];
+  const rect = parent ? parent.getBoundingClientRect() : { left: window.innerWidth / 2, top: window.innerHeight / 2, width: 40, height: 30 };
 
   $('#popups').animate({
     opacity: 0
   }, { duration: 300, easing: 'swing', queue: false });
 
   $('.settings-view').animate({
-    left: parent.offsetLeft + 'px',
-    top: parent.offsetTop + parent.offsetParent.offsetTop + 35 + 'px',
-    width: parent.clientWidth + 'px',
-    height: parent.clientHeight + 'px',
+    left: rect.left + 'px',
+    top: rect.top + 'px',
+    width: rect.width + 'px',
+    height: rect.height + 'px',
   }, { duration: 300, easing: 'swing', queue: false, complete: function () { removePopups() } });
 }
 
 function removePopups() {
   $('.settings-view').css('visibility', 'hidden');
-  $('#popups').css('display', 'none')
+  $('#popups').css('display', 'none');
+  ja.kq = null;
 }
 
 !function (e, n, t) {
@@ -652,7 +802,7 @@ function aa(a) {
   }
   null == a && (a = !1);
   var k = this;
-  aa.N = '<div class=\'dialog settings-view\'><h1>Settings</h1><button data-hook=\'close\'>Close</button><div class=\'tabs\'><button data-hook=\'soundbtn\'>Sound</button><button id=\'video_button\' data-hook=\'videobtn\'>Video</button><button data-hook=\'inputbtn\'>Input</button><button data-hook=\'miscbtn\'>Misc</button></div><div data-hook=\'presskey\' tabindex=\'-1\'><div>Press a key</div></div><div class=\'tabcontents\'><div class=\'section\' data-hook=\'miscsec\'><div class=\'loc\' data-hook=\'loc\'></div><div class=\'loc\' data-hook=\'loc-ovr\'></div><button data-hook=\'loc-ovr-btn\'></button></div><div class=\'section\' data-hook=\'soundsec\'><div data-hook="tsound-main">Sounds enabled</div><div data-hook="tsound-chat">Chat sound enabled</div><div data-hook="tsound-highlight">Nick highlight sound enabled</div><div data-hook="tsound-crowd">Crowd sound enabled</div></div><div class=\'section\' data-hook=\'inputsec\'></div><div class=\'section\' data-hook=\'videosec\'><div>Viewport Mode:<select data-hook=\'viewmode\'><option>Dynamic</option><option>Restricted 840x410</option><option>Full 1x Zoom</option><option>Full 1.25x Zoom</option><option>Full 1.5x Zoom</option><option>Full 1.75x Zoom</option><option>Full 2x Zoom</option><option>Full 2.25x Zoom</option><option>Full 2.5x Zoom</option></select></div><div>FPS Limit:<select data-hook=\'fps\'><option>None (Recommended)</option><option>30</option></select></div><div>Resolution Scaling:<select data-hook=\'resscale\'><option>100%</option><option>75%</option><option>50%</option><option>25%</option></select></div><div>Player To Follow:<select id="selectPlayerToFollow" data-hook="follow">' + playersToFollowList() + '</select></div><div data-hook="tvideo-teamcol">Custom team colors enabled</div><div data-hook="tvideo-showindicators">Show chat indicators</div><div data-hook="tvideo-showavatars">Show player avatars</div></div></div></div>';
+  aa.N = '<div class=\'dialog settings-view\'><h1>Settings</h1><button data-hook=\'close\'>Close</button><div class=\'tabs\'><button data-hook=\'soundbtn\'>Sound</button><button id=\'video_button\' data-hook=\'videobtn\'>Video</button><button data-hook=\'inputbtn\'>Input</button><button data-hook=\'miscbtn\'>Misc</button></div><div data-hook=\'presskey\' tabindex=\'-1\'><div>Press a key</div></div><div class=\'tabcontents\'><div class=\'section\' data-hook=\'miscsec\'><div class=\'loc\' data-hook=\'loc\'></div><div class=\'loc\' data-hook=\'loc-ovr\'></div><button data-hook=\'loc-ovr-btn\'></button></div><div class=\'section\' data-hook=\'soundsec\'><div data-hook="tsound-main">Sounds enabled</div><div data-hook="tsound-chat">Chat sound enabled</div><div data-hook="tsound-highlight">Nick highlight sound enabled</div><div data-hook="tsound-crowd">Crowd sound enabled</div></div><div class=\'section\' data-hook=\'inputsec\'></div><div class=\'section\' data-hook=\'videosec\'><div>Viewport Mode:<select data-hook=\'viewmode\'><option>Dynamic</option><option>Restricted 840x410</option><option>Full 1x Zoom</option><option>Full 1.25x Zoom</option><option>Full 1.5x Zoom</option><option>Full 1.75x Zoom</option><option>Full 2x Zoom</option><option>Full 2.25x Zoom</option><option>Full 2.5x Zoom</option></select></div><div>Player UI Style:<select data-hook=\'uistyle\'><option>' + autoUiStyleOptionLabel() + '</option><option>Modern</option><option>Classic</option></select></div><div>FPS Limit:<select data-hook=\'fps\'><option>None (Recommended)</option><option>30</option></select></div><div>Resolution Scaling:<select data-hook=\'resscale\'><option>100%</option><option>75%</option><option>50%</option><option>25%</option></select></div><div>Player To Follow:<select id="selectPlayerToFollow" data-hook="follow">' + playersToFollowList() + '</select></div><div data-hook="tvideo-teamcol">Custom team colors enabled</div><div data-hook="tvideo-showindicators">Show chat indicators</div><div data-hook="tvideo-showavatars">Show player avatars</div><div class="option-row"><div class="option-label">Chat opacity</div><div class="option-value" data-hook="chatopacity-value">0.8</div><input class="slider" type="range" min="0.5" max="1" step="0.01" data-hook="chatopacity-range"></div><div>Chat background width:<select data-hook=\'chatbgmode\'><option>Full</option><option>Compact</option></select></div></div></div></div>';
   this.g = v.Ga(aa.N);
   var l = v.Ea(this.g);
   // wybór gracza podpięty przy budowie widoku: ustawienia otwierają się od razu na ostatniej
@@ -684,6 +834,13 @@ function aa(a) {
   }, function (a) {
     return a + 1
   });
+  var uiStyles = ['auto', 'modern', 'classic'];
+  d('uistyle', n.A.uiStyle, function (a) {
+    return uiStyles[a] || 'auto';
+  }, function (a) {
+    var idx = uiStyles.indexOf(a);
+    return 0 <= idx ? idx : 0;
+  });
   d('fps', n.A.Fh, function (a) {
     return a
   }, function (a) {
@@ -704,6 +861,25 @@ function aa(a) {
   e('tvideo-teamcol', n.A.xm);
   e('tvideo-showindicators', n.A.Ak);
   e('tvideo-showavatars', n.A.lm);
+  var chatOpacityVal = l.get('chatopacity-value'),
+    chatOpacityRange = l.get('chatopacity-range');
+  function syncChatOpacity() {
+    var op = n.A.chatOpacity.L();
+    if (op != op || 0.5 > op) op = 0.5;
+    if (1 < op) op = 1;
+    chatOpacityVal.textContent = '' + Math.round(100 * op) / 100;
+    chatOpacityRange.value = '' + op;
+  }
+  syncChatOpacity();
+  chatOpacityRange.oninput = function () {
+    n.A.chatOpacity.Xa(parseFloat(chatOpacityRange.value));
+    syncChatOpacity();
+  };
+  d('chatbgmode', n.A.chatBgMode, function (a) {
+    return 0 == a ? 'full' : 'compact';
+  }, function (a) {
+    return 'full' == a ? 0 : 1;
+  });
   var m = null,
     m = function () {
       var b = n.A.Ne.L();
@@ -849,6 +1025,7 @@ export function handleFile(e) {
   if (!(1 > a.length)) {
     var a = a.item(0),
       b = new FileReader;
+    setCurrentReplayMeta({ name: a.name, lastModified: a.lastModified });
     // console.log(a);
     b.onload = function () {
       if (b.result.byteLength < 3000000) replayerHooks.onUpload(b.result, a.name.slice(0, -5), a.lastModified);
@@ -896,8 +1073,9 @@ export function handleFile(e) {
     b.readAsArrayBuffer(a)
   }
 };
-export function replayFromSite(r) {
+export function replayFromSite(r, meta) {
   newReplay();
+  setCurrentReplayMeta(meta || null);
   // console.log(r);
   y.i(parseReplay, r)
 }
@@ -1367,6 +1545,7 @@ function exd(a, b, c) {
 }
 function ja(a) {
   //console.log(a);
+  this.ul = this.tl = null;
   this.Fb = new hb;
   this.Gd = !1;
   this.pe = new Xa;
@@ -1386,6 +1565,15 @@ function ja(a) {
     b.me(!b.Gd);
     b.bi.blur()
   };
+  this.chatToggleBtn = a.get('togglechat');
+  this.chatToggleBtn.onclick = function () {
+    b.toggleChat();
+    b.chatToggleBtn.blur();
+  };
+  this.Qa.onHiddenChange = function (hidden) {
+    b.syncChatHiddenUi(hidden);
+  };
+  this.syncChatHiddenUi(this.Qa.bf);
   a.get('settings').onclick = function () {
     var a = new aa;
     a.qb = function () {
@@ -1397,7 +1585,7 @@ function ja(a) {
   };
   a.get('staty').onclick = function (el) {
 
-    if (lastAnalysis && lastAnalysis.matches.length > 0) replayerHooks.onShowStats(el.target);
+    if (lastAnalysis && lastAnalysis.matches.length > 0) replayerHooks.onShowStats(el.currentTarget || el.target);
     else replayerHooks.onMessage('Error: this replay doesn\'t contain any started match.', 'darkred', 4)
 
   };
@@ -1544,13 +1732,56 @@ function Da() {
     b.gb.blur()
   }
   var b = this;
+  this.bf = null != n.A && null != n.A.chatHidden ? !!n.A.chatHidden.L() : !1;
+  this.classicMode = !1;
+  this.dragCleanup = null;
+  this.scrollTimer = null;
+  this.onHiddenChange = null;
   this.g = v.Ga(Da.N);
   var c = v.Ea(this.g);
   this.dc = c.get('log');
+  this.ji = c.get('log-contents') || this.dc;
   this.vg = Ba.cg(this.dc);
   this.gb = c.get('input');
   this.gb.maxLength = 140;
-  c.get('send').onclick = a;
+  var sendBtn = c.get('send');
+  null != sendBtn && (sendBtn.onclick = a);
+  var dragEl = c.get('drag');
+  null != dragEl && (dragEl.onmousedown = function (ev) {
+    if (b.classicMode || b.bf) return;
+    ev.preventDefault();
+    cleanupActiveChatDrag();
+    var startHeight = b.qk(),
+      startY = ev.clientY;
+    b.g.classList.add('dragging');
+    window.document.body.classList.add('chat-dragging');
+    function onMove(moveEv) {
+      moveEv.preventDefault();
+      var nextHeight = clampChatHeight(Math.round(startHeight + (startY - moveEv.clientY)));
+      n.A.chatHeight.Xa(nextHeight);
+      b.gb.blur();
+      if (b.bf) b.setHidden(!1);
+      else b.Af();
+    }
+    function cleanup() {
+      b.g.classList.remove('dragging');
+      window.document.body.classList.remove('chat-dragging');
+      window.document.removeEventListener('mousemove', onMove, !1);
+      window.document.removeEventListener('mouseup', onUp, !1);
+      window.removeEventListener('blur', cleanup, !1);
+      if (b.dragCleanup === cleanup) b.dragCleanup = null;
+      if (activeChatDragCleanup === cleanup) activeChatDragCleanup = null;
+    }
+    function onUp(upEv) {
+      if (null != upEv) onMove(upEv);
+      cleanup();
+    }
+    b.dragCleanup = cleanup;
+    registerChatDragCleanup(cleanup);
+    window.document.addEventListener('mousemove', onMove, !1);
+    window.document.addEventListener('mouseup', onUp, !1);
+    window.addEventListener('blur', cleanup, !1);
+  });
   this.Bc = new lb(c.get('autocompletebox'), function (a, c) {
     b.gb.value = a;
     b.gb.setSelectionRange(c, c)
@@ -1583,7 +1814,8 @@ function Da() {
   };
   this.gb.oninput = function () {
     b.Bc.Hn(b.gb.value, b.gb.selectionStart)
-  }
+  };
+  this.Af()
 }
 function mb() {
   this.rf = null;
@@ -1647,6 +1879,7 @@ function N() {
   this.dd = new Map;
   this.zg = 1;
   this.xf = 35;
+  this.Ch = 0;
   this.jf = 0;
   this.kf = 1.5;
   this.Ya = new H(0, 0);
@@ -1814,6 +2047,28 @@ function Yb() {
       return a
     })
   }
+  function f(a, b) {
+    return new wa(a, e, function (a) {
+      var c = b;
+      try {
+        if (null != a) {
+          var parsed = parseFloat(a);
+          if (parsed == parsed) c = parsed;
+        }
+      } catch (t) {
+      }
+      return c
+    }, function (a) {
+      return '' + a
+    })
+  }
+  function g(a, b) {
+    return new wa(a, e, function (a) {
+      return null != a ? '1' == a : b
+    }, function (a) {
+      return a ? '1' : '0'
+    })
+  }
   var e = Xb.Pm();
   this.fe = d('player_name', '', 25);
   this.Tb = c('view_mode', - 1);
@@ -1828,19 +2083,13 @@ function Yb() {
   this.nm = b('sound_crowd');
   this.Gj = d('player_auth_key', null, 1024);
   this.rd = c('extrapolation', 0);
-  this.Sl = function (a, b) {
-    return new wa(a, e, function (a) {
-      var c = b;
-      try {
-        null != a && (c = parseFloat(a))
-      } catch (t) {
-      }
-      return c
-    }, function (a) {
-      return '' + a
-    })
-  }('resolution_scale', 1);
+  this.Sl = f('resolution_scale', 1);
   this.lm = b('show_avatars');
+  this.chatHeight = c('chat_height', 160);
+  this.chatOpacity = f('chat_opacity', 0.8);
+  this.chatBgMode = d('chat_bg_mode', 'compact', 50);
+  this.chatHidden = g('chat_hidden', !1);
+  this.uiStyle = d('player_ui_style', 'auto', 20);
   this.Me = a('geo');
   this.Ne = a('geo_override');
   this.tg = function () {
@@ -4942,7 +5191,8 @@ Vb.prototype = {
     window.document.removeEventListener('keyup', G(this, this.Cd));
     window.onbeforeunload = null;
     window.cancelAnimationFrame(this.De);
-    window.clearInterval(this.Gh)
+    window.clearInterval(this.Gh);
+    null != this.j && null != this.j.Qa && this.j.Qa.destroy();
   },
   bf: function () {
     this.De = window.requestAnimationFrame(G(this, this.bf));
@@ -4971,12 +5221,55 @@ Vb.prototype = {
         n.A.Tb.Xa(3);
         break;
       case 52:
-        n.A.Tb.Xa(0)
+        n.A.Tb.Xa(0);
+        break;
+      case 67:
+        if (!a.ctrlKey && !a.altKey && !a.metaKey && !this.j.Zo() && !window.document.getElementById('game-stats')) {
+          var tag = a.target && a.target.tagName ? a.target.tagName.toUpperCase() : '';
+          if ('INPUT' !== tag && 'TEXTAREA' !== tag && 'SELECT' !== tag) {
+            this.j.toggleChat();
+            a.preventDefault();
+          }
+        }
     }
   },
   uf: function (a) {
     var b = this.j.Fb;
-    0 >= a ? (b.Gg(!0), b.Eb.kf = 1, b.Eb.xf = 0) : (b.Gg(!1), b.Eb.xf = 35, b.Eb.kf = 1 + 0.25 * (a - 1))
+    var modern = isModernUiActive();
+    var viewEl = this.j.g;
+    viewEl.classList.toggle('modern-ui', modern);
+    viewEl.classList.toggle('classic-ui', !modern);
+    this.j.Qa.setClassicMode(!modern);
+    var chatHidden = this.j.Qa.bf;
+    viewEl.classList.toggle('chat-hidden', chatHidden);
+    if (modern) {
+      this.j.Wr(n.A.chatOpacity.L());
+      this.j.Vr('full' == n.A.chatBgMode.L());
+    } else {
+      this.j.Vr(!1);
+    }
+    var overlay = modern && 0 != a && !this.j.Gd;
+    viewEl.classList.toggle('chat-overlay', overlay);
+    var chatH = overlay && !chatHidden ? this.j.Qa.g.getBoundingClientRect().height : 0;
+    if (0 == a) {
+      b.Gg(!0);
+      b.Eb.kf = 1;
+      b.Eb.jf = 0;
+      b.Eb.xf = 0;
+      b.Eb.Ch = 0;
+    } else if (0 > a) {
+      b.Gg(!1);
+      b.Eb.xf = 35;
+      b.Eb.jf = modern ? 610 : 450;
+      b.Eb.kf = 1;
+      b.Eb.Ch = chatH * window.devicePixelRatio;
+    } else {
+      b.Gg(!1);
+      b.Eb.xf = 35;
+      b.Eb.jf = 0;
+      b.Eb.kf = 1 + 0.25 * (a - 1);
+      b.Eb.Ch = chatH * window.devicePixelRatio;
+    }
   },
   Cd: function () {
   },
@@ -5326,10 +5619,11 @@ Tb.prototype = {
         g = null != f ? f.H : null,
         k = 0 != this.jf ? this.sa.height / this.jf : this.kf * window.devicePixelRatio * this.zg,
         h = this.xf * this.zg,
+        ch = Math.min(this.Ch * this.zg, Math.max(0, this.sa.height - h - 10)),
         m = c.S.Ye,
         n = this.sa.width / k;
       0 < m && n > m && (n = m, k = this.sa.width / m);
-      m = (this.sa.height - h) / k;
+      m = Math.max(1, (this.sa.height - h - ch) / k);
       this.Mr(c, g, n, m, d);
       for (var p = 0, q = a.I; p < q.length;) {
         var r = q[p];
@@ -5341,7 +5635,7 @@ Tb.prototype = {
           this.Jg.set(r.H, u)
         }
       }
-      this.c.translate(this.sa.width / 2, (this.sa.height + h) / 2);
+      this.c.translate(this.sa.width / 2, (this.sa.height + h - ch) / 2);
       this.c.scale(k, k);
 
       // console.log(a, b, c, d, e)
@@ -5403,7 +5697,8 @@ Tb.prototype = {
       }
       this.c.lineWidth = 3;
       this.c.resetTransform();
-      this.c.translate(this.sa.width / 2, this.sa.height / 2);
+      var hudTop = this.xf * this.zg;
+      this.c.translate(this.sa.width / 2, hudTop + (this.sa.height - hudTop - ch) / 2);
       this.Oq(c);
       0 >= c.Oa && (this.td.C(d), this.td.Kc(this.c));
       this.Jg.clear();
@@ -5851,6 +6146,48 @@ Da.Yo = function (a) {
   return a.parentElement.querySelector(':hover') == a
 };
 Da.prototype = {
+  toggleHidden: function () {
+    this.setHidden(!this.bf);
+  },
+  setHidden: function (hidden) {
+    hidden = !!hidden;
+    if (this.bf === hidden) {
+      this.Af();
+      return;
+    }
+    this.bf = hidden;
+    null != n.A && null != n.A.chatHidden && n.A.chatHidden.Xa(this.bf);
+    this.Af();
+    null != this.onHiddenChange && this.onHiddenChange(this.bf);
+    if (!this.bf) {
+      var logEl = this.dc;
+      null != this.scrollTimer && window.clearTimeout(this.scrollTimer);
+      this.scrollTimer = window.setTimeout(function () {
+        logEl.scrollTop = logEl.scrollHeight;
+      }, 200);
+    }
+  },
+  setClassicMode: function (classic) {
+    classic = !!classic;
+    if (this.classicMode === classic) return;
+    this.classicMode = classic;
+    classic && null != this.dragCleanup && this.dragCleanup();
+    this.Af();
+  },
+  qk: function () {
+    if (this.bf) return 0;
+    if (this.classicMode) return 130;
+    return clampChatHeight(null != n.A && null != n.A.chatHeight ? n.A.chatHeight.L() : 160);
+  },
+  Af: function () {
+    var h = this.qk();
+    this.g.classList.toggle('chat-hidden', this.bf);
+    this.g.style.height = h + 'px';
+  },
+  destroy: function () {
+    null != this.dragCleanup && this.dragCleanup();
+    null != this.scrollTimer && (window.clearTimeout(this.scrollTimer), this.scrollTimer = null);
+  },
   pp: function (a, b, c) {
     var d = window.document.createElement('p');
     d.className = 'announcement';
@@ -5876,9 +6213,9 @@ Da.prototype = {
   Ok: function (a) {
     var b = this.dc.clientHeight,
       b = this.dc.scrollTop + b - this.dc.scrollHeight >= 0.5 * - b || !Da.Yo(this.dc);
-    this.dc.appendChild(a);
-    b && (this.dc.scrollTop = a.offsetTop);
-    for (a = b ? 50 : 100; this.dc.childElementCount > a;) this.dc.firstElementChild.remove();
+    this.ji.appendChild(a);
+    b && (this.dc.scrollTop = this.dc.scrollHeight);
+    for (a = b ? 50 : 100; this.ji.childElementCount > a;) this.ji.firstElementChild.remove();
     // this.vg.update()
   },
   ba: function (a, b) {
@@ -6093,6 +6430,28 @@ Rb.prototype = {
 };
 ja.b = !0;
 ja.prototype = {
+  Wr: function (a) {
+    if (a != a || 0.5 > a) a = 0.5;
+    if (1 < a) a = 1;
+    this.ul != a && (this.ul = a, this.g.style.setProperty('--chat-opacity', '' + a));
+  },
+  Vr: function (a) {
+    a = !!a;
+    this.tl != a && (this.tl = a, this.g.classList.toggle('chat-bg-full', a));
+  },
+  toggleChat: function () {
+    this.Qa.toggleHidden();
+  },
+  syncChatHiddenUi: function (hidden) {
+    this.g.classList.toggle('chat-hidden', !!hidden);
+    if (null != this.chatToggleBtn) {
+      var lbl = this.chatToggleBtn.querySelector('.btn-label');
+      var tip = this.chatToggleBtn.querySelector('.tooltip');
+      if (lbl) lbl.textContent = hidden ? 'Show chat' : 'Hide chat';
+      if (tip) tip.textContent = hidden ? 'Show chat [C]' : 'Hide chat [C]';
+      this.chatToggleBtn.classList.toggle('chat-is-hidden', !!hidden);
+    }
+  },
   C: function (a) {
     null == a.T.K && this.me(!0);
     A.i(this.yl);
@@ -6100,7 +6459,7 @@ ja.prototype = {
     this.Gd ? this.Wa.C(a.T, a.T.na(a.uc)) : (a = a.Sf(), this.Fb.C(a), n.Na.Xj.Ls(a))
   },
   me: function (a) {
-    this.Gd != a && ((this.Gd = a) ? (this.Jh.appendChild(this.Wa.g), this.Fb.g.remove()) : (this.Jh.appendChild(this.Fb.g), this.Wa.g.remove()))
+    this.Gd != a && (this.Gd = a, this.g.classList.toggle('showing-room-view', this.Gd), this.Gd ? (this.Jh.appendChild(this.Wa.g), this.Fb.g.remove()) : (this.Jh.appendChild(this.Fb.g), this.Wa.g.remove()))
   },
   Zo: function () {
     return null != ja.kq
@@ -7567,13 +7926,13 @@ R.kn = new Ib([0,
   3,
   1]);
 mb.N = '<div class=\'dialog change-location-view\'><h1>Change Location</h1><div class=\'splitter\'><div class=\'list\' data-hook=\'list\'></div><div class=\'buttons\'><button data-hook=\'change\'>Change</button><button data-hook=\'cancel\'>Cancel</button></div></div></div>';
-Da.N = '<div class=\'chatbox-view\'><div data-hook=\'log\' class=\'log\'><p>Controls:<br/>Move: WASD or Arrows<br/>Kick: X, Space, Ctrl, Shift, Numpad 0<br/>View: Numbers 1 to 4</p></div><div class=\'autocompletebox\' data-hook=\'autocompletebox\'></div><div class=\'input\'><input data-hook=\'input\' type=\'text\' /><button data-hook=\'send\'>Send</button></div></div>';
+Da.N = '<div class=\'chatbox-view\'><div class=\'chatbox-view-contents\'><div data-hook=\'drag\' class=\'drag\'></div><div data-hook=\'log\' class=\'log subtle-thin-scrollbar\'><div data-hook=\'log-contents\' class=\'log-contents\'><p>Controls:<br/>Move: WASD or Arrows<br/>Kick: X, Space, Ctrl, Shift, Numpad 0<br/>View: Numbers 1 to 4<br/>Toggle chat: C</p></div></div><div class=\'autocompletebox\' data-hook=\'autocompletebox\'></div><div class=\'input\'><input data-hook=\'input\' type=\'text\' /><button data-hook=\'send\'>Send</button></div></div></div>';
 kb.N = '<div class=\'choose-nickname-view\'><img src="https://kpias760.github.io/haxball-replay-analyzer.github.io/images/falafcio.png" /><div class=\'dialog\'><h1>Haxball Replay Analyzer</h1><div style=\'display: none\' class=\'label-input\'><label>Nick:</label><input data-hook=\'input\' type=\'text\' /></div><button id=\'button_ok\' data-hook=\'ok\'>Start</button></div></div>';
 jb.N = '<div class=\'connecting-view\'><div class=\'dialog\'><h1>Connecting</h1><div class=\'connecting-view-log\' data-hook=\'log\'></div><button data-hook=\'cancel\'>Cancel</button></div></div>';
 ib.N = '<div class=\'create-room-view\'><div class=\'dialog\'><h1>Create room</h1><div class=\'label-input\'><label>Room name:</label><input data-hook=\'name\' required /></div><div class=\'label-input\'><label>Password:</label><input data-hook=\'pass\' /></div><div class=\'label-input\'><label>Max players:</label><select data-hook=\'max-pl\'></select></div><button data-hook=\'unlisted\'></button><div class=\'row\'><button data-hook=\'cancel\'>Cancel</button><button data-hook=\'create\'>Create</button></div></div></div>';
 Ka.N = '<div class=\'disconnected-view\'><div class=\'dialog basic-dialog\'><h1>Disconnected</h1><p data-hook=\'reason\'></p><div class=\'buttons\'><button data-hook=\'ok\'>Ok</button><button data-hook=\'replay\'>Save replay</button></div></div></div>';
 hb.N = '<div id=\'game-state-view\' class=\'game-state-view\'><div class=\'bar-container\'><div class=\'bar\'><div class=\'scoreboard\'><div class=\'teamicon red\'></div><div class=\'score\' data-hook=\'red-score\'>0</div><div>-</div><div class=\'score\' data-hook=\'blue-score\'>0</div><div class=\'teamicon blue\'></div></div><div data-hook=\'timer\'></div></div></div><div class=\'canvas\' data-hook=\'canvas\'></div></div>';
-ja.N = '<div class=\'game-view\' tabindex=\'-1\'><div class=\'top-section\' data-hook=\'gameplay-section\'></div><div class=\'bottom-section\'><div data-hook=\'stats\'></div><div data-hook=\'chatbox\'></div><div class=\'buttons\'><button data-hook=\'menu\'>☰ Menu<span class=\'tooltip\'>Toggle room menu [Escape]</span></button><button id="settings_button" data-hook=\'settings\'>⛭ Settings</button><button id=\'button_staty\' data-hook=\'staty\'>📈 Game stats</button><button id=\'button_gif\' data-hook=\'gif_creator\' style=\'display:none\'>📷 Create GIF</button></div></div><div id="popups" data-hook=\'popups\'></div></div>';
+ja.N = '<div class=\'game-view\' tabindex=\'-1\'><div class=\'top-section\' data-hook=\'gameplay-section\'></div><div class=\'bottom-section\'><div data-hook=\'stats\'></div><div data-hook=\'chatbox\'></div></div><div class=\'buttons\'><button data-hook=\'menu\'>☰ <span class=\'btn-label\'>Menu</span><span class=\'tooltip\'>Toggle room menu [Escape]</span></button><button id="settings_button" data-hook=\'settings\'>⛭ <span class=\'btn-label\'>Settings</span><span class=\'tooltip\'>Settings</span></button><button id=\'button_staty\' data-hook=\'staty\'>📈 <span class=\'btn-label\'>Game stats</span><span class=\'tooltip\'>Game stats</span></button><button id=\'button_toggle_chat\' data-hook=\'togglechat\'>💬 <span class=\'btn-label\'>Hide chat</span><span class=\'tooltip\'>Hide chat [C]</span></button><button id=\'button_gif\' data-hook=\'gif_creator\' style=\'display:none\'>📷 <span class=\'btn-label\'>Create GIF</span></button></div><div id="popups" data-hook=\'popups\'></div></div>';
 gb.N = '<div class=\'dialog kick-player-view\'><h1 id="tytul" data-hook=\'title\'></h1><div class=label-input><label>Reason: </label><input type=\'text\' data-hook=\'reason\' /></div><button data-hook=\'ban-btn\'><i class=\'icon-block\'></i>Ban from rejoining: <span data-hook=\'ban-text\'></span></button><div class="row"><button data-hook=\'close\'>Cancel</button><button data-hook=\'kick\'>Kick</button></div></div>';
 gxd.N = '';
 exd.N = '<div class=\'simple-dialog-view\'><div class=\'dialog basic-dialog\'><h1 data-hook=\'title\'></h1><p data-hook=\'content\'></p><div class=\'buttons\' data-hook=\'buttons\'></div></div></div>';
@@ -7588,7 +7947,7 @@ ab.tj = '<tr><td><span data-hook=\'tag\'></span><span data-hook=\'name\'></span>
 Aa.tj = '<div></div>';
 Za.N = '<div class=\'room-password-view\'><div class=\'dialog\'><h1>Password required</h1><div class=\'label-input\'><label>Password:</label><input data-hook=\'input\' /></div><div class=\'buttons\'><button data-hook=\'cancel\'>Cancel</button><button data-hook=\'ok\'>Ok</button></div></div></div>';
 Ya.N = '<div id=\'room-view\' class=\'room-view\'><div class=\'container\'><h1 data-hook=\'room-name\'></h1><div class=\'header-btns\'><button data-hook=\'rec-btn\'><i class=\'icon-circle\'></i>Rec</button><button data-hook=\'link-btn\'><i class=\'icon-link\'></i>Link</button><button data-hook=\'leave-btn\'><i class=\'icon-logout\'></i>Leave</button></div><div class=\'teams\'><div class=\'tools admin-only\'><button data-hook=\'auto-btn\'>Auto</button><button data-hook=\'rand-btn\'>Rand</button><button data-hook=\'lock-btn\'>Lock</button><button data-hook=\'reset-all-btn\'>Reset</button></div><div data-hook=\'red-list\'></div><div data-hook=\'spec-list\'></div><div data-hook=\'blue-list\'></div><div class=\'spacer admin-only\'></div></div><div class=\'settings\'><div><label class=\'lbl\'>Time limit</label><select data-hook=\'time-limit-sel\'></select></div><div><label class=\'lbl\'>Score limit</label><select data-hook=\'score-limit-sel\'></select></div><div><label class=\'lbl\'>Stadium</label><label class=\'val\' data-hook=\'stadium-name\'>testing the stadium name</label><button class=\'admin-only\' data-hook=\'stadium-pick\'>Pick</button></div></div><div class=\'controls admin-only\'><button data-hook=\'start-btn\'><i class=\'icon-play\'></i>Start game</button><button data-hook=\'stop-btn\'><i class=\'icon-stop\'></i>Stop game</button><button data-hook=\'pause-btn\'><i class=\'icon-pause\'></i>Pause</button></div></div></div>';
-aa.N = '<div class=\'dialog settings-view\'><h1>Settings</h1><button data-hook=\'close\'>Close</button><div class=\'tabs\'><button data-hook=\'soundbtn\'>Sound</button><button data-hook=\'videobtn\'>Video</button><button data-hook=\'inputbtn\'>Input</button><button data-hook=\'miscbtn\'>Misc</button></div><div data-hook=\'presskey\' tabindex=\'-1\'><div>Press a key</div></div><div class=\'tabcontents\'><div class=\'section\' data-hook=\'miscsec\'><div class=\'loc\' data-hook=\'loc\'></div><div class=\'loc\' data-hook=\'loc-ovr\'></div><button data-hook=\'loc-ovr-btn\'></button></div><div class=\'section\' data-hook=\'soundsec\'><div data-hook="tsound-main">Sounds enabled</div><div data-hook="tsound-chat">Chat sound enabled</div><div data-hook="tsound-highlight">Nick highlight sound enabled</div><div data-hook="tsound-crowd">Crowd sound enabled</div></div><div class=\'section\' data-hook=\'inputsec\'></div><div class=\'section\' data-hook=\'videosec\'><div>Viewport Mode:<select data-hook=\'viewmode\'><option>Dynamic</option><option>Restricted 840x410</option><option>Full 1x Zoom</option><option>Full 1.25x Zoom</option><option>Full 1.5x Zoom</option><option>Full 1.75x Zoom</option><option>Full 2x Zoom</option><option>Full 2.25x Zoom</option><option>Full 2.5x Zoom</option></select></div><div>FPS Limit:<select data-hook=\'fps\'><option>None (Recommended)</option><option>30</option></select></div><div>Resolution Scaling:<select data-hook=\'resscale\'><option>100%</option><option>75%</option><option>50%</option><option>25%</option></select></div><div>Player To Follow:<select data-hook=\'follow\'>' + playersToFollowList() + '</select></div><div data-hook="tvideo-teamcol">Custom team colors enabled</div><div data-hook="tvideo-showindicators">Show chat indicators</div><div data-hook="tvideo-showavatars">Show player avatars</div></div></div></div>';
+aa.N = '<div class=\'dialog settings-view\'><h1>Settings</h1><button data-hook=\'close\'>Close</button><div class=\'tabs\'><button data-hook=\'soundbtn\'>Sound</button><button data-hook=\'videobtn\'>Video</button><button data-hook=\'inputbtn\'>Input</button><button data-hook=\'miscbtn\'>Misc</button></div><div data-hook=\'presskey\' tabindex=\'-1\'><div>Press a key</div></div><div class=\'tabcontents\'><div class=\'section\' data-hook=\'miscsec\'><div class=\'loc\' data-hook=\'loc\'></div><div class=\'loc\' data-hook=\'loc-ovr\'></div><button data-hook=\'loc-ovr-btn\'></button></div><div class=\'section\' data-hook=\'soundsec\'><div data-hook="tsound-main">Sounds enabled</div><div data-hook="tsound-chat">Chat sound enabled</div><div data-hook="tsound-highlight">Nick highlight sound enabled</div><div data-hook="tsound-crowd">Crowd sound enabled</div></div><div class=\'section\' data-hook=\'inputsec\'></div><div class=\'section\' data-hook=\'videosec\'><div>Viewport Mode:<select data-hook=\'viewmode\'><option>Dynamic</option><option>Restricted 840x410</option><option>Full 1x Zoom</option><option>Full 1.25x Zoom</option><option>Full 1.5x Zoom</option><option>Full 1.75x Zoom</option><option>Full 2x Zoom</option><option>Full 2.25x Zoom</option><option>Full 2.5x Zoom</option></select></div><div>Player UI Style:<select data-hook=\'uistyle\'><option>Auto (by replay date)</option><option>Modern</option><option>Classic</option></select></div><div>FPS Limit:<select data-hook=\'fps\'><option>None (Recommended)</option><option>30</option></select></div><div>Resolution Scaling:<select data-hook=\'resscale\'><option>100%</option><option>75%</option><option>50%</option><option>25%</option></select></div><div>Player To Follow:<select data-hook=\'follow\'>' + playersToFollowList() + '</select></div><div data-hook="tvideo-teamcol">Custom team colors enabled</div><div data-hook="tvideo-showindicators">Show chat indicators</div><div data-hook="tvideo-showavatars">Show player avatars</div><div class="option-row"><div class="option-label">Chat opacity</div><div class="option-value" data-hook="chatopacity-value">0.8</div><input class="slider" type="range" min="0.5" max="1" step="0.01" data-hook="chatopacity-range"></div><div>Chat background width:<select data-hook=\'chatbgmode\'><option>Full</option><option>Compact</option></select></div></div></div></div>';
 aa.$l = 0;
 P.N = '<div class=\'simple-dialog-view\'><div class=\'dialog basic-dialog\'><h1 data-hook=\'title\'></h1><p data-hook=\'content\'></p><div class=\'buttons\' data-hook=\'buttons\'></div></div></div>';
 Xa.N = '<div class=\'stats-view\'><div data-hook=\'graph\'></div></div>';

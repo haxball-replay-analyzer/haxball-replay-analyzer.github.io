@@ -8,6 +8,9 @@ const changelog = [
     version: '3.3.6',
     date: '22.11.2026',
     changes: [
+      'New modern player layout matching the updated HaxBall client: translucent chat overlay on the pitch (except in Restricted mode), draggable chat height, chat opacity slider, Full/Compact background width, and hiding the chat with a button or the C key',
+      'True Dynamic viewport mode: fills the screen instead of staying locked to 840x410',
+      'Automatic Classic / Modern player style based on the replay date (cutoff: 24.04.2023), with a manual Auto / Modern / Classic switch in Settings → Video',
       'Fixed assists in Space Mode: they now appear next to the scorer in the goals list and are counted in the players table',
       'Fixed missing replays from thehax.pl getting stuck on the loading screen — they now show "Replay not found" and return to the main page'
     ]
