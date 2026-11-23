@@ -176,6 +176,7 @@ function resetReplay() {
 }
 
 function newReplay() {
+  cameraPoint = null;
   replayerHooks.onClearStats();
 }
 
@@ -215,6 +216,7 @@ function leaveReplayer() {
   players = [];
   // id gracza z poprzedniej powtórki to w nowej zwykle inny człowiek albo nikt (TD-036)
   playerToFollow = 0;
+  cameraPoint = null;
   followView.room = null;
   followView.toWorld = null;
   playSounds = false;
@@ -580,6 +582,8 @@ function removePopups() {
 var players = [], playSounds = false, autoClick = false, autoClickValue;
 var lastAnalysis = null; // wynik analyzeReplay() wczytanej powtórki
 var playerToFollow = 0, mainCanvas;
+// camera pinned to a point in the room (Shift+click): {x, y} or null (TD-0xx)
+var cameraPoint = null;
 // ostatnia narysowana klatka, dla wyboru gracza kliknięciem na boisku (TD-038):
 // odwrotność przekształcenia canvasu (piksele → współrzędne boiska) i pokój z tej klatki
 var followView = { toWorld: null, room: null };
@@ -607,16 +611,22 @@ function playersToFollowList() {
   }).join('');
 }
 
-// id gracza pod kursorem w ostatniej klatce: 0 = piłka, null = nic
-function discUnderCursor(e) {
-  var room = followView.room, toWorld = followView.toWorld;
-  if (null == mainCanvas || null == room || null == toWorld || null == room.K) return null;
+// point in the room under the cursor in the last frame: {x, y} or null
+function pointUnderCursor(e) {
+  var toWorld = followView.toWorld;
+  if (null == mainCanvas || null == toWorld) return null;
   var rect = mainCanvas.getBoundingClientRect();
   if (0 == rect.width || 0 == rect.height) return null;
-  var p = toWorld.transformPoint({
+  return toWorld.transformPoint({
     x: (e.clientX - rect.left) * mainCanvas.width / rect.width,
     y: (e.clientY - rect.top) * mainCanvas.height / rect.height
   });
+}
+
+// id gracza pod kursorem w ostatniej klatce: 0 = piłka, null = nic
+function discUnderCursor(e) {
+  var room = followView.room, p = pointUnderCursor(e);
+  if (null == room || null == p || null == room.K) return null;
   function hit(d) {
     if (null == d) return false;
     var dx = d.a.x - p.x, dy = d.a.y - p.y;
@@ -630,18 +640,39 @@ function discUnderCursor(e) {
 
 function setPlayerToFollow(id) {
   playerToFollow = id;
+  cameraPoint = null;
   // ustawienia otwarte: lista pokazuje nowy wybór (zamknięte budują listę od nowa)
   var select = document.getElementById('selectPlayerToFollow');
   if (null != select) select.value = '' + id;
 }
 
+// pin the camera to a point in the room; detaches player/ball following
+function setCameraPoint(pt) {
+  playerToFollow = 0;
+  cameraPoint = pt ? { x: pt.x, y: pt.y } : null;
+  var select = document.getElementById('selectPlayerToFollow');
+  if (null != select) select.value = '0';
+}
+
 function getCanvas(a) {
   mainCanvas = a;
   mainCanvas.onmousemove = function (e) {
+    if (e.shiftKey) {
+      mainCanvas.style.cursor = 'crosshair';
+      return;
+    }
     var id = discUnderCursor(e);
     mainCanvas.style.cursor = null != id && id != playerToFollow ? 'pointer' : '';
   }
   mainCanvas.onclick = function (e) {
+    if (e.shiftKey) {
+      var pt = pointUnderCursor(e);
+      if (null != pt) {
+        setCameraPoint(pt);
+        mainCanvas.style.cursor = '';
+      }
+      return;
+    }
     var id = discUnderCursor(e);
     if (null != id) {
       setPlayerToFollow(id);
@@ -809,7 +840,7 @@ function aa(a) {
   // zakładce, więc obsługa w kliknięciu „Video” nie działała po ponownym otwarciu (TD-035)
   var follow = l.get('follow');
   follow.onchange = function () {
-    playerToFollow = follow.value
+    setPlayerToFollow(Number(follow.value) || 0)
   };
   // console.log(l, this.g)
   // console.log('e', l.get('videosec'))
@@ -5658,6 +5689,15 @@ Tb.prototype = {
           translatetoDisc.x = followedPlayer.H.a.x;
           translatetoDisc.y = followedPlayer.H.a.y;
         }
+      }
+      // a pinned point (Shift+click) takes precedence; clamped so the view stays inside the
+      // stadium, like the ball-following camera (Xn, TD-0xx)
+      if (null != cameraPoint) {
+        var halfW = 0.5 * n, halfH = 0.5 * m;
+        translatetoDisc = {
+          x: n > 2 * c.S.$b ? 0 : Math.min(c.S.$b - halfW, Math.max(- c.S.$b + halfW, cameraPoint.x)),
+          y: m > 2 * c.S.qc ? 0 : Math.min(c.S.qc - halfH, Math.max(- c.S.qc + halfH, cameraPoint.y))
+        };
       }
       this.c.translate(- translatetoDisc.x, - translatetoDisc.y);
       // środek widoku dla tła (Sq) i strzałek graczy poza kadrem (nk): przy Player To Follow
