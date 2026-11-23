@@ -606,9 +606,30 @@ function playersToFollowList() {
   });
   list.unshift({ id: 0, name: 'ball' });
   // nick z powtórki to tekst gracza: bez escapowania wchodziłby do HTML ustawień
-  return list.map(function (p) {
-    return '<option value=' + p.id + (playerToFollow == p.id ? ' selected' : '') + '>[' + p.id + '] ' + escapeHtml(p.name) + '</option>'
+  var html = list.map(function (p) {
+    return '<option value=' + p.id + (null == cameraPoint && playerToFollow == p.id ? ' selected' : '') + '>[' + p.id + '] ' + escapeHtml(p.name) + '</option>'
   }).join('');
+  if (null != cameraPoint) html += '<option value="fixed" selected>[STATIC POINT]</option>';
+  return html;
+}
+
+// keep the "Player To Follow" select in sync with a pinned camera point
+function updateFollowSelect() {
+  var select = document.getElementById('selectPlayerToFollow');
+  if (null == select) return;
+  var fixed = select.querySelector('option[value="fixed"]');
+  if (null != cameraPoint) {
+    if (null == fixed) {
+      fixed = document.createElement('option');
+      fixed.value = 'fixed';
+      fixed.textContent = 'FIXED POINT';
+      select.appendChild(fixed);
+    }
+    select.value = 'fixed';
+  } else {
+    if (null != fixed) fixed.remove();
+    select.value = '' + playerToFollow;
+  }
 }
 
 // point in the room under the cursor in the last frame: {x, y} or null
@@ -642,16 +663,14 @@ function setPlayerToFollow(id) {
   playerToFollow = id;
   cameraPoint = null;
   // ustawienia otwarte: lista pokazuje nowy wybór (zamknięte budują listę od nowa)
-  var select = document.getElementById('selectPlayerToFollow');
-  if (null != select) select.value = '' + id;
+  updateFollowSelect();
 }
 
 // pin the camera to a point in the room; detaches player/ball following
 function setCameraPoint(pt) {
   playerToFollow = 0;
   cameraPoint = pt ? { x: pt.x, y: pt.y } : null;
-  var select = document.getElementById('selectPlayerToFollow');
-  if (null != select) select.value = '0';
+  updateFollowSelect();
 }
 
 function getCanvas(a) {
@@ -840,6 +859,7 @@ function aa(a) {
   // zakładce, więc obsługa w kliknięciu „Video” nie działała po ponownym otwarciu (TD-035)
   var follow = l.get('follow');
   follow.onchange = function () {
+    if ('fixed' === follow.value) return; // pinned point already active
     setPlayerToFollow(Number(follow.value) || 0)
   };
   // console.log(l, this.g)
