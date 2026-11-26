@@ -3,7 +3,7 @@
 // Wejście:  { bytes: ArrayBuffer, progressEvery }
 // Wyjście:  { type: 'progress', value }                ułamek 0..1 co progressEvery ticków
 //           { type: 'result', result }                 wynik analyzeReplay() spakowany przez packAnalysis()
-//           { type: 'error', kind: 'version', version }  plik w innej wersji niż 3 (błąd HaxBalla Kb)
+//           { type: 'error', kind: 'version', version }  plik w nieobsługiwanej wersji (poza 1–3; błąd HaxBalla Kb)
 //           { type: 'error', kind: 'other', message, code, limit }  code i limit przy przekroczonym
 //                                                      limicie analizy ('replay_too_long', 'replay_too_large')
 // Strona tworzy nowy Worker na każdą analizę i kończy go po wyniku (src/analysis/client.js).

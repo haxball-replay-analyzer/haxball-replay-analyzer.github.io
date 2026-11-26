@@ -1,5 +1,5 @@
 // Analiza powtórki bez odtwarzacza i bez DOM (kod HBRA, MIT).
-import { F, Jb, fa, kc, m, setInflateBudget } from './haxball.js';
+import { F, Jb, SUPPORTED_REPLAY_VERSIONS, fa, kc, m, setInflateBudget } from './haxball.js';
 import { createFootballStats, parseTime, STATS_VERSION } from './stats/football.js';
 
 // Nagłówek pliku .hbr2 (big endian): "HBR2", wersja, długość w tickach.
@@ -38,7 +38,22 @@ function discPos(d) {
 //   options.maxInflatedBytes: limit bajtów po rozpakowaniu, suma zdarzeń i stadionów (domyślnie
 //     128 MiB); przekroczony = Error z code 'replay_too_large' (TD-043)
 //   Błąd limitu ma pola code, limit i (przy 'replay_too_long') value.
-// Rzuca błąd HaxBalla (q z Kb) przy wersji pliku innej niż 3.
+// Rzuca błąd HaxBalla (q z Kb) przy nieobsługiwanej wersji pliku (poza SUPPORTED_REPLAY_VERSIONS: 1, 2, 3).
+export function createReplay(bytes, options) {
+  options = options || {};
+  var maxInflatedBytes = null != options.maxInflatedBytes ? options.maxInflatedBytes : DEFAULT_LIMITS.maxInflatedBytes,
+    oldBudget = setInflateBudget(maxInflatedBytes);
+  try {
+    kc.fj();
+    return new Jb(new Uint8Array(bytes), new fa)
+  } catch (e) {
+    e && 'replay_too_large' === e.code && (e.limit = maxInflatedBytes);
+    throw e
+  } finally {
+    setInflateBudget(oldBudget)
+  }
+}
+
 export function analyzeReplay(bytes, options) {
   options = options || {};
   var maxInflatedBytes = null != options.maxInflatedBytes ? options.maxInflatedBytes : DEFAULT_LIMITS.maxInflatedBytes,
@@ -71,8 +86,8 @@ function analyze(bytes, options) {
     tooLong.value = header.totalFrames;
     throw tooLong
   }
-  // konstruktor: magic, wersja, inflate, znaczniki, stan początkowy
-  var rep = new Jb(data, new fa, 3);
+  // konstruktor: magic, wersja (1..3), inflate, znaczniki (v2+), stan początkowy
+  var rep = new Jb(data, new fa);
   var st = rep.T;
   // zdarzenia: kopia czytnika, żeby nie przesunąć rep
   var L = rep.Lc,
@@ -83,7 +98,7 @@ function analyze(bytes, options) {
   while (0 < L2.o.byteLength - L2.a) {
     L2.Ab();
     L2.Ob();
-    var ev = m.fh(L2),
+    var ev = m.fh(L2, rep.replayVersion),
       name = ev.f && ev.f.name || '?'; // nazwa klasy po minifikacji (np. Ga); w buildzie strony inna
     eventsByClass[name] = (eventsByClass[name] || 0) + 1;
     events++
@@ -153,4 +168,4 @@ function analyze(bytes, options) {
   return result
 }
 
-export { readReplayHeader, DEFAULT_LIMITS };
+export { readReplayHeader, DEFAULT_LIMITS, SUPPORTED_REPLAY_VERSIONS };
