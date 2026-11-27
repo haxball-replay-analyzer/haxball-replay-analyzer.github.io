@@ -531,3 +531,270 @@ describe('limity analizy (TD-042, TD-043)', () => {
     assert.equal(left, Infinity);
   });
 });
+
+describe('obsługa starszych wersji .hbr2 (v1 i v2, TD-015)', () => {
+  function writeDiscV12(wr, d) {
+    wr.s(d.x); wr.s(d.y); wr.s(d.vx || 0); wr.s(d.vy || 0);
+    wr.s(d.r); wr.s(d.bCoef ?? 0.5); wr.s(d.invMass ?? 1); wr.s(d.damping ?? 0.99);
+    wr.tb(d.color ?? 0xffffff); wr.O(d.cMask ?? 63); wr.O(d.cGroup ?? 1);
+  }
+
+  function writeStadiumV12(wr, st, ver) {
+    wr.l(255);
+    wr.Db(st.name);
+    wr.O(st.bgType ?? 1);
+    wr.s(st.bgW ?? 370); wr.s(st.bgH ?? 170); wr.s(st.kickOffR ?? 64); wr.s(st.cornerR ?? 0); wr.s(st.goalLine ?? 0);
+    wr.O(st.bgColor ?? 0x718c5a);
+    wr.s(st.width ?? 420); wr.s(st.height ?? 200); wr.s(st.spawnDistance ?? 20);
+    // playerPhysics (7 × float64)
+    wr.s(0.5); wr.s(0.5); wr.s(0.96); wr.s(0.1); wr.s(0.07); wr.s(0.96); wr.s(st.kickStrength ?? 6);
+    // ballPhysics (76 B)
+    writeDiscV12(wr, st.ball);
+    wr.Ub(st.maxViewWidth ?? 0);
+    if (ver >= 2) wr.l(st.cameraFollow ?? 0);
+    // vertexes
+    wr.l(st.vertexes.length);
+    for (const v of st.vertexes) {
+      wr.s(v.x); wr.s(v.y); wr.s(v.bCoef ?? 1); wr.O(v.cMask ?? 63); wr.O(v.cGroup ?? 32);
+    }
+    // segments
+    wr.l(st.segments.length);
+    for (const s of st.segments) {
+      if (ver === 1) {
+        wr.l(s.v0); wr.l(s.v1);
+        wr.s(s.bCoef ?? 1); wr.O(s.cMask ?? 63); wr.O(s.cGroup ?? 32);
+        wr.s(s.curveF ?? Infinity); wr.l(s.vis === false ? 0 : 1); wr.O(s.color ?? 0);
+      } else {
+        let flags = 0;
+        if (s.bias) flags |= 1;
+        if (s.curveF != null && Number.isFinite(s.curveF)) flags |= 2;
+        if (s.color != null) flags |= 4;
+        if (s.vis !== false) flags |= 8;
+        wr.l(flags); wr.l(s.v0); wr.l(s.v1);
+        if (flags & 1) wr.s(s.bias);
+        if (flags & 2) wr.s(s.curveF);
+        if (flags & 4) wr.O(s.color);
+        wr.s(s.bCoef ?? 1); wr.O(s.cMask ?? 63); wr.O(s.cGroup ?? 32);
+      }
+    }
+    // planes
+    wr.l(st.planes.length);
+    for (const pl of st.planes) {
+      wr.s(pl.nx); wr.s(pl.ny); wr.s(pl.dist); wr.s(pl.bCoef ?? 1); wr.O(pl.cMask ?? 63); wr.O(pl.cGroup ?? 32);
+    }
+    // goals
+    wr.l(st.goals.length);
+    for (const g of st.goals) {
+      wr.s(g.x0); wr.s(g.y0); wr.s(g.x1); wr.s(g.y1); wr.l(g.team);
+    }
+    // extra discs
+    wr.l(st.discs.length);
+    for (const d of st.discs) writeDiscV12(wr, d);
+  }
+
+  async function buildLegacyReplay(ver, { totalFrames, markers = [], roomName = 'Test', stadium, game = null, players = [], events = [] }) {
+    const pako = require('pako');
+    const { w } = await import('@hbra/replay-core/haxball');
+    const wr = w.ha();
+    if (ver >= 2) {
+      wr.Ub(markers.length);
+      for (const mk of markers) { wr.lb(mk.dt); wr.l(mk.kind); }
+    }
+    wr.Db(roomName);
+    wr.l(0); // locked
+    wr.O(3); // scoreLimit
+    wr.O(3); // timeLimit
+    writeStadiumV12(wr, stadium, ver);
+    wr.l(game ? 1 : 0);
+    if (game) {
+      wr.l(game.discs.length);
+      for (const d of game.discs) writeDiscV12(wr, d);
+      wr.O(0); // ball index
+      wr.O(game.vc ?? 0); wr.O(game.Bb ?? 1);
+      wr.s(game.prevBallX ?? 0); wr.s(game.prevBallY ?? 0);
+      wr.O(game.Pb ?? 0); wr.O(game.Kb ?? 0); wr.s(game.Hc ?? 0); wr.O(game.Oa ?? 0);
+      wr.l(game.ae ?? 1);
+    }
+    wr.l(players.length);
+    for (const pl of players) {
+      wr.l(pl.admin ? 1 : 0); wr.O(pl.teamSlot ?? 1); wr.Db(pl.avatar ?? null);
+      wr.l(0); wr.Db(pl.country ?? 'pl'); wr.O(0); wr.Db(pl.name);
+      wr.O(0); wr.lb(pl.id); wr.l(0); wr.l(pl.team); wr.Xi(pl.discIdx ?? -1);
+    }
+    // teams[1], teams[2]
+    for (const col of [0xe56e56, 0x5689e5]) { wr.l(0); wr.O(0xffffff); wr.l(1); wr.O(col); }
+    // events
+    for (const ev of events) {
+      wr.lb(ev.dt);
+      wr.Ub(ev.pid ?? 0);
+      wr.l(ev.type);
+      ev.write(wr);
+    }
+    const head = Buffer.alloc(12);
+    head.write('HBR2', 0, 'latin1');
+    head.writeUInt32BE(ver, 4);
+    head.writeUInt32BE(totalFrames, 8);
+    return Buffer.concat([head, Buffer.from(pako.deflateRaw(wr.Sb()))]);
+  }
+
+  const baseStadium = {
+    name: 'Legacy Pitch',
+    width: 420,
+    height: 200,
+    spawnDistance: 20,
+    kickStrength: 6,
+    // ball cGroup = 1 (bez bitów 64 i 128); dodatkowy dysk cGroup = -1 (ma bity 64 i 128!)
+    ball: { x: 0, y: 0, r: 10, cMask: 63, cGroup: 1 },
+    vertexes: [
+      { x: 50, y: -150 },
+      { x: 150, y: -150 },
+    ],
+    segments: [
+      { v0: 0, v1: 1, curveF: -1, bias: 5, vis: true, color: 0xffffff },
+    ],
+    planes: [
+      { nx: 0, ny: 1, dist: -200 },
+      { nx: 0, ny: -1, dist: -200 },
+      { nx: 1, ny: 0, dist: -420 },
+      { nx: -1, ny: 0, dist: -420 },
+    ],
+    goals: [
+      { x0: -200, y0: -60, x1: -200, y1: 60, team: 1 },
+      { x0: 200, y0: -60, x1: 200, y1: 60, team: 2 },
+    ],
+    discs: [
+      { x: -12, y: 0, r: 8, invMass: 0, cMask: 0, cGroup: -1 },
+    ],
+  };
+
+  it('SUPPORTED_REPLAY_VERSIONS obejmuje [1, 2, 3]', async () => {
+    const { SUPPORTED_REPLAY_VERSIONS } = await loadCore();
+    assert.deepEqual([...SUPPORTED_REPLAY_VERSIONS], [1, 2, 3]);
+  });
+
+  it('dekoduje i symuluje powtórkę v1 (bez znaczników, czat 144 zn., qa v1, kopnięcie i gol tylko na piłce)', async () => {
+    const pako = require('pako');
+    const { analyzeReplay, createReplay } = await loadCore();
+    const { w } = await import('@hbra/replay-core/haxball');
+    const stWriter = w.ha();
+    writeStadiumV12(stWriter, baseStadium, 1);
+    const stCompressed = pako.deflateRaw(stWriter.Sb());
+
+    const longChat = 'a'.repeat(144);
+    const v1Bytes = await buildLegacyReplay(1, {
+      totalFrames: 180,
+      stadium: baseStadium,
+      players: [
+        { id: 1, name: 'P1', team: 1, admin: true },
+        { id: 2, name: 'P2', team: 0 },
+      ],
+      events: [
+        // v1: 9=qa (zmiana stadionu), 5=Ma (start), 2=Na (czat), 1=Ga (input), 6=La (stop)
+        { dt: 0, pid: 1, type: 9, write: (wr) => { wr.Ub(stCompressed.byteLength); wr.Vb(stCompressed); } },
+        { dt: 1, pid: 1, type: 5, write: () => {} },
+        { dt: 0, pid: 1, type: 2, write: (wr) => wr.mc(longChat) },
+        { dt: 2, pid: 1, type: 1, write: (wr) => wr.tb(16) }, // kopnięcie piłki w prawo
+        { dt: 100, pid: 1, type: 6, write: () => {} },
+      ],
+    });
+
+    const r = analyzeReplay(v1Bytes, { positionsEvery: 30 });
+    assert.equal(r.header.version, 1);
+    assert.deepEqual(r.markers, []);
+    assert.equal(r.ticks, 180);
+    assert.equal(r.matches.length, 1);
+    assert.equal(r.matches[0].kicks.length, 1);
+    assert.equal(r.matches[0].scoreRed, 1);
+    assert.equal(r.matches[0].scoreBlue, 0);
+    assert.equal(r.matches[0].goals.length, 1);
+    assert.equal(r.matches[0].goals[0].scorer, 'P1');
+    assert.deepEqual(invariantErrors(r), []);
+
+    // createReplay + przewijanie wstecz (rep.ui())
+    const rep = createReplay(v1Bytes);
+    assert.equal(rep.replayVersion, 1);
+    assert.equal(rep.T.replayVersion, 1);
+    let chatMsg = null;
+    rep.T.rl = (_pl, msg) => { chatMsg = msg; };
+    while (rep.Y < rep.mf) {
+      while (rep.gg != null && rep.hg === rep.Y) { rep.gg.apply(rep.T); rep.Dl(); }
+      rep.Y++;
+      rep.T.C(1);
+    }
+    assert.equal(chatMsg, longChat);
+    assert.equal(rep.Lc.a, rep.Lc.o.byteLength);
+    rep.ui();
+    assert.equal(rep.Y, 0);
+    assert.equal(rep.T.K, null);
+  });
+
+  it('dekoduje i symuluje powtórkę v2 (znaczniki Cq, Ge=1, bias/curveF, trwająca gra O.ja, na/da/qa)', async () => {
+    const pako = require('pako');
+    const { analyzeReplay, createReplay } = await loadCore();
+    const { w } = await import('@hbra/replay-core/haxball');
+    const stV2 = { ...baseStadium, cameraFollow: 1 };
+    const stWriter = w.ha();
+    writeStadiumV12(stWriter, stV2, 2);
+    const stCompressed = pako.deflateRaw(stWriter.Sb());
+
+    const v2Bytes = await buildLegacyReplay(2, {
+      totalFrames: 120,
+      markers: [{ dt: 30, kind: 1 }, { dt: 60, kind: 2 }],
+      stadium: stV2,
+      game: {
+        discs: [
+          { x: 0, y: 0, r: 10, cMask: 63, cGroup: 1 },
+          { x: -12, y: 0, r: 8, invMass: 0, cMask: 0, cGroup: -1 },
+          { x: -20, y: 0, r: 15, cMask: 63, cGroup: 2 },
+        ],
+        Bb: 1, Pb: 2, Kb: 1, Hc: 12.5, ae: 1,
+      },
+      players: [
+        { id: 1, name: 'P1', team: 1, admin: true, discIdx: 2 },
+      ],
+      events: [
+        // v2: 0=na, 2=Ga, 3=Na, 6=Ma, 7=La, 9=da, 10=qa
+        { dt: 0, pid: 1, type: 0, write: (wr) => wr.l(1) },
+        { dt: 5, pid: 1, type: 2, write: (wr) => wr.tb(16) },
+        { dt: 1, pid: 1, type: 3, write: (wr) => wr.mc('v2 ok') },
+        { dt: 70, pid: 1, type: 7, write: () => {} },
+        { dt: 1, pid: 1, type: 9, write: (wr) => { wr.O(0); wr.O(5); } },
+        { dt: 1, pid: 1, type: 10, write: (wr) => { wr.Ub(stCompressed.byteLength); wr.Vb(stCompressed); } },
+      ],
+    });
+
+    const r = analyzeReplay(v2Bytes, { positionsEvery: 30 });
+    assert.equal(r.header.version, 2);
+    assert.equal(r.markers.length, 2);
+    assert.equal(r.markers[0].kind, 1);
+    assert.equal(r.markers[1].kind, 2);
+    assert.equal(r.matches[0].stadium.cameraFollow, 'player');
+    assert.equal(r.matches[0].kicks.length, 1);
+    for (const snap of r.positions) {
+      if (snap.ball) assert.ok(Number.isFinite(snap.ball[0]) && Number.isFinite(snap.ball[1]));
+      for (const [, px, py] of snap.players) assert.ok(Number.isFinite(px) && Number.isFinite(py));
+    }
+
+    const rep = createReplay(v2Bytes);
+    assert.equal(rep.replayVersion, 2);
+    assert.equal(rep.T.K.Pb, 2);
+    assert.equal(rep.T.K.Kb, 1);
+    assert.equal(rep.T.K.Hc, 12.5);
+  });
+
+  it('odrzuca nieobsługiwane wersje (v0, v4) błędem Kb i zachowuje jawny 3. argument Jb', async () => {
+    const { analyzeReplay, createReplay } = await loadCore();
+    const { Jb, Kb, fa, q } = await import('@hbra/replay-core/haxball');
+    for (const badVer of [0, 4]) {
+      const buf = Buffer.alloc(16);
+      buf.write('HBR2', 0, 'latin1');
+      buf.writeUInt32BE(badVer, 4);
+      buf.writeUInt32BE(10, 8);
+      for (const fn of [() => analyzeReplay(buf), () => createReplay(buf), () => new Jb(new Uint8Array(buf), new fa())]) {
+        assert.throws(fn, (e) => e instanceof q && e.Ta instanceof Kb && e.Ta.Id === badVer);
+      }
+    }
+    const v1Buf = await buildLegacyReplay(1, { totalFrames: 1, stadium: baseStadium });
+    assert.throws(() => new Jb(new Uint8Array(v1Buf), new fa(), 3), (e) => e instanceof q && e.Ta instanceof Kb && e.Ta.Id === 1);
+  });
+});

@@ -50,6 +50,7 @@ var REPLAY_MODERN_UI_CUTOFF = Date.UTC(2023, 3, 24);
 var currentReplayMeta = null;
 var currentReplayAutoStyle = 'modern';
 var currentReplayTimestamp = null;
+var currentReplayVersion = null;
 var activeChatDragCleanup = null;
 
 function clampChatHeight(a) {
@@ -93,7 +94,8 @@ function formatUtcDateShort(ts) {
 function autoUiStyleOptionLabel() {
   var styleName = 'classic' === currentReplayAutoStyle ? 'Classic' : 'Modern';
   var dateStr = formatUtcDateShort(currentReplayTimestamp);
-  return 'Auto (' + styleName + ' · ' + (dateStr ? dateStr : 'no date') + ')';
+  var suffix = dateStr ? dateStr : (null != currentReplayVersion && 3 > currentReplayVersion ? 'v' + currentReplayVersion : 'no date');
+  return 'Auto (' + styleName + ' · ' + suffix + ')';
 }
 
 function extractFilenameFromContentDisposition(header) {
@@ -147,6 +149,7 @@ function resolveReplayTimestamp(meta) {
 
 function setCurrentReplayMeta(meta) {
   currentReplayMeta = meta || null;
+  currentReplayVersion = null;
   var ts = resolveReplayTimestamp(currentReplayMeta);
   currentReplayTimestamp = ts;
   currentReplayAutoStyle = (null != ts && ts < REPLAY_MODERN_UI_CUTOFF) ? 'classic' : 'modern';
@@ -4943,6 +4946,8 @@ u.po = function (a) {
 u.analysisDone = function (a, result) {
   try {
     lastAnalysis = result;
+    currentReplayVersion = result && result.header ? result.header.version : null;
+    if (null != currentReplayVersion && 3 > currentReplayVersion) currentReplayAutoStyle = 'classic';
     players = result.playerEntries.map(function (p) { return { V: p.id, w: p.name } });
     replayerHooks.onProgress(1);
     replayerHooks.onPlayerList(result.playerList);
@@ -4965,7 +4970,7 @@ u.resourcesFailed = function () {
 u.openPlayer = function (a) {
   try {
     // odtwarzacz tylko do oglądania: start na początku, pauza, 1x (ha)
-    var b = new Vb(new Jb(new Uint8Array(a), new fa, 3));
+    var b = new Vb(new Jb(new Uint8Array(a), new fa));
     b.je.de = function () {
       b.ia();
       u.xb()

@@ -544,7 +544,7 @@ function Home() {
         </div>
         <div className='dialog'>
           <h1>Haxball Replay Analyzer v{version}</h1>
-          <p>Contact: <br />Discord: Falafel#3895, you can find me at discord.io/haxracing<br />turbofalafel@gmail.com</p>
+          <p>Contact: <br />Discord: falafel96, you can find me at <a href="https://haxracing.com/discord" target="_blank" rel="noreferrer">haxracing.com/discord</a><br />turbofalafel@gmail.com</p>
           <div className='file-btn'>
             <label htmlFor='replayfile'>
               <span style={{ float: 'left' }}>►</span>

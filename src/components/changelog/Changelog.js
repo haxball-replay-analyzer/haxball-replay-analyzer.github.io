@@ -5,6 +5,13 @@ import { useEffect } from 'react';
 
 const changelog = [
   {
+    version: '3.3.7',
+    date: '25.11.2026',
+    changes: [
+      'Added support for older replay files (.hbr2 versions 1 and 2 from 2018–2019) in both the player and match statistics'
+    ]
+  },
+  {
     version: '3.3.6',
     date: '22.11.2026',
     changes: [

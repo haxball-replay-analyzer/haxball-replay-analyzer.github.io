@@ -10,6 +10,8 @@
 
 import pako from 'pako';
 
+var SUPPORTED_REPLAY_VERSIONS = Object.freeze([1, 2, 3]);
+
 // Limit bajtów po rozpakowaniu (TD-043, dopisek HBRA): wspólny budżet dla każdego inflateRaw
 // (zdarzenia w Jb i stadiony w Pa.va), ustawiany przez analyzeReplay na czas analizy.
 // Rozpakowanie strumieniowe przerywa się po przekroczeniu budżetu, więc mały plik z dużym blokiem
@@ -103,6 +105,7 @@ function L() {
   this.wa = new H(0, 0)
 }
 function Fa() {
+  this.replayVersion = 3;
   this.hc = - 1;
   this.gc = null;
   this.F = [
@@ -218,6 +221,7 @@ function ea() {
   this.cb = !1
 }
 function fa() {
+  this.replayVersion = 3;
   this.hc = - 1;
   this.S = this.gc = null;
   this.yd = 2;
@@ -342,11 +346,17 @@ function Jb(a, b, c) {
   a = new F(new DataView(a.buffer), !1);
   if (1212305970 != a.hb()) throw new q('');
   b = a.hb();
-  if (c != b) throw new q(new Kb(b));
+  if (null == c) {
+    if (0 > SUPPORTED_REPLAY_VERSIONS.indexOf(b)) throw new q(new Kb(b));
+  } else if (Array.isArray(c)) {
+    if (0 > c.indexOf(b)) throw new q(new Kb(b));
+  } else if (c != b) throw new q(new Kb(b));
+  this.replayVersion = b;
+  this.T.replayVersion = b;
   this.mf = a.hb();
   c = inflateRawLimited(a.sb());
   this.Lc = new F(new DataView(c.buffer, c.byteOffset, c.byteLength));
-  this.Cq(this.Lc);
+  2 <= this.replayVersion && this.Cq(this.Lc);
   c = this.Lc.sb();
   this.Lc = new F(new DataView(c.buffer, c.byteOffset, c.byteLength), !1);
   this.ui();
@@ -814,12 +824,16 @@ m.lj = function (a, b) {
   b.l(c);
   a.ua(b)
 };
-m.fh = function (a) {
-  var b = a.B(),
-    b = Object.create(m.Qm.get(b).prototype);
+m.fh = function (a, version) {
+  null == version && (version = 3);
+  var table = m.QmByVersion && m.QmByVersion[version] || m.Qm,
+    id = a.B(),
+    cls = table.get(id);
+  if (null == cls) throw new q('Unknown action ' + id + ' for replay version ' + version);
+  var b = Object.create(cls.prototype);
   b.da = 0;
   b.mb = 0;
-  b.va(a);
+  b.va(a, version);
   return b
 };
 m.prototype = {
@@ -1005,7 +1019,7 @@ V.prototype = C(yb.prototype, {
   },
   Dl: function () {
     var a = this.Lc;
-    0 < a.o.byteLength - a.a ? (a = this.Lc.Ab(), this.hg += a, a = this.Lc.Ob(), this.gg = m.fh(this.Lc), this.gg.P = a) : this.gg = null
+    0 < a.o.byteLength - a.a ? (a = this.Lc.Ab(), this.hg += a, a = this.Lc.Ob(), this.gg = m.fh(this.Lc, this.replayVersion), this.gg.P = a) : this.gg = null
   },
   Go: function () {
     return this.Y / this.mf
@@ -1047,7 +1061,8 @@ V.prototype = C(yb.prototype, {
   ui: function () {
     this.hg = 0;
     this.Qb = this.Y = this.Lc.a = 0;
-    this.T.ja(this.Lc);
+    this.T.replayVersion = this.replayVersion;
+    this.T.ja(this.Lc, this.replayVersion);
     this.Dl()
   },
   f: Jb
@@ -1082,7 +1097,7 @@ ua.prototype = {
     a.O(this.h);
     a.O(this.v)
   },
-  ja: function (a) {
+  ja: function (a, version) {
     var b = this.a;
     b.x = a.u();
     b.y = a.u();
@@ -1090,8 +1105,7 @@ ua.prototype = {
     b.x = a.u();
     b.y = a.u();
     b = this.oa;
-    b.x = a.u();
-    b.y = a.u();
+    null == version || 3 <= version ? (b.x = a.u(), b.y = a.u()) : (b.x = 0, b.y = 0);
     this.Z = a.u();
     this.m = a.u();
     this.aa = a.u();
@@ -1149,6 +1163,7 @@ O.qd = function (a, b) {
 O.prototype = {
   Wo: function (a) {
     this.Ma = a;
+    this.ta.replayVersion = a.replayVersion;
     this.ib = a.ib;
     this.Da = a.Da;
     this.S = a.S;
@@ -1192,6 +1207,7 @@ O.prototype = {
       null != b && b();
       var footballStats = this.Ma.statsListener; // createFootballStats() podpięte do pokoju (tylko analiza)
       null != footballStats && footballStats.beforeTick(this);
+      var legacy = null != this.Ma && 3 > this.Ma.replayVersion;
       for (var b = this.Ma.I, c = 0; c < b.length;) {
         var d = b[c];
         ++c;
@@ -1202,7 +1218,32 @@ O.prototype = {
           d.yc < this.Ma.ce && d.yc++;
           if (d.Wb && 0 >= d.Sc && 0 <= d.yc) {
             // console.log("iksnął", d.w, d.Wb, d.Sc, d.yc);
-            for (var f = !1, g = 0, k = this.ta.F; g < k.length;) {
+            var f = !1;
+            if (legacy) {
+              var l = this.ta.F[0];
+              if (null != l && l != d.H) {
+                var t = l.a,
+                  h = d.H.a,
+                  m = t.x - h.x,
+                  t = t.y - h.y,
+                  h = Math.sqrt(m * m + t * t);
+                if (4 > h - l.Z - d.H.Z) {
+                  let ball = { x: l.a.x, y: l.a.y };
+                  let ballDisc = l;
+                  var f = m / h,
+                    m = t / h,
+                    t = e.Re,
+                    n = h = l.D,
+                    l = l.aa;
+                  h.x = n.x + f * t * l;
+                  h.y = n.y + m * t * l;
+                  ball.vx = h.x;
+                  ball.vy = h.y;
+                  null != footballStats && footballStats.onKick(d, ball, ballDisc);
+                  f = !0
+                }
+              }
+            } else for (var g = 0, k = this.ta.F; g < k.length;) {
               var l = k[g];
               ++g;
               if (0 != (l.v & 64) && l != d.H) {
@@ -1260,10 +1301,13 @@ O.prototype = {
       }
       c = 0;
       d = this.ta.F;
-      e = 0;
-      for (g = d.length; e < g;) f = e++,
-        k = d[f],
-        0 != (k.v & 128) && (O.dk[c] = f, f = O.Yk[c], k = k.a, f.x = k.x, f.y = k.y, ++c);
+      if (legacy) 0 < d.length && (O.dk[0] = 0, f = O.Yk[0], k = d[0].a, f.x = k.x, f.y = k.y, c = 1);
+      else {
+        e = 0;
+        for (g = d.length; e < g;) f = e++,
+          k = d[f],
+          0 != (k.v & 128) && (O.dk[c] = f, f = O.Yk[c], k = k.a, f.x = k.x, f.y = k.y, ++c);
+      }
       this.ta.C(a);
       if (0 == this.Bb) {
         for (a = 0; a < b.length;) c = b[a],
@@ -1338,17 +1382,13 @@ O.prototype = {
     a.O(this.Oa);
     a.l(this.ae.$)
   },
-  ja: function (a, b) {
-    this.ta.ja(a);
-    this.vc = a.M();
-    this.Bb = a.M();
-    this.Pb = a.M();
-    this.Kb = a.M();
-    this.Hc = a.u();
-    this.Oa = a.M();
+  ja: function (a, b, version) {
+    this.ta.ja(a, version);
+    null != version && 3 > version ? (a.M(), this.vc = a.M(), this.Bb = a.M(), a.u(), a.u(), this.Pb = a.M(), this.Kb = a.M(), this.Hc = a.u(), this.Oa = a.M()) : (this.vc = a.M(), this.Bb = a.M(), this.Pb = a.M(), this.Kb = a.M(), this.Hc = a.u(), this.Oa = a.M());
     var c = a.lf();
     this.ae = 1 == c ? p.fa : 2 == c ? p.xa : p.Ia;
     this.Ma = b;
+    this.ta.replayVersion = b.replayVersion;
     this.ib = b.ib;
     this.Da = b.Da;
     this.S = b.S;
@@ -1405,7 +1445,7 @@ Eb.prototype = {
     a.s(this.Z);
     a.s(this.Se)
   },
-  ja: function (a) {
+  ja: function (a, version) {
     this.m = a.u();
     this.aa = a.u();
     this.Ca = a.u();
@@ -1413,12 +1453,14 @@ Eb.prototype = {
     this.Te = a.u();
     this.Ue = a.u();
     this.Re = a.u();
-    var b = this.oa;
-    b.x = a.u();
-    b.y = a.u();
-    this.v = a.M();
-    this.Z = a.u();
-    this.Se = a.u()
+    if (null == version || 3 <= version) {
+      var b = this.oa;
+      b.x = a.u();
+      b.y = a.u();
+      this.v = a.M();
+      this.Z = a.u();
+      this.Se = a.u()
+    }
   },
   f: Eb
 };
@@ -1427,9 +1469,9 @@ Bb.prototype = {
   f: Bb
 };
 h.b = !0;
-h.ja = function (a) {
+h.ja = function (a, version) {
   var b = a.B();
-  return 255 == b ? (b = new h, b.Kr(a), b) : h.Kh()[b]
+  return 255 == b ? (b = new h, b.Kr(a, version), b) : h.Kh()[b]
 };
 h.Kh = function () {
   if (null == h.wb) {
@@ -1882,7 +1924,8 @@ h.prototype = {
         a.s(d.y)
     }
   },
-  Kr: function (a) {
+  Kr: function (a, version) {
+    null == version && (version = 3);
     function b() {
       for (var b = [
       ], c = a.B(), d = 0; d < c;) {
@@ -1905,11 +1948,21 @@ h.prototype = {
     this.$b = a.u();
     this.qc = a.u();
     this.kc = a.u();
-    this.ge.ja(a);
-    this.Ye = a.Ob();
-    this.Ge = a.B();
-    this.Lf = 0 != a.B();
-    this.pf = 0 != a.B();
+    this.ge.ja(a, version);
+    var ball = null;
+    if (3 > version) {
+      ball = new ua;
+      ball.ja(a, version);
+      this.Ye = a.Ob();
+      this.Ge = 2 <= version ? a.B() : 0;
+      this.Lf = !0;
+      this.pf = !1
+    } else {
+      this.Ye = a.Ob();
+      this.Ge = a.B();
+      this.Lf = 0 != a.B();
+      this.pf = 0 != a.B()
+    }
     this.J = [
     ];
     for (var c = a.B(), d = 0; d < c;) {
@@ -1923,7 +1976,7 @@ h.prototype = {
     c = a.B();
     for (d = 0; d < c;) ++d,
       e = new E,
-      e.ja(a, this.J),
+      e.ja(a, this.J, version),
       this.U.push(e);
     this.qa = [
     ];
@@ -1939,26 +1992,32 @@ h.prototype = {
       e = new sb,
       e.ja(a),
       this.tc.push(e);
-    this.F = [
+    this.F = null != ball ? [ball] : [
     ];
     c = a.B();
     for (d = 0; d < c;) ++d,
       e = new ua,
-      e.ja(a),
+      e.ja(a, version),
       this.F.push(e);
-    this.pb = [
-    ];
-    c = a.B();
-    for (d = 0; d < c;) ++d,
-      e = new nb,
-      e.ja(a),
-      this.pb.push(e);
-    this.Dd = b();
-    this.md = b();
-    this.he()
+    if (3 > version) {
+      this.pb = [];
+      this.Dd = [];
+      this.md = []
+    } else {
+      this.pb = [
+      ];
+      c = a.B();
+      for (d = 0; d < c;) ++d,
+        e = new nb,
+        e.ja(a),
+        this.pb.push(e);
+      this.Dd = b();
+      this.md = b();
+    }
+    this.he(version)
   },
-  he: function () {
-    for (var a = 0, b = this.U; a < b.length;) b[a++].he()
+  he: function (version) {
+    for (var a = 0, b = this.U; a < b.length;) b[a++].he(version)
   },
   Pe: function () {
     return 255 != this.Bh
@@ -2634,6 +2693,7 @@ fa.Rd = [
   cc
 ];
 fa.qd = function (a, b) {
+  a.replayVersion = b.replayVersion;
   a.jc = b.jc;
   if (null ==
     b.I) a.I = null;
@@ -2722,22 +2782,22 @@ fa.prototype = {
     this.kb[1].ga(a);
     this.kb[2].ga(a)
   },
-  ja: function (a) {
+  ja: function (a, version) {
+    null == version && (version = 3);
+    this.replayVersion = version;
     this.jc = a.zb();
     this.Pc = 0 != a.B();
     this.ib = a.M();
     this.Da = a.M();
-    this.ce = a.ni();
-    this.Zc = a.B();
-    this.yd = a.B();
-    this.S = h.ja(a);
+    3 <= version ? (this.ce = a.ni(), this.Zc = a.B(), this.yd = a.B()) : (this.ce = 0, this.Zc = 0, this.yd = 0);
+    this.S = h.ja(a, version);
     var b = 0 != a.B();
     this.K = null;
-    b && (this.K = new O, this.K.ja(a, this));
+    b && (this.K = new O, this.K.ja(a, this, version));
     for (var b = null == this.K ? null : this.K.ta.F, c = a.B(), d = this.I; d.length > c;) d.pop();
     for (d = 0; d < c;) {
       var e = new ea;
-      e.va(a, b);
+      e.va(a, b, version);
       this.I[d++] = e
     }
     this.kb[1].ja(a);
@@ -2823,11 +2883,12 @@ ea.prototype = {
     a.Xi(null ==
       this.H ? - 1 : this.H.jl)
   },
-  va: function (a, b) {
+  va: function (a, b, version) {
+    null == version && (version = 3);
     this.cb = 0 != a.B();
     this.Jb = a.M();
     this.Xb = a.zb();
-    this.Jd = a.zb();
+    this.Jd = 3 <= version ? a.zb() : null;
     this.Ld = 0 != a.B();
     this.Kd = a.zb();
     this.Ug = a.M();
@@ -2835,8 +2896,7 @@ ea.prototype = {
     this.ob = a.M();
     this.V = a.Ab();
     this.Wb = 0 != a.B();
-    this.yc = a.ni();
-    this.Sc = a.B();
+    3 <= version ? (this.yc = a.ni(), this.Sc = a.B()) : (this.yc = 0, this.Sc = 0);
     var c = a.lf();
     this.ea = 1 == c ? p.fa : 2 == c ? p.xa : p.Ia;
     c = a.ni();
@@ -3024,9 +3084,9 @@ da.prototype = C(m.prototype, {
     a.Ub(b.byteLength);
     a.Vb(b)
   },
-  va: function (a) {
+  va: function (a, version) {
     a = inflateRawLimited(a.sb(a.Ob()));
-    this.Pd = h.ja(new F(new DataView(a.buffer, a.byteOffset, a.byteLength)))
+    this.Pd = h.ja(new F(new DataView(a.buffer, a.byteOffset, a.byteLength)), version)
   },
   f: qa
 }); Pa.b = !0; Pa.ma = m; Pa.prototype = C(m.prototype, {
@@ -3141,9 +3201,9 @@ da.prototype = C(m.prototype, {
   ua: function (a) {
     a.mc(U.Qc(this.Tc, 140))
   },
-  va: function (a) {
+  va: function (a, version) {
     this.Tc = a.ic();
-    if (140 < this.Tc.length) throw new q('message too long');
+    if ((null == version || 3 <= version) && 140 < this.Tc.length) throw new q('message too long');
   },
   f: Na
 }); Ga.b = !0; Ga.ma = m; Ga.prototype = C(m.prototype, {
@@ -3206,7 +3266,15 @@ da.prototype = C(m.prototype, {
   m.Ha(pb);
   m.Ha(ma);
   m.Ha(qb);
-  m.Ha(ob)
+  m.Ha(ob);
+  var v1 = [Ua, Ga, Na, oa, Y, Ma, La, Oa, da, qa, S, pa, sa, Qa, ta, la, ra, Pa, pb],
+    v2 = [na, Ua, Ga, Na, oa, Y, Ma, La, Oa, da, qa, S, pa, sa, Qa, ta, la, ra, Pa, pb],
+    m1 = new Map,
+    m2 = new Map,
+    i;
+  for (i = 0; i < v1.length; i++) m1.set(i, v1[i]);
+  for (i = 0; i < v2.length; i++) m2.set(i, v2[i]);
+  m.QmByVersion = { 1: m1, 2: m2, 3: m.Qm }
 }; Y.b = !0; Y.la = function (a, b, c) {
   var d = new Y;
   d.V = a;
@@ -3456,7 +3524,7 @@ da.prototype = C(m.prototype, {
     a.O(this.h);
     a.O(this.v)
   },
-  ja: function (a) {
+  ja: function (a, version) {
     var b = this.a;
     b.x = a.u();
     b.y = a.u();
@@ -3464,8 +3532,7 @@ da.prototype = C(m.prototype, {
     b.x = a.u();
     b.y = a.u();
     b = this.oa;
-    b.x = a.u();
-    b.y = a.u();
+    null == version || 3 <= version ? (b.x = a.u(), b.y = a.u()) : (b.x = 0, b.y = 0);
     this.Z = a.u();
     this.m = a.u();
     this.aa = a.u();
@@ -3623,6 +3690,7 @@ da.prototype = C(m.prototype, {
 }; Fa.b = !0; Fa.Rd = [
   Ta
 ]; Fa.qd = function (a, b) {
+  a.replayVersion = b.replayVersion;
   if (null == b.F) a.F = null;
   else {
     null == a.F && (a.F = [
@@ -3647,13 +3715,13 @@ da.prototype = C(m.prototype, {
       e.ga(a)
     }
   },
-  ja: function (a) {
+  ja: function (a, version) {
     this.F = [
     ];
     for (var b = a.B(), c = 0; c < b;) {
       ++c;
       var d = new ca;
-      d.ja(a);
+      d.ja(a, version);
       this.F.push(d)
     }
   },
@@ -3669,8 +3737,7 @@ da.prototype = C(m.prototype, {
       f = e = d.D;
       g = d.oa;
       d = d.Ca;
-      e.x = (f.x + g.x) * d;
-      e.y = (f.y + g.y) * d
+      null != this.replayVersion && 3 > this.replayVersion ? (e.x = f.x * d, e.y = f.y * d) : (e.x = (f.x + g.x) * d, e.y = (f.y + g.y) * d)
     }
     a = 0;
     for (b = this.F.length; a < b;) {
@@ -3760,17 +3827,29 @@ da.prototype = C(m.prototype, {
     a.O(this.h);
     a.O(this.v)
   },
-  ja: function (a, b) {
-    var c = a.B();
-    this.W = b[a.B()];
-    this.ca = b[a.B()];
-    this.Cc = 0 != (c & 1) ? a.u() : 0;
-    this.vb = 0 != (c & 2) ? a.u() : 1 / 0;
-    this.R = 0 != (c & 4) ? a.M() : 0;
-    this.Za = 0 != (c & 8);
-    this.m = a.u();
-    this.h = a.M();
-    this.v = a.M()
+  ja: function (a, b, version) {
+    if (1 == version) {
+      this.W = b[a.B()];
+      this.ca = b[a.B()];
+      this.Cc = 0;
+      this.m = a.u();
+      this.h = a.M();
+      this.v = a.M();
+      this.vb = a.u();
+      this.Za = 0 != a.B();
+      this.R = a.M()
+    } else {
+      var c = a.B();
+      this.W = b[a.B()];
+      this.ca = b[a.B()];
+      this.Cc = 0 != (c & 1) ? a.u() : 0;
+      this.vb = 0 != (c & 2) ? a.u() : 1 / 0;
+      this.R = 0 != (c & 4) ? a.M() : 0;
+      this.Za = 0 != (c & 8);
+      this.m = a.u();
+      this.h = a.M();
+      this.v = a.M()
+    }
   },
   Oc: function (a) {
     a *= 0.017453292519943295;
@@ -3786,7 +3865,7 @@ da.prototype = C(m.prototype, {
   Co: function () {
     return 0 != 0 * this.vb ? 0 : 114.59155902616465 * Math.atan(1 / this.vb)
   },
-  he: function () {
+  he: function (version) {
     if (0 == 0 * this.vb) {
       var a = this.ca.a,
         b = this.W.a,
@@ -3795,7 +3874,7 @@ da.prototype = C(m.prototype, {
         b = this.W.a,
         d = this.vb;
       this.Xd = new H(b.x + c + - a * d, b.y + a + c * d);
-      a = this.W.a;
+      a = 1 == version ? this.ca.a : this.W.a;
       b = this.Xd;
       c = a.x - b.x;
       a = a.y - b.y;
@@ -4092,7 +4171,8 @@ r.sn = {
 }.toString;
 
 export {
-  Ab, Bb, C, Cb, D, F, Ga, H, Ia, J, Jb, K, Kb, La, Ma, Na, Oa, Pa, Qa, S, U, Ua, V, Y,
-  addRoomListener, da, ea, ec, fa, h, ia, ka, kc, la, m, ma, na, oa, p, pa, q, qa, r, ra,
-  inflateRawLimited, removeRoomListener, sa, setInflateBudget, ta, vb, w, y
+  Ab, Bb, C, Cb, D, F, Ga, H, Ia, J, Jb, K, Kb, La, Ma, Na, Oa, Pa, Qa, S,
+  SUPPORTED_REPLAY_VERSIONS, U, Ua, V, Y, addRoomListener, da, ea, ec, fa, h,
+  ia, ka, kc, la, m, ma, na, oa, p, pa, q, qa, r, ra, inflateRawLimited,
+  removeRoomListener, sa, setInflateBudget, ta, vb, w, y
 };
