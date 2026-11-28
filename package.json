@@ -5,7 +5,7 @@
   "workspaces": [
     "packages/*"
   ],
-  "homepage": "https://haxball-replay-analyzer.github.io",
+  "homepage": "https://haxball-replay-analyzer.com",
   "dependencies": {
     "@emotion/react": "^11.11.0",
     "@emotion/styled": "^11.11.0",

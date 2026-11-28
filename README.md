@@ -1,5 +1,5 @@
 # Haxball Replay Analyzer
-https://haxball-replay-analyzer.github.io
+https://haxball-replay-analyzer.com
 
 A tool for analyzing haxball recordings (.hbr2). It decrypts Uint8Array files and allow you to check various statistics:  
 • scores, kicks, shots on goal, passes, ball possession  
