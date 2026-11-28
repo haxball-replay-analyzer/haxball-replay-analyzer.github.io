@@ -5,6 +5,13 @@ import { useEffect } from 'react';
 
 const changelog = [
   {
+    version: '3.3.8',
+    date: '28.11.2026',
+    changes: [
+      'Pin the camera to any point on the field: hold Shift and click. Pick a player or the ball in Settings → Video → Player To Follow (or click on them) to follow them again. Thanks to Facundo Tuñas'
+    ]
+  },
+  {
     version: '3.3.7',
     date: '25.11.2026',
     changes: [

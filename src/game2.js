@@ -585,8 +585,13 @@ function removePopups() {
 var players = [], playSounds = false, autoClick = false, autoClickValue;
 var lastAnalysis = null; // wynik analyzeReplay() wczytanej powtórki
 var playerToFollow = 0, mainCanvas;
-// camera pinned to a point in the room (Shift+click): {x, y} or null (TD-0xx)
+// kamera przypięta do punktu boiska (Shift+klik, PR #16): {x, y} albo null
 var cameraPoint = null;
+// wpis przypiętego punktu na liście „Player To Follow” (ta sama nazwa przy budowaniu listy i przy zmianie)
+var CAMERA_POINT_LABEL = '[STATIC POINT]';
+// ostatnie położenie myszy nad boiskiem ({clientX, clientY}; null = poza canvasem): kursor
+// zmienia się też po wciśnięciu albo puszczeniu Shift bez ruchu myszy
+var canvasMouse = null, shiftCursorListeners = false;
 // ostatnia narysowana klatka, dla wyboru gracza kliknięciem na boisku (TD-038):
 // odwrotność przekształcenia canvasu (piksele → współrzędne boiska) i pokój z tej klatki
 var followView = { toWorld: null, room: null };
@@ -612,11 +617,11 @@ function playersToFollowList() {
   var html = list.map(function (p) {
     return '<option value=' + p.id + (null == cameraPoint && playerToFollow == p.id ? ' selected' : '') + '>[' + p.id + '] ' + escapeHtml(p.name) + '</option>'
   }).join('');
-  if (null != cameraPoint) html += '<option value="fixed" selected>[STATIC POINT]</option>';
+  if (null != cameraPoint) html += '<option value="fixed" selected>' + CAMERA_POINT_LABEL + '</option>';
   return html;
 }
 
-// keep the "Player To Follow" select in sync with a pinned camera point
+// lista „Player To Follow” w ustawieniach zgodna z wyborem: gracz, piłka albo przypięty punkt
 function updateFollowSelect() {
   var select = document.getElementById('selectPlayerToFollow');
   if (null == select) return;
@@ -625,7 +630,7 @@ function updateFollowSelect() {
     if (null == fixed) {
       fixed = document.createElement('option');
       fixed.value = 'fixed';
-      fixed.textContent = 'FIXED POINT';
+      fixed.textContent = CAMERA_POINT_LABEL;
       select.appendChild(fixed);
     }
     select.value = 'fixed';
@@ -635,7 +640,7 @@ function updateFollowSelect() {
   }
 }
 
-// point in the room under the cursor in the last frame: {x, y} or null
+// punkt boiska pod kursorem w ostatniej klatce: {x, y} albo null
 function pointUnderCursor(e) {
   var toWorld = followView.toWorld;
   if (null == mainCanvas || null == toWorld) return null;
@@ -669,37 +674,54 @@ function setPlayerToFollow(id) {
   updateFollowSelect();
 }
 
-// pin the camera to a point in the room; detaches player/ball following
+// przypina kamerę do punktu boiska; kończy śledzenie gracza i piłki
 function setCameraPoint(pt) {
   playerToFollow = 0;
   cameraPoint = pt ? { x: pt.x, y: pt.y } : null;
   updateFollowSelect();
 }
 
+// kursor nad boiskiem: krzyżyk z Shift (przypięcie punktu), rączka nad dyskiem do śledzenia
+function updateCanvasCursor(shift) {
+  if (null == mainCanvas || null == canvasMouse) return;
+  if (shift) {
+    mainCanvas.style.cursor = 'crosshair';
+    return;
+  }
+  var id = discUnderCursor(canvasMouse);
+  // przy przypiętym punkcie playerToFollow = 0, a kliknięcie piłki też odpina kamerę
+  mainCanvas.style.cursor = null != id && (id != playerToFollow || null != cameraPoint) ? 'pointer' : '';
+}
+
 function getCanvas(a) {
   mainCanvas = a;
   mainCanvas.onmousemove = function (e) {
-    if (e.shiftKey) {
-      mainCanvas.style.cursor = 'crosshair';
-      return;
-    }
-    var id = discUnderCursor(e);
-    mainCanvas.style.cursor = null != id && id != playerToFollow ? 'pointer' : '';
+    canvasMouse = { clientX: e.clientX, clientY: e.clientY };
+    updateCanvasCursor(e.shiftKey);
+  }
+  mainCanvas.onmouseleave = function () {
+    canvasMouse = null;
   }
   mainCanvas.onclick = function (e) {
+    canvasMouse = { clientX: e.clientX, clientY: e.clientY };
     if (e.shiftKey) {
       var pt = pointUnderCursor(e);
-      if (null != pt) {
-        setCameraPoint(pt);
-        mainCanvas.style.cursor = '';
-      }
-      return;
+      if (null != pt) setCameraPoint(pt);
+    } else {
+      var id = discUnderCursor(e);
+      if (null != id) setPlayerToFollow(id);
     }
-    var id = discUnderCursor(e);
-    if (null != id) {
-      setPlayerToFollow(id);
-      mainCanvas.style.cursor = '';
-    }
+    updateCanvasCursor(e.shiftKey);
+  }
+  // getCanvas działa przy każdym nowym widoku gry: nasłuch klawisza Shift tylko raz;
+  // w fazie przechwytywania, żeby obsługa klawiszy gry go nie zatrzymała
+  if (!shiftCursorListeners) {
+    shiftCursorListeners = true;
+    var onShift = function (e) {
+      if ('Shift' == e.key) updateCanvasCursor('keydown' == e.type);
+    };
+    window.addEventListener('keydown', onShift, true);
+    window.addEventListener('keyup', onShift, true);
   }
 }
 
@@ -5715,8 +5737,8 @@ Tb.prototype = {
           translatetoDisc.y = followedPlayer.H.a.y;
         }
       }
-      // a pinned point (Shift+click) takes precedence; clamped so the view stays inside the
-      // stadium, like the ball-following camera (Xn, TD-0xx)
+      // przypięty punkt (Shift+klik) ma pierwszeństwo; ograniczony tak, żeby kadr nie wychodził
+      // poza stadion, jak kamera piłki (Xn)
       if (null != cameraPoint) {
         var halfW = 0.5 * n, halfH = 0.5 * m;
         translatetoDisc = {
@@ -7991,7 +8013,7 @@ R.kn = new Ib([0,
   3,
   1]);
 mb.N = '<div class=\'dialog change-location-view\'><h1>Change Location</h1><div class=\'splitter\'><div class=\'list\' data-hook=\'list\'></div><div class=\'buttons\'><button data-hook=\'change\'>Change</button><button data-hook=\'cancel\'>Cancel</button></div></div></div>';
-Da.N = '<div class=\'chatbox-view\'><div class=\'chatbox-view-contents\'><div data-hook=\'drag\' class=\'drag\'></div><div data-hook=\'log\' class=\'log subtle-thin-scrollbar\'><div data-hook=\'log-contents\' class=\'log-contents\'><p>Controls:<br/>Move: WASD or Arrows<br/>Kick: X, Space, Ctrl, Shift, Numpad 0<br/>View: Numbers 1 to 4<br/>Toggle chat: C</p></div></div><div class=\'autocompletebox\' data-hook=\'autocompletebox\'></div><div class=\'input\'><input data-hook=\'input\' type=\'text\' /><button data-hook=\'send\'>Send</button></div></div></div>';
+Da.N = '<div class=\'chatbox-view\'><div class=\'chatbox-view-contents\'><div data-hook=\'drag\' class=\'drag\'></div><div data-hook=\'log\' class=\'log subtle-thin-scrollbar\'><div data-hook=\'log-contents\' class=\'log-contents\'><p>Controls:<br/>Move: WASD or Arrows<br/>Kick: X, Space, Ctrl, Shift, Numpad 0<br/>View: Numbers 1 to 4<br/>Toggle chat: C<br/>Follow a player: click on them<br/>Pin the camera: Shift+click</p></div></div><div class=\'autocompletebox\' data-hook=\'autocompletebox\'></div><div class=\'input\'><input data-hook=\'input\' type=\'text\' /><button data-hook=\'send\'>Send</button></div></div></div>';
 kb.N = '<div class=\'choose-nickname-view\'><img src="https://kpias760.github.io/haxball-replay-analyzer.github.io/images/falafcio.png" /><div class=\'dialog\'><h1>Haxball Replay Analyzer</h1><div style=\'display: none\' class=\'label-input\'><label>Nick:</label><input data-hook=\'input\' type=\'text\' /></div><button id=\'button_ok\' data-hook=\'ok\'>Start</button></div></div>';
 jb.N = '<div class=\'connecting-view\'><div class=\'dialog\'><h1>Connecting</h1><div class=\'connecting-view-log\' data-hook=\'log\'></div><button data-hook=\'cancel\'>Cancel</button></div></div>';
 ib.N = '<div class=\'create-room-view\'><div class=\'dialog\'><h1>Create room</h1><div class=\'label-input\'><label>Room name:</label><input data-hook=\'name\' required /></div><div class=\'label-input\'><label>Password:</label><input data-hook=\'pass\' /></div><div class=\'label-input\'><label>Max players:</label><select data-hook=\'max-pl\'></select></div><button data-hook=\'unlisted\'></button><div class=\'row\'><button data-hook=\'cancel\'>Cancel</button><button data-hook=\'create\'>Create</button></div></div></div>';
